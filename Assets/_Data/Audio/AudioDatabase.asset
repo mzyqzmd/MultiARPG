@@ -1,0 +1,210 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0958a366abd7e4faecb74e250aeb1e, type: 3}
+  m_Name: AudioDatabase
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 8300000, guid: c9fa4f0b04cbbbb47ab5ff57c6bf7610, type: 3}
+    - {fileID: 8300000, guid: 3e764b6369299f248a8ec7fa4c089ee3, type: 3}
+    - {fileID: 24300002, guid: 994e39754bc4ebf44a9343f2aade3988, type: 2}
+    - {fileID: 8300000, guid: 1d73c2ae6713f274cb4a52c5abbb1558, type: 3}
+    - {fileID: 8300000, guid: 73458f5d709c2b94d9d9b1ada032f50f, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: _audioDictionary
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.Dictionary`2[[System.String,
+        mscorlib],[AudioClipData, Assembly-CSharp]], mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Player
+    - Name: $v
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[AudioClipData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: DodgeSFX
+    - Name: $v
+      Entry: 7
+      Data: 4|AudioClipData, Assembly-CSharp
+    - Name: _clips
+      Entry: 7
+      Data: 5|System.Collections.Generic.List`1[[UnityEngine.AudioClip, UnityEngine.AudioModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _priority
+      Entry: 3
+      Data: 128
+    - Name: _isRandomVolume
+      Entry: 5
+      Data: true
+    - Name: _volume
+      Entry: 4
+      Data: 1
+    - Name: _volumeRandomMin
+      Entry: 4
+      Data: 0.1
+    - Name: _isRandomPitch
+      Entry: 5
+      Data: true
+    - Name: _pitch
+      Entry: 4
+      Data: 1
+    - Name: _pitchRandomMin
+      Entry: 4
+      Data: 0.1
+    - Name: _spatialBlend
+      Entry: 4
+      Data: 1
+    - Name: _mixerGroup
+      Entry: 10
+      Data: 2
+    - Name: _loop
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ExhaustedBreath
+    - Name: $v
+      Entry: 7
+      Data: 6|AudioClipData, Assembly-CSharp
+    - Name: _clips
+      Entry: 7
+      Data: 7|System.Collections.Generic.List`1[[UnityEngine.AudioClip, UnityEngine.AudioModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 10
+      Data: 3
+    - Name: 
+      Entry: 10
+      Data: 4
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _priority
+      Entry: 3
+      Data: 128
+    - Name: _isRandomVolume
+      Entry: 5
+      Data: true
+    - Name: _volume
+      Entry: 4
+      Data: 1
+    - Name: _volumeRandomMin
+      Entry: 4
+      Data: 0.1
+    - Name: _isRandomPitch
+      Entry: 5
+      Data: true
+    - Name: _pitch
+      Entry: 4
+      Data: 1
+    - Name: _pitchRandomMin
+      Entry: 4
+      Data: 0.1
+    - Name: _spatialBlend
+      Entry: 4
+      Data: 1
+    - Name: _mixerGroup
+      Entry: 10
+      Data: 2
+    - Name: _loop
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  _audioEmitterPrefab: {fileID: 2907860877625260931, guid: 2b5848acb8204584f9806b3efcd4db0c,
+    type: 3}
+  _perAudioClipMaxSize: 10
+  _musicMixer: {fileID: 24100000, guid: 2560deb79e12310428b7376f23454b55, type: 2}
+  _sfxMixer: {fileID: 24100000, guid: 994e39754bc4ebf44a9343f2aade3988, type: 2}

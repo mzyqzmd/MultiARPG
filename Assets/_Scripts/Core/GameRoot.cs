@@ -1,0 +1,202 @@
+using System.IO;
+using UnityEngine;
+
+/// <summary>
+/// 组合根：全场唯一的引导 MonoBehaviour，在 Awake 中创建并登记各 C# 服务，
+/// 解决"纯 C# 类无生命周期、Unity 预制体无法构造函数注入"的问题。
+/// </summary>
+public class GameRoot : MonoBehaviour
+{
+    [SerializeField] private SO_AudioDatabase _audioDatabase;
+    [SerializeField] private SO_UIDatabase _uiDatabase;
+    [SerializeField] private SO_EffectDatabase _effectDatabase;
+
+    private static bool _alive;
+    private SettingsSaveService _settingsService;
+    private AudioService _audioService;
+    private InputService _inputService;
+    private SceneControlService _sceneControlService;
+    private NetworkService _networkService;
+    private PlayerCameraService _playerCameraService;
+    private UIService _uiService;
+    private GameSaveService _saveService;
+    private EffectService _effectService;
+
+    private void Awake()
+    {
+        if (_alive)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _alive = true;
+        DontDestroyOnLoad(gameObject);
+        Services.Clear();
+
+        // 存档与全局设置共享同一份文件 IO 实现（SaveFileDataWriter 已泛型化，全项目复用）
+        var dataWriter = new SaveFileDataWriter();
+        RegisterSettingsService(dataWriter);   // 须在 AudioService 之前：其构造即 ApplyVolumes 依赖 SettingsService
+        RegisterSaveService(dataWriter);
+        RegisterAudioService();
+        RegisterInputService();
+        RegisterUIService();                   // 须在 SceneControlService 之前：场景服务构造注入 UIService 以驱动场景切换黑幕
+        RegisterSceneControlService();
+        RegisterNetworkService();
+        RegisterPlayerCameraService();
+        RegisterEffectService();
+    }
+
+    private void OnDestroy()
+    {
+        _alive = false;
+        UnregisterAudioService();
+        UnregisterSettingsService();
+        UnregisterInputService();
+        UnregisterSceneControlService();
+        UnregisterNetworkService();
+        UnregisterPlayerCameraService();
+        UnregisterEffectService();
+        UnregisterSaveService();
+        UnregisterUIService();
+        Services.Clear();
+        EventBus<ReturningToMainMenuEvent>.Clear();
+        EventBus<LocalPlayerBoundEvent>.Clear();
+        EventBus<LocalPlayerUnboundEvent>.Clear();
+    }
+
+    #region 注册/注销全局设置服务
+    private void RegisterSettingsService(SaveFileDataWriter dataWriter_)
+    {
+        string settingsPath = Application.persistentDataPath + "/Settings/settings.setting";
+        _settingsService = new SettingsSaveService(dataWriter_, settingsPath);
+        Services.Register(_settingsService);
+    }
+
+    private void UnregisterSettingsService()
+    {
+        Services.Unregister<SettingsSaveService>();
+    }
+    #endregion
+
+    #region 注册/注销存档服务
+    private void RegisterSaveService(SaveFileDataWriter dataWriter_)
+    {
+        // 存档目录 persistentDataPath/Saves（单机双开按实例后缀隔离，后缀统一由 LocalPlayerId 解析）
+        string saveDir = Application.persistentDataPath + "/Saves";
+        string suffix = LocalPlayerId.InstanceSuffix;
+        if (!string.IsNullOrEmpty(suffix))
+            saveDir = Path.Combine(saveDir, suffix);
+        _saveService = new GameSaveService(dataWriter_, saveDir);
+        Services.Register(_saveService);
+    }
+
+    private void UnregisterSaveService()
+    {
+        Services.Unregister<GameSaveService>();
+    }
+    #endregion
+
+    #region 注册/注销音频服务
+    public void RegisterAudioService()
+    {
+        _audioService = new AudioService(_audioDatabase, transform, _settingsService);
+        Services.Register(_audioService);
+    }
+    public void UnregisterAudioService()
+    {
+        Services.Unregister<AudioService>();
+    }
+    #endregion
+
+    #region 注册/注销输入服务
+    private void RegisterInputService()
+    {
+        _inputService = new InputService();
+        _inputService.EnableUIMode();
+        Services.Register(_inputService);
+    }
+
+    private void UnregisterInputService()
+    {
+        _inputService?.Dispose();
+        Services.Unregister<InputService>();
+    }
+    #endregion
+
+    #region 注册/注销场景控制服务
+    public void RegisterSceneControlService()
+    {
+        // InputService / UIService 已在本方法之前注册，可安全注入
+        _sceneControlService = new SceneControlService(_inputService, _uiService);
+        Services.Register(_sceneControlService);
+    }
+
+    public void UnregisterSceneControlService()
+    {
+        Services.Unregister<SceneControlService>();
+    }
+    #endregion
+
+    #region 注册/注销网络服务
+    private void RegisterNetworkService()
+    {
+        _networkService = new NetworkService();
+        Services.Register(_networkService);
+    }
+
+    private void UnregisterNetworkService()
+    {
+        Services.Unregister<NetworkService>();
+    }
+    #endregion
+
+    #region 注册/注销玩家摄像机服务
+    private void RegisterPlayerCameraService()
+    {
+        _playerCameraService = new PlayerCameraService();
+        Services.Register(_playerCameraService);
+    }
+
+    private void UnregisterPlayerCameraService()
+    {
+        Services.Unregister<PlayerCameraService>();
+    }
+    #endregion
+
+    #region 注册/注销效果服务
+    private void RegisterEffectService()
+    {
+        _effectService = new EffectService(_effectDatabase);
+        Services.Register(_effectService);
+    }
+
+    private void UnregisterEffectService()
+    {
+        Services.Unregister<EffectService>();
+    }
+    #endregion
+
+    #region 注册/注销 UI 服务
+    private void RegisterUIService()
+    {
+        _uiService = new UIService(transform, _uiDatabase);
+        Services.Register(_uiService);
+        EventBus<LocalPlayerBoundEvent>.Subscribe(OnLocalPlayerBound);
+        EventBus<LocalPlayerUnboundEvent>.Subscribe(OnLocalPlayerUnbound);
+    }
+
+    private void UnregisterUIService()
+    {
+        EventBus<LocalPlayerBoundEvent>.Unsubscribe(OnLocalPlayerBound);
+        EventBus<LocalPlayerUnboundEvent>.Unsubscribe(OnLocalPlayerUnbound);
+        Services.Unregister<UIService>();
+    }
+
+    private void OnLocalPlayerBound(LocalPlayerBoundEvent e_) =>
+        _uiService.SpawnUiView<UI_InGameUI>("InGameUI", EUILayerCanvas.Hud).
+            Initialize(e_.Player.PlayerStatsControl);
+
+    private void OnLocalPlayerUnbound(LocalPlayerUnboundEvent _) =>
+        _uiService.ClearAllLayerView();
+    #endregion
+}

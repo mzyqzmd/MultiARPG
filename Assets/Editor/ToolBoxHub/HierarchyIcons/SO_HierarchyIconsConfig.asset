@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14df9a781e8167a42854977108548e8f, type: 3}
+  m_Name: SO_HierarchyIconsConfig
+  m_EditorClassIdentifier: 
+  _enabled: 1
+  _rules:
+  - ruleName: Camera
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Light
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: MeshRenderer
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: MeshFilter
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: SkinnedMeshRenderer
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Rigidbody
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: AudioSource
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: AudioListener
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: ParticleSystem
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Animator
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Animation
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: BoxCollider
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: SphereCollider
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: CapsuleCollider
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Canvas
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: RectTransform
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Rigidbody2D
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: BoxCollider2D
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: CircleCollider2D
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: PolygonCollider2D
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: CapsuleCollider2D
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: SpriteRenderer
+    icon: {fileID: 0}
+    enabled: 1
+  - ruleName: Image
+    icon: {fileID: 0}
+    enabled: 1
