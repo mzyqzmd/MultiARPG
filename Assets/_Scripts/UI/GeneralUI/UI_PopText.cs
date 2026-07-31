@@ -29,7 +29,7 @@ public class UI_PopText : UI_BaseView
         if (_needDestroy_)
             pop.AppendInterval(0.5f);
         else
-            pop.AppendInterval(20f);
+            pop.AppendInterval(60f);
         pop.Append(_text.DOFade(0f, 0.4f));
         pop.OnComplete(() => Destroy(gameObject));
     }

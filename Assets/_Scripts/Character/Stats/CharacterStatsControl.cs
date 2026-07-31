@@ -7,14 +7,19 @@ using UnityEngine;
 /// 白名单属性（见 EStatType）注册为 ModifiableStat 支持运行时加减乘除修正；其余属性（如 RotationSpeed）保持配置透传。
 /// 派生计算（移动速度、转向角速度等）统一收敛于此，避免散落在状态机/运动控制类。
 /// Player 与未来 Enemy 各自派生 StatsControl 经 RegisterStat 扩展专属可修正属性与派生逻辑。
+/// 同时实现 IEffectSource（攻击者来源）与 IEffectTarget（效果作用目标）：效果最终修改的数据均在此，
+/// 故数据持有者即唯一的效果目标/来源。本类为纯本地数据中心，零网络依赖；
+/// 数值修改权归 owner 本地，死亡上报由 Character 经 _networkStatsControl 完成（见 Character.OnCurrentHealthChanged）。
 /// </summary>
-public abstract class CharacterStatsControl : IEffectSource
+public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
 {
     protected readonly Dictionary<EStatType, ModifiableStat> _modifiableStats = new();
 
     private readonly SO_CharacterStats _stats;
+    private readonly EffectControl _effectControl = new();
     private int _currentHealth;
-
+    public float NormalMoveSpeed => _modifiableStats[EStatType.NormalMoveSpeed].Current;
+    public float RotationSpeed => _stats.RotationSpeed;
     public CharacterStatsControl(SO_CharacterStats stats_)
     {
         _stats = stats_;
@@ -26,20 +31,19 @@ public abstract class CharacterStatsControl : IEffectSource
     #region 生命值体系（纯本地，不跨端同步）
     /// <summary>当前生命值变化事件（old, new），供 UI 订阅；上限变化夹取后亦会触发。</summary>
     public event Action<int, int> OnCurrentHealthChanged;
-
     public int CurrentHealth => _currentHealth;
     public int MaxHealth => Mathf.RoundToInt(_modifiableStats[EStatType.MaxHealth].Current);
     public float HealthRatio => MaxHealth > 0f ? (float)CurrentHealth / MaxHealth : 0f;
     /// <summary>是否已死亡：本地生命值归零即判定死亡，作为 FSM 统一本地死亡判断来源（不依赖网络往返）。</summary>
     public bool IsDead => _currentHealth <= 0;
 
-    /// <summary>受伤：当前生命减损并夹取不低于 0，触发变更事件。</summary>
-    public void TakeDamage(int amount_) =>
-        ApplyHealthDelta(-amount_);
+    /// <summary>受伤（IEffectTarget）：取总伤害减血。</summary>
+    public void TakeDamage(DamageInfo damage_) =>
+       SetCurrentHealth(_currentHealth - damage_.TotalDamage);
 
-    /// <summary>治疗：当前生命增长并夹取不超上限，触发变更事件。</summary>
+    /// <summary>治疗（IEffectTarget）：当前生命增长并夹取不超上限。</summary>
     public void Heal(int amount_) =>
-        ApplyHealthDelta(amount_);
+        SetCurrentHealth(_currentHealth + amount_);
 
     /// <summary>新游戏默认满血初始化。</summary>
     public void ApplyDefaultHealth() =>
@@ -48,12 +52,6 @@ public abstract class CharacterStatsControl : IEffectSource
     /// <summary>读档还原当前生命值（夹取到合法范围）。</summary>
     public void RestoreHealth(int value_) =>
         SetCurrentHealth(value_);
-
-    private void ApplyHealthDelta(int delta_)
-    {
-        int old = _currentHealth;
-        SetCurrentHealth(old + delta_);
-    }
 
     private void SetCurrentHealth(int value_)
     {
@@ -66,9 +64,6 @@ public abstract class CharacterStatsControl : IEffectSource
     }
     #endregion
 
-    public float NormalMoveSpeed => _modifiableStats[EStatType.NormalMoveSpeed].Current;
-    public float RotationSpeed => _stats.RotationSpeed;
-
     #region 派生计算（属性运算集中于此）
     /// <summary>当前水平移动速度：基类默认步行速度，子类可 override 区分跑/走。</summary>
     public virtual float GetMoveSpeed(bool running_) => NormalMoveSpeed;
@@ -76,7 +71,7 @@ public abstract class CharacterStatsControl : IEffectSource
     public float GetRotationDelta() => RotationSpeed * Time.deltaTime;
     #endregion
 
-    #region 运行时属性修正 API（由 Character 经效果系统调用）
+    #region 运行时属性修正 API（原始数据 API：不抛网络事件，供网络回放路径调用避免回声）
     /// <summary>施加一条修正（未注册的属性静默忽略，防御 Enemy 收到玩家专属属性修正）。</summary>
     public virtual void AddModifier(EStatType type_, StatModifier modifier_)
     {
@@ -109,5 +104,22 @@ public abstract class CharacterStatsControl : IEffectSource
     public virtual int FireAttack => 0;
     public virtual int IceAttack => 0;
     public virtual int LightningAttack => 0;
+    #endregion
+
+    #region 效果目标（IEffectTarget：纯本地数据改动，不抛网络同步事件）
+    /// <summary>施加一个效果：转交 EffectControl 作用于自身（target_ = this）。</summary>
+    public void ApplyEffect(SO_BaseEffect effect_, IEffectSource source_) =>
+        _effectControl.ApplyEffect(effect_, this, source_);
+
+    /// <summary>施加属性修正（IEffectTarget）：本地应用（原始 API，不抛网络事件）。</summary>
+    public void ApplyStatModifier(EStatType type_, StatModifier modifier_) =>
+        AddModifier(type_, modifier_);
+
+    /// <summary>移除属性修正（IEffectTarget）：本地回滚（原始 API，不抛网络事件）。</summary>
+    public void RemoveStatModifier(EStatType type_, StatModifier modifier_) =>
+        RemoveModifier(type_, modifier_);
+
+    /// <summary>每帧驱动持续型效果（由各 owner 端本地调用）。</summary>
+    public void TickEffects(float dt_) => _effectControl.Tick(dt_, this);
     #endregion
 }

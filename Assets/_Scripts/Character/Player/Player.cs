@@ -16,6 +16,7 @@ public class Player : Character
     private UIService _uiService;
     private GameSaveService _saveService;
     private SceneControlService _sceneControlService;
+    private NetworkService _networkService;
 
     // 组件
     private PlayerStatsControl _playerStatsControl;//玩家数据控制(含耐力)
@@ -41,18 +42,18 @@ public class Player : Character
         _uiService = Services.Get<UIService>();
         _saveService = Services.Get<GameSaveService>();
         _sceneControlService = Services.Get<SceneControlService>();
+        _networkService = Services.Get<NetworkService>();
         #endregion
 
         #region 注册组件
         _playerStatsControl = new PlayerStatsControl(_soPlayerStats);
         _playerStatsControl.OnExhausted += OnStaminaExhausted;
-        _statsControl = _playerStatsControl;// 供基类分流本地属性修正
-        _effectSource = _playerStatsControl;// 攻击者来源（供攻击结算读取实时攻击属性）
+        _statsControl = _playerStatsControl;// 供基类分流本地属性修正（同时作为 IEffectTarget / IEffectSource）
         _networkStatsControl = _playerNetworkStatsControl;
 
         // 存档数据组装/还原能力（纯本地，不含网络字段；写盘统一由 Host 侧 SaveService 单文件落盘）
         _saveControl = new PlayerSaveControl(_sceneControlService, transform, _playerStatsControl);
-        _playerNetworkSaveControl.Initialize(_saveService, _saveControl, _playerStatsControl);
+        _playerNetworkSaveControl.Initialize(_saveService, _saveControl, _playerStatsControl, _networkService);
 
         _groundCheck = new PlayerGroundCheck(_characterController);
         _verticalMotion = new PlayerVerticalMotionControl(_playerStatsControl, _groundCheck);
@@ -60,22 +61,21 @@ public class Player : Character
             _characterController, _playerStatsControl, _anim, _audioService, _uiService, _verticalMotion);
         #endregion
 
-        //NOTE:测试用的
-        _inputService.OnTestButtonClicked += TestButtonClicked;
     }
     #endregion
     private void TestButtonClicked()
     {
+        if (!IsOwner) return;
         Debug.Log("TestButtonClicked");
-        ApplyEffectServerRpc("aaa");
-        ApplyEffectServerRpc("bbb");
-        //ApplyEffectServerRpc("ccc");
+        ApplyEffect("aaa");
+        ApplyEffect("bbb");
+        //ApplyEffect("ccc");
     }
 
     #region Update 更新
     protected override void Update()
     {
-        base.Update();   // 基类在 server 端驱动持续效果 Tick
+        base.Update();   // 基类在 owner 端驱动持续效果 Tick
 
         if (!IsOwner) return;
 
@@ -107,6 +107,9 @@ public class Player : Character
 
         // 订阅"即将返回主菜单"信号：Host 端协调各端存档，客人端仅上报自身
         EventBus<ReturningToMainMenuEvent>.Subscribe(OnReturningToMainMenu);
+
+        //NOTE:测试用的（仅本地玩家订阅，避免远端副本误触发）
+        _inputService.OnTestButtonClicked += TestButtonClicked;
     }
 
     public override void OnNetworkDespawn()
@@ -119,17 +122,15 @@ public class Player : Character
 
             // 仅解绑本地玩家 UI
             _uiService.UnbindLocalPlayer();
+
+            //NOTE:测试用的（与 OnNetworkSpawn 订阅对称反订阅）
+            _inputService.OnTestButtonClicked -= TestButtonClicked;
         }
     }
 
-    /// <summary>返回主菜单信号回调：Host 协调全体存档；客人仅上报自身。</summary>
-    private void OnReturningToMainMenu(ReturningToMainMenuEvent _)
-    {
-        if (IsHost)
-            _playerNetworkSaveControl.CoordinateSave();
-        else
-            _playerNetworkSaveControl.ReportSaveToHost();
-    }
+    /// <summary>返回主菜单信号回调：统一经存档组件按 IsHost/IsOwner 分流（Host 协调全体，客人仅上报自身）。</summary>
+    private void OnReturningToMainMenu(ReturningToMainMenuEvent _) =>
+        _playerNetworkSaveControl.RequestSave();
     #endregion
 
     #region 力竭事件回调
@@ -137,15 +138,8 @@ public class Player : Character
         _audioService.PlayAudio("Player", "ExhaustedBreath", transform);
     #endregion
 
-    #region 供场景 Checkpoint 调用：手动存档当前进度（仅 owner 端）。Host 仅存自身+世界，客人上报自身
-    public void ManualSaveCheckpoint()
-    {
-        if (!IsOwner) return;
-        if (IsHost)
-            _playerNetworkSaveControl.CoordinateSave();
-        else
-            _playerNetworkSaveControl.ReportSaveToHost();
-    }
+    #region 供场景 Checkpoint 调用：手动存档当前进度（内部按 IsHost/IsOwner 分流）
+    public void ManualSaveCheckpoint() => _playerNetworkSaveControl.RequestSave();
     #endregion
 
     #region 应用焦点切换时恢复输入

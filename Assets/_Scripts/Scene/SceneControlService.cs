@@ -1,14 +1,13 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Unity.Netcode;
-using System.Collections;
 
 /// <summary>
 /// 场景控制服务（IService）：负责世界/关卡场景切换。
 /// 多人场景下必须用 NGO 的 SceneManager 而非原生 SceneManager——
 /// 否则 Player 等网络对象会被场景卸载销毁，且各客户端场景不同步。
 /// NGO 场景管理会在切场景时自动保留 Player 网络对象，无需手动 DontDestroyOnLoad。
+/// 场景加载能力统一收归 NetworkService（IsHost 守卫 + NGO SceneManager），本服务不再直连 NetworkManager。
 /// </summary>
 public class SceneControlService : IService
 {
@@ -17,13 +16,15 @@ public class SceneControlService : IService
 
     private readonly InputService _inputService;
     private readonly UIService _uiService;
+    private readonly NetworkService _networkService;
     private bool _transitioning;
     public Scene CurrentActiveScene { get; private set; }
 
-    public SceneControlService(InputService inputService_, UIService uiService_)
+    public SceneControlService(InputService inputService_, UIService uiService_, NetworkService networkService_)
     {
         _inputService = inputService_;
         _uiService = uiService_;
+        _networkService = networkService_;
         CurrentActiveScene = SceneManager.GetActiveScene();
         // 订阅 Unity 原生场景切换：Host 与 late-join Client 都会触发，
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
@@ -33,14 +34,13 @@ public class SceneControlService : IService
     /// <summary>
     /// 由 Host/Server 驱动，同步所有客户端加载世界场景。
     /// 仅 Host 可发起场景切换，纯 Client 端调用无效（需由 Host 触发或经 ServerRpc 请求）。
-    /// 切换前先渐黑，黑幕完成后才发起加载。
+    /// 切换前先渐黑，黑幕完成后才发起加载（经 NetworkService 收归 NGO SceneManager）。
     /// </summary>
     public void LoadWorldScene(string sceneName = SceneWorld)
     {
-        var mgr = NetworkManager.Singleton;
-        if (mgr == null || !mgr.IsHost) return;
+        if (!_networkService.IsHost) return;
         _transitioning = true;
-        _uiService.FadeToBlack(() => mgr.SceneManager.LoadScene(sceneName, LoadSceneMode.Single));
+        _uiService.FadeToBlack(() => _networkService.LoadScene(sceneName));
     }
     #endregion
 
@@ -50,10 +50,9 @@ public class SceneControlService : IService
     public void ReturnToMainMenu()
     {
         EventBus<ReturningToMainMenuEvent>.InvokeEvent(new ReturningToMainMenuEvent());
-        var mgr = NetworkManager.Singleton;
-        if (mgr == null || !mgr.IsHost) return;
+        if (!_networkService.IsHost) return;
         _transitioning = true;
-        _uiService.FadeToBlack(() => mgr.SceneManager.LoadScene(SceneMainMenu, LoadSceneMode.Single));
+        _uiService.FadeToBlack(() => _networkService.LoadScene(SceneMainMenu));
     }
     #endregion
 

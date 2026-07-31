@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-/// <summary>环境/接触型伤害效果（陷阱 / 熔岩 / 毒云等）：伤害数值写死在资产字段，无攻击者来源（source_ 为 null）。经 IEffectTarget.TakeDamage 共用战斗伤害的扣血 + 仅 Owner 定向同步链路，仅数值来源不同（写死 vs 攻击者实时属性）。</summary>
+/// <summary>环境/接触型伤害效果（陷阱 / 熔岩 / 毒云等）：伤害数值写死在资产字段，无攻击者来源（source_ 为 null）。经 IEffectTarget.TakeDamage（目标为 CharacterStatsControl）共用战斗伤害的扣血 + 仅 Owner 定向同步链路，仅数值来源不同（写死 vs 攻击者实时属性）。</summary>
 [CreateAssetMenu(fileName = "SO_DamageEffect", menuName = "MultiARPG/Effects/DamageEffect")]
 public class SO_DamageEffect : SO_BaseEffect
 {

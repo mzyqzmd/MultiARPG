@@ -12,7 +12,8 @@ public class Checkpoint : MonoBehaviour
     private void OnTriggerEnter(Collider other_)
     {
         var player = other_.GetComponent<Player>();
-        if (player != null && player.IsOwner)
+        // 仅本地玩家触发（经 UIService.LocalPlayer 判定，避免读取网络层 IsOwner）
+        if (player != null && player == Services.Get<UIService>().LocalPlayer)
         {
             player.ManualSaveCheckpoint();
             Services.Get<UIService>().SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay)

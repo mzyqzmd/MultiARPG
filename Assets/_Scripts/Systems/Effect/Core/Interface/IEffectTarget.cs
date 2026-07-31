@@ -1,4 +1,4 @@
-/// <summary>效果作用目标：任何可被施加伤害 / 回复 / 属性修正等效果的对象（如 Character）实现此接口。</summary>
+/// <summary>效果作用目标：任何可被施加伤害 / 回复 / 属性修正等效果的数据持有者（如 CharacterStatsControl）实现此接口。</summary>
 public interface IEffectTarget
 {
     /// <summary>受伤：接收运行时结算出的 DamageInfo（含元素类型与总伤害），由实现方提取 TotalDamage 扣血。</summary>

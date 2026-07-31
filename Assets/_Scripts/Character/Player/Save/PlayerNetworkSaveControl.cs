@@ -16,13 +16,15 @@ public class PlayerNetworkSaveControl : NetworkBehaviour
     private GameSaveService _saveService;
     private PlayerSaveControl _saveControl;
     private PlayerStatsControl _statsControl;
+    private NetworkService _networkService;
 
     /// <summary>依赖注入（MonoBehaviour 无法构造函数注入，由 Player.Awake 显式传入）</summary>
-    public void Initialize(GameSaveService saveService_, PlayerSaveControl saveControl_, PlayerStatsControl statsControl_)
+    public void Initialize(GameSaveService saveService_, PlayerSaveControl saveControl_, PlayerStatsControl statsControl_, NetworkService networkService_)
     {
         _saveService = saveService_;
         _saveControl = saveControl_;
         _statsControl = statsControl_;
+        _networkService = networkService_;
     }
 
     #region 网络生命周期：owner 端写入身份并触发恢复/上报；断联时存档
@@ -55,6 +57,14 @@ public class PlayerNetworkSaveControl : NetworkBehaviour
     #endregion
 
     #region Host/客人 存档触发
+    /// <summary>owner 端统一存档入口：替代 Player 内重复的 IsHost 分支。Host 协调全体存档，客人仅上报自身。</summary>
+    public void RequestSave()
+    {
+        if (!IsOwner) return;
+        if (IsHost) CoordinateSave();
+        else ReportSaveToHost();
+    }
+
     /// <summary>Host owner：从工作副本按 playerId 恢复自己；无记录则新建并加入 Players。</summary>
     private void HostRestoreSelf()
     {
@@ -80,16 +90,11 @@ public class PlayerNetworkSaveControl : NetworkBehaviour
     {
         _saveService.UpsertPlayer(_saveControl.BuildPlayerSaveData(LocalPlayerId.Value));
 
-        var nm = NetworkManager.Singleton;
-        if (nm != null)
+        _networkService.ForEachClientPlayerObject(obj =>
         {
-            foreach (var client in nm.ConnectedClientsList)
-            {
-                if (client.ClientId == nm.LocalClientId) continue; // 跳过 Host 自身
-                if (client.PlayerObject != null && client.PlayerObject.TryGetComponent(out PlayerNetworkSaveControl ctrl))
-                    _saveService.UpsertPlayer(ctrl.BuildReplicaSnapshot());
-            }
-        }
+            if (obj.TryGetComponent(out PlayerNetworkSaveControl ctrl))
+                _saveService.UpsertPlayer(ctrl.BuildReplicaSnapshot());
+        });
 
         _saveService.SetWorld(_saveControl.BuildWorldSaveData());
         _saveService.SaveCurrentSlot();
@@ -102,8 +107,9 @@ public class PlayerNetworkSaveControl : NetworkBehaviour
         SubmitPlayerSaveServerRpc(_saveControl.BuildPlayerSaveData(LocalPlayerId.Value));
     }
 
-    /// <summary>Host 端从 client 副本组装存档：复用本地组装（含 currentHealth）取实时同步的 transform/生命值，
-    /// 再覆盖 characterName/secondsPlayed 自已有存档（本机副本不持有客人真实姓名与时长）。</summary>
+    /// <summary>Host 端从 client 副本组装存档：复用本地组装取实时 transform，但 currentHealth 不读服务端客人副本
+    /// （本地权威下该副本生命值已陈旧），改以客人主动上报的已有存档记录为准；
+    /// 无记录时回退到副本当前值。再覆盖 characterName 自已有存档。</summary>
     public PlayerSaveData BuildReplicaSnapshot()
     {
         string id = _playerId.Value.ToString();
@@ -111,6 +117,7 @@ public class PlayerNetworkSaveControl : NetworkBehaviour
         var data = _saveControl.BuildPlayerSaveData(id);
         if (existing != null)
         {
+            data.currentHealth = existing.currentHealth;
             data.characterName = existing.characterName;
         }
         return data;

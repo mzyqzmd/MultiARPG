@@ -40,8 +40,8 @@ public class GameRoot : MonoBehaviour
         RegisterAudioService();
         RegisterInputService();
         RegisterUIService();                   // 须在 SceneControlService 之前：场景服务构造注入 UIService 以驱动场景切换黑幕
+        RegisterNetworkService();              // 须在 SceneControlService 之前：场景服务构造注入 NetworkService 以收归场景加载
         RegisterSceneControlService();
-        RegisterNetworkService();
         RegisterPlayerCameraService();
         RegisterEffectService();
     }
@@ -126,8 +126,8 @@ public class GameRoot : MonoBehaviour
     #region 注册/注销场景控制服务
     public void RegisterSceneControlService()
     {
-        // InputService / UIService 已在本方法之前注册，可安全注入
-        _sceneControlService = new SceneControlService(_inputService, _uiService);
+        // InputService / UIService / NetworkService 已在本方法之前注册，可安全注入
+        _sceneControlService = new SceneControlService(_inputService, _uiService, _networkService);
         Services.Register(_sceneControlService);
     }
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 属性修正效果（通用）：对目标的白名单属性施加一条加减乘除修正，移除时自动回滚。
+/// 属性修正效果（通用）：对目标（CharacterStatsControl）的白名单属性施加一条加减乘除修正，移除时自动回滚。
 /// 用法示例（建资产配置即可，无需新类）：减速 = NormalMoveSpeed, additive=0, multiplier=0.7, Timed 5s；
 /// 血量上限增益 = MaxHealth, additive=20, multiplier=1, Static。
 /// </summary>

@@ -1,9 +1,10 @@
-﻿using Unity.Netcode;
+﻿using System;
+using Unity.Netcode;
 
 /// <summary>
 /// 角色网络同步状态组件（独立 NetworkBehaviour，与 Character 同挂一个 GameObject）：
-/// 承载需要共享给其他玩家的运行时状态。当前仅死亡布尔，由 server 权威置位，经 NetworkVariable 广播所有客户端。
-/// 不持有本地 stats 引用、不反向依赖 Character，符合网络控制组件铁律。
+/// 仅承载死亡状态的 server 权威广播（使队友端能进入死亡 FSM/动画）。
+/// 生命值与属性修正现由 owner 本地权威，不经本组件跨端同步。
 /// 死亡不入存档，复活/重连由 server 在 OnNetworkSpawn 复位为 false。
 /// </summary>
 public class CharacterNetworkStatsControl : NetworkBehaviour
@@ -12,7 +13,7 @@ public class CharacterNetworkStatsControl : NetworkBehaviour
     private readonly NetworkVariable<bool> _isDead = new();
 
     /// <summary>死亡状态翻转事件（old, new），供各端订阅接入死亡表现（含其他玩家）。</summary>
-    public event System.Action<bool, bool> OnDeathStateChanged;
+    public event Action<bool, bool> OnDeathStateChanged;
 
     /// <summary>当前是否死亡（纯读取）。</summary>
     public bool IsDead => _isDead.Value;
