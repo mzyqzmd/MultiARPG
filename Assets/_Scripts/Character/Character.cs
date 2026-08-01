@@ -22,6 +22,8 @@ public abstract class Character : NetworkBehaviour
     protected CharacterStatsControl _statsControl;// 本地属性控制（子类 Awake 赋值），同时是 IEffectTarget / IEffectSource
     protected CharacterNetworkStatsControl _networkStatsControl;// 网络属性控制
 
+    public CharacterStatsControl StatsControl => _statsControl;
+
     protected virtual void Awake()
     {
         _effectService = Services.Get<EffectService>();
@@ -62,16 +64,11 @@ public abstract class Character : NetworkBehaviour
         if (effect != null) _statsControl.ApplyEffect(effect, null);
     }
 
-    /// <summary>跨玩家攻击结算入口：以自身 StatsControl 作为攻击者来源，用实时攻击属性直接构造 DamageInfo，经 IEffectTarget.TakeDamage 作用目标。
-    /// 注意（本地权威模型·占位）：当前为直接改"攻击者机器上目标的本地副本"，对目标真实 owner 无效。
-    /// 完整结算需战斗阶段补「攻击者 → Host 中继 → 目标 owner 本地 TakeDamage」RPC 链路（DamageInfo 跨端传递），本次不实现。</summary>
-    public void DealDamage(IEffectTarget target_, Vector3 contactPoint_)
+    /// <summary>效果移除本地入口：owner 端按 id 移除已施加效果（与 ApplyEffect 对称）。</summary>
+    public void RemoveEffect(string effectId_)
     {
-        if (!IsServer) return;
-        if (_statsControl == null || target_ == null) return;
-        var dmg = new DamageInfo(_statsControl.PhysicalAttack, _statsControl.MagicAttack, _statsControl.FireAttack,
-            _statsControl.IceAttack, _statsControl.LightningAttack, contactPoint_, _statsControl, target_);
-        target_.TakeDamage(dmg);
+        if (!IsOwner) return;
+        _statsControl?.RemoveEffect(effectId_);
     }
     #endregion
 }

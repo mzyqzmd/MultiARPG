@@ -28,6 +28,13 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
         _currentHealth = MaxHealth;
     }
 
+    #region 派生计算（属性运算集中于此）
+    /// <summary>当前水平移动速度：基类默认步行速度，子类可 override 区分跑/走。</summary>
+    public virtual float GetMoveSpeed(bool running_) => NormalMoveSpeed;
+    /// <summary>单帧转向角速度（度/帧），供动作态 RotateTowards 统一使用。</summary>
+    public float GetRotationDelta() => RotationSpeed * Time.deltaTime;
+    #endregion
+
     #region 生命值体系（纯本地，不跨端同步）
     /// <summary>当前生命值变化事件（old, new），供 UI 订阅；上限变化夹取后亦会触发。</summary>
     public event Action<int, int> OnCurrentHealthChanged;
@@ -64,16 +71,32 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
     }
     #endregion
 
-    #region 派生计算（属性运算集中于此）
-    /// <summary>当前水平移动速度：基类默认步行速度，子类可 override 区分跑/走。</summary>
-    public virtual float GetMoveSpeed(bool running_) => NormalMoveSpeed;
-    /// <summary>单帧转向角速度（度/帧），供动作态 RotateTowards 统一使用。</summary>
-    public float GetRotationDelta() => RotationSpeed * Time.deltaTime;
+    #region EffectControl施加/移除效果对外接口
+
+    /// <summary>施加一个效果：转交 EffectControl 作用于自身（target_ = this）。</summary>
+    public void ApplyEffect(SO_BaseEffect effect_, IEffectSource source_) =>
+        _effectControl.ApplyEffect(effect_, this, source_);
+
+    /// <summary>按效果 id 手动移除（与 ApplyEffect 对称）：撤除对应 ActiveEffect 并触发其 OnRemove 回滚（如 Static 属性修正减回）。</summary>
+    public void RemoveEffect(string id_) =>
+        _effectControl.RemoveEffect(id_, this);
+
+
+    /// <summary>每帧驱动持续型效果（由各 owner 端本地调用）。</summary>
+    public void TickEffects(float dt_) => _effectControl.Tick(dt_, this);
     #endregion
 
-    #region 运行时属性修正 API（原始数据 API：不抛网络事件，供网络回放路径调用避免回声）
+    #region 属性修正对外接口(StatModifier)
+    /// <summary>施加属性修正（IEffectTarget）：本地应用（原始 API，不抛网络事件）。</summary>
+    public void ApplyStatModifier(EStatType type_, StatModifier modifier_) =>
+        AddModifier(type_, modifier_);
+
+    /// <summary>移除属性修正（IEffectTarget）：本地回滚（原始 API，不抛网络事件）。</summary>
+    public void RemoveStatModifier(EStatType type_, StatModifier modifier_) =>
+        RemoveModifier(type_, modifier_);
+
     /// <summary>施加一条修正（未注册的属性静默忽略，防御 Enemy 收到玩家专属属性修正）。</summary>
-    public virtual void AddModifier(EStatType type_, StatModifier modifier_)
+    protected virtual void AddModifier(EStatType type_, StatModifier modifier_)
     {
         if (!_modifiableStats.TryGetValue(type_, out var stat)) return;
         stat.Add(modifier_);
@@ -81,7 +104,7 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
     }
 
     /// <summary>移除一条修正（按值匹配，与施加时来自同一效果资产）。</summary>
-    public virtual void RemoveModifier(EStatType type_, StatModifier modifier_)
+    protected virtual void RemoveModifier(EStatType type_, StatModifier modifier_)
     {
         if (!_modifiableStats.TryGetValue(type_, out var stat)) return;
         stat.Remove(modifier_);
@@ -96,30 +119,5 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
         if (old != _currentHealth)
             OnCurrentHealthChanged?.Invoke(old, _currentHealth);
     }
-    #endregion
-
-    #region 攻击者来源（IEffectSource 默认 0，子类 override 读具体配置）
-    public virtual int PhysicalAttack => 0;
-    public virtual int MagicAttack => 0;
-    public virtual int FireAttack => 0;
-    public virtual int IceAttack => 0;
-    public virtual int LightningAttack => 0;
-    #endregion
-
-    #region 效果目标（IEffectTarget：纯本地数据改动，不抛网络同步事件）
-    /// <summary>施加一个效果：转交 EffectControl 作用于自身（target_ = this）。</summary>
-    public void ApplyEffect(SO_BaseEffect effect_, IEffectSource source_) =>
-        _effectControl.ApplyEffect(effect_, this, source_);
-
-    /// <summary>施加属性修正（IEffectTarget）：本地应用（原始 API，不抛网络事件）。</summary>
-    public void ApplyStatModifier(EStatType type_, StatModifier modifier_) =>
-        AddModifier(type_, modifier_);
-
-    /// <summary>移除属性修正（IEffectTarget）：本地回滚（原始 API，不抛网络事件）。</summary>
-    public void RemoveStatModifier(EStatType type_, StatModifier modifier_) =>
-        RemoveModifier(type_, modifier_);
-
-    /// <summary>每帧驱动持续型效果（由各 owner 端本地调用）。</summary>
-    public void TickEffects(float dt_) => _effectControl.Tick(dt_, this);
     #endregion
 }

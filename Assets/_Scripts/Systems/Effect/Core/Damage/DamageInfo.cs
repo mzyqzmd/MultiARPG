@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>运行时伤害结算结果（readonly struct，零分配、不写盘）：由攻击结算入口（Character.DealDamage）以自身 StatsControl 作为 IEffectSource 用实时攻击属性直接构造，经 IEffectTarget.TakeDamage 专用通道作用到目标的（CharacterStatsControl）。ContactPoint 供后续流血特效定位。不持有任何配置项（poise 按 YAGNI 不纳入）。</summary>
+/// <summary>运行时伤害结算结果（readonly struct，零分配、不写盘）：由效果来源（IEffectSource，如武器 SO_WeaponItem）在构造时直接填入五类攻击数值，经 IEffectTarget.TakeDamage 专用通道作用到目标（CharacterStatsControl）。ContactPoint 供后续流血特效定位。不持有任何配置项（poise 按 YAGNI 不纳入）。</summary>
 public readonly struct DamageInfo
 {
     public readonly int physical;

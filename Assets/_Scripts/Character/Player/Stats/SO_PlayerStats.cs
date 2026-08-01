@@ -25,18 +25,6 @@ public class SO_PlayerStats : SO_CharacterStats
     [Tooltip("主动跳跃一次性消耗的耐力值。耐力不足时跳跃请求被丢弃，无法起跳。")]
     [SerializeField] private int _jumpStaminaCost = 20;
 
-    [Header("攻击属性")]
-    [Tooltip("物理攻击力")]
-    [SerializeField] private int _physicalAttack = 10;
-    [Tooltip("魔法攻击力")]
-    [SerializeField] private int _magicAttack;
-    [Tooltip("火属性攻击力")]
-    [SerializeField] private int _fireAttack;
-    [Tooltip("冰属性攻击力")]
-    [SerializeField] private int _iceAttack;
-    [Tooltip("电属性攻击力")]
-    [SerializeField] private int _lightningAttack;
-
     [Header("耐力参数")]
     [Tooltip("耐力上限。用于跑步 / 闪避 / 跳跃等消耗性动作的通用资源。")]
     [SerializeField] private int _maxStamina = 100;
@@ -57,12 +45,6 @@ public class SO_PlayerStats : SO_CharacterStats
     public float JumpHeight => _jumpHeight;
     public float Gravity => _gravity;
     public int JumpStaminaCost => _jumpStaminaCost;
-
-    public int PhysicalAttack => _physicalAttack;
-    public int MagicAttack => _magicAttack;
-    public int FireAttack => _fireAttack;
-    public int IceAttack => _iceAttack;
-    public int LightningAttack => _lightningAttack;
 
     public int MaxStamina => _maxStamina;
     public int DodgeStaminaCost => _dodgeStaminaCost;

@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 1622834158841702894}
   - component: {fileID: -4664897816591084523}
   m_Layer: 5
-  m_Name: PopText
+  m_Name: UI_PopText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

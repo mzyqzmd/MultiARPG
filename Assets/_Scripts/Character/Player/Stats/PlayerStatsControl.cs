@@ -45,14 +45,6 @@ public class PlayerStatsControl : CharacterStatsControl
     public float StaminaRegenDelay => _stats.StaminaRegenDelay; 
     #endregion
 
-    #region 攻击者来源（IEffectSource，读 SO_PlayerStats）
-    public override int PhysicalAttack => _stats.PhysicalAttack;
-    public override int MagicAttack => _stats.MagicAttack;
-    public override int FireAttack => _stats.FireAttack;
-    public override int IceAttack => _stats.IceAttack;
-    public override int LightningAttack => _stats.LightningAttack;
-    #endregion
-
     #region 派生计算（属性运算集中于此）
     /// <summary>当前水平移动速度：跑步取 RunSpeed，否则取 NormalMoveSpeed。</summary>
     public override float GetMoveSpeed(bool running_) => running_ ? RunSpeed : NormalMoveSpeed;
@@ -124,13 +116,13 @@ public class PlayerStatsControl : CharacterStatsControl
     #endregion
 
     #region 属性修正（扩基类：耐力上限被减益收缩时立即夹取当前耐力）
-    public override void AddModifier(EStatType type_, StatModifier modifier_)
+    protected override void AddModifier(EStatType type_, StatModifier modifier_)
     {
         base.AddModifier(type_, modifier_);
         _currentStamina = Mathf.Min(_currentStamina, MaxStamina);
     }
 
-    public override void RemoveModifier(EStatType type_, StatModifier modifier_)
+    protected override void RemoveModifier(EStatType type_, StatModifier modifier_)
     {
         base.RemoveModifier(type_, modifier_);
         _currentStamina = Mathf.Min(_currentStamina, MaxStamina);

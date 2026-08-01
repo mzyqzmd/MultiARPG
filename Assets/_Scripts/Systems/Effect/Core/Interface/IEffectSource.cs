@@ -1,9 +1,5 @@
-/// <summary>效果攻击者来源：暴露五类攻击属性（int），供攻击结算（Character.DealDamage）直接读取构造 DamageInfo。CharacterStatsControl 提供默认 0 实现，PlayerStatsControl override 读 SO_PlayerStats。</summary>
+/// <summary>效果来源身份标记接口：仅标识「谁发起效果 / 伤害」，不携带任何攻击数值。
+/// 实际伤害数值（五类 attack）由来源方（如武器 SO_WeaponItem）在构造 DamageInfo 时直接填入，不读本接口属性（2026-08-01 决策：攻击属性归武器 Item，角色不持有）。</summary>
 public interface IEffectSource
 {
-    int PhysicalAttack { get; }
-    int MagicAttack { get; }
-    int FireAttack { get; }
-    int IceAttack { get; }
-    int LightningAttack { get; }
 }

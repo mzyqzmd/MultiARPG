@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7099295852255759016}
   - component: {fileID: 4040787818968492118}
   m_Layer: 5
-  m_Name: FadeScreen
+  m_Name: UI_FadeScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55,6 +55,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvasGroup: {fileID: 5374760776343884298}
+  _fadeTime: 0.8
 --- !u!223 &6964506570676316897
 Canvas:
   m_ObjectHideFlags: 0

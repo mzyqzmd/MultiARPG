@@ -3,14 +3,17 @@ public class ActiveEffect
 {
     private readonly SO_BaseEffect _effect;
     private readonly IEffectSource _source;
+    private readonly string _id;
     private float _remaining;
 
     public SO_BaseEffect Effect => _effect;
+    public string Id => _id;
     public bool IsFinished => _remaining <= 0f;
 
     public ActiveEffect(SO_BaseEffect effect_, IEffectSource source_ = null)
     {
         _effect = effect_;
+        _id = effect_.Id;
         _source = source_;
         _remaining = effect_.EffectType == EEffectType.Timed ? effect_.Duration : 0f;
     }

@@ -9,6 +9,13 @@ public class Player : Character
     [SerializeField] private PlayerNetworkSaveControl _playerNetworkSaveControl;//网络存档
     [SerializeField] private PlayerNetworkStatsControl _playerNetworkStatsControl;//玩家网络属性控制
 
+    [Header("装备挂载点")]
+    [SerializeField] private Transform _leftHand;//左手
+    [SerializeField] private Transform _rightHand;//右手
+    [SerializeField] private Transform _leftHip;//左胯
+    [SerializeField] private Transform _rightHip;//右胯
+    [SerializeField] private Transform _back;//背后
+
     // 服务
     private InputService _inputService;
     private PlayerCameraService _playerCameraService;
@@ -26,10 +33,10 @@ public class Player : Character
     private PlayerStateControl _stateControl;// 玩家状态控制
     private PlayerGroundCheck _groundCheck;// 玩家地面检测
     private PlayerVerticalMotionControl _verticalMotion;// 玩家垂直运动控制
+    private PlayerEquipmentControl _equipmentControl;// 玩家装备控制
 
     /// <summary>本地玩家属性控制(含耐力与生命，供 UI 访问)。</summary>
     public PlayerStatsControl PlayerStatsControl => _playerStatsControl;
-
 
     #region Awake 时初始化
     protected override void Awake()
@@ -46,6 +53,7 @@ public class Player : Character
         #endregion
 
         #region 注册组件
+        // 属性控制
         _playerStatsControl = new PlayerStatsControl(_soPlayerStats);
         _playerStatsControl.OnExhausted += OnStaminaExhausted;
         _statsControl = _playerStatsControl;// 供基类分流本地属性修正（同时作为 IEffectTarget / IEffectSource）
@@ -55,21 +63,26 @@ public class Player : Character
         _saveControl = new PlayerSaveControl(_sceneControlService, transform, _playerStatsControl);
         _playerNetworkSaveControl.Initialize(_saveService, _saveControl, _playerStatsControl, _networkService);
 
+        //状态机控制
         _groundCheck = new PlayerGroundCheck(_characterController);
         _verticalMotion = new PlayerVerticalMotionControl(_playerStatsControl, _groundCheck);
         _stateControl = new PlayerStateControl(_inputService, _playerCameraService,
             _characterController, _playerStatsControl, _anim, _audioService, _uiService, _verticalMotion);
+
+        //装备控制
+        _equipmentControl = new PlayerEquipmentControl(_leftHand, _rightHand, _leftHip, _rightHip, _back);
         #endregion
 
     }
     #endregion
+
     private void TestButtonClicked()
     {
         if (!IsOwner) return;
         Debug.Log("TestButtonClicked");
-        ApplyEffect("aaa");
-        ApplyEffect("bbb");
-        //ApplyEffect("ccc");
+        ApplyEffect("StatModifierEffect");
+        ApplyEffect("DamageEffect");
+        //ApplyEffect("HealEffect");
     }
 
     #region Update 更新
