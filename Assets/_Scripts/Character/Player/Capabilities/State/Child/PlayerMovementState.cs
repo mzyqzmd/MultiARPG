@@ -10,11 +10,11 @@ public class PlayerMovementState : PlayerActionState
     private readonly PlayerVerticalMotionControl _jumpControl;
 
     public PlayerMovementState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl playerState_, CharacterController characterController_,
-        PlayerStatsControl playerStats_, Animator anim_, InputService inputService_,
+        PlayerStateControl stateControl_, CharacterController characterController_,
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_,
         PlayerVerticalMotionControl jumpControl_) :
-        base(stateMachine_, playerState_, characterController_, playerStats_, anim_,
+        base(stateMachine_, stateControl_, characterController_, statsControl_, anim_,
             inputService_, playerCameraService_, audioService_)
     {
         _jumpControl = jumpControl_;
@@ -32,12 +32,14 @@ public class PlayerMovementState : PlayerActionState
         // 走出平台边缘(地面丢失)自动坠落
         if (!_jumpControl.CanJump)
         {
-            _stateMachine.ChangeState(_playerStateControl.FallState);
+            _stateMachine.ChangeState(_stateControl.FallState);
             return;
         }
-        bool combat = _playerStateControl.IsInCombat;
+        bool combat = _stateControl.IsInCombat;
         // 0 耐力时即使按住跑步也降级为走路
         bool running = _inputService.IsRunning && _statsControl.CanExert;
+        if (running)
+            _statsControl.DrainStamina(_statsControl.RunStaminaDrain, Time.deltaTime);
         HandleMovement(combat, running);
         UpdateAnimator(combat, running);
     }

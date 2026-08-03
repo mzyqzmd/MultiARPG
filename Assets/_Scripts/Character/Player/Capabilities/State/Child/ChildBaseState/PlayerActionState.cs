@@ -16,13 +16,13 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
     protected readonly AudioService _audioService;
 
     protected PlayerActionState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl playerState_, CharacterController characterController_,
-        PlayerStatsControl playerStats_, Animator anim_, InputService inputService_,
+        PlayerStateControl stateControl_, CharacterController characterController_,
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_) :
-        base(stateMachine_, playerState_)
+        base(stateMachine_, stateControl_)
     {
         _characterController = characterController_;
-        _statsControl = playerStats_;
+        _statsControl = statsControl_;
         _anim = anim_;
         _inputService = inputService_;
         _playerCameraService = playerCameraService_;
@@ -67,7 +67,7 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
     public override void Update()
     {
         base.Update();
-        _anim.SetBool("IsGrounded", _playerStateControl.IsGrounded);
+        _anim.SetBool("IsGrounded", _stateControl.IsGrounded);
     }
     #endregion
 }

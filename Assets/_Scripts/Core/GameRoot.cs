@@ -10,6 +10,7 @@ public class GameRoot : MonoBehaviour
     [SerializeField] private SO_AudioDatabase _audioDatabase;
     [SerializeField] private SO_UIDatabase _uiDatabase;
     [SerializeField] private SO_EffectDatabase _effectDatabase;
+    [SerializeField] private SO_ItemDatabase _itemDatabase;
 
     private static bool _alive;
     private SettingsSaveService _settingsService;
@@ -21,6 +22,7 @@ public class GameRoot : MonoBehaviour
     private UIService _uiService;
     private GameSaveService _saveService;
     private EffectService _effectService;
+    private ItemService _itemService;
 
     private void Awake()
     {
@@ -37,27 +39,29 @@ public class GameRoot : MonoBehaviour
         var dataWriter = new SaveFileDataWriter();
         RegisterSettingsService(dataWriter);   // 须在 AudioService 之前：其构造即 ApplyVolumes 依赖 SettingsService
         RegisterSaveService(dataWriter);
-        RegisterAudioService();
-        RegisterInputService();
         RegisterUIService();                   // 须在 SceneControlService 之前：场景服务构造注入 UIService 以驱动场景切换黑幕
         RegisterNetworkService();              // 须在 SceneControlService 之前：场景服务构造注入 NetworkService 以收归场景加载
+        RegisterAudioService();
+        RegisterInputService();
         RegisterSceneControlService();
         RegisterPlayerCameraService();
         RegisterEffectService();
+        RegisterItemService();
     }
 
     private void OnDestroy()
     {
         _alive = false;
-        UnregisterAudioService();
-        UnregisterSettingsService();
-        UnregisterInputService();
-        UnregisterSceneControlService();
-        UnregisterNetworkService();
-        UnregisterPlayerCameraService();
+        UnregisterItemService();
         UnregisterEffectService();
-        UnregisterSaveService();
+        UnregisterPlayerCameraService();
+        UnregisterSceneControlService();
+        UnregisterInputService();
+        UnregisterAudioService();
+        UnregisterNetworkService();
         UnregisterUIService();
+        UnregisterSaveService();
+        UnregisterSettingsService();
         Services.Clear();
         EventBus<ReturningToMainMenuEvent>.Clear();
         EventBus<LocalPlayerBoundEvent>.Clear();
@@ -93,6 +97,43 @@ public class GameRoot : MonoBehaviour
     private void UnregisterSaveService()
     {
         Services.Unregister<GameSaveService>();
+    }
+    #endregion
+
+    #region 注册/注销 UI 服务
+    private void RegisterUIService()
+    {
+        _uiService = new UIService(transform, _uiDatabase);
+        Services.Register(_uiService);
+        EventBus<LocalPlayerBoundEvent>.Subscribe(OnLocalPlayerBound);
+        EventBus<LocalPlayerUnboundEvent>.Subscribe(OnLocalPlayerUnbound);
+    }
+
+    private void UnregisterUIService()
+    {
+        EventBus<LocalPlayerBoundEvent>.Unsubscribe(OnLocalPlayerBound);
+        EventBus<LocalPlayerUnboundEvent>.Unsubscribe(OnLocalPlayerUnbound);
+        Services.Unregister<UIService>();
+    }
+
+    private void OnLocalPlayerBound(LocalPlayerBoundEvent e_) =>
+        _uiService.SpawnUiView<UI_InGameUI>("InGameUI", EUILayerCanvas.Hud).
+            Initialize(e_.Player.PlayerStatsControl);
+
+    private void OnLocalPlayerUnbound(LocalPlayerUnboundEvent _) =>
+        _uiService.ClearAllLayerView();
+    #endregion
+
+    #region 注册/注销网络服务
+    private void RegisterNetworkService()
+    {
+        _networkService = new NetworkService();
+        Services.Register(_networkService);
+    }
+
+    private void UnregisterNetworkService()
+    {
+        Services.Unregister<NetworkService>();
     }
     #endregion
 
@@ -137,19 +178,6 @@ public class GameRoot : MonoBehaviour
     }
     #endregion
 
-    #region 注册/注销网络服务
-    private void RegisterNetworkService()
-    {
-        _networkService = new NetworkService();
-        Services.Register(_networkService);
-    }
-
-    private void UnregisterNetworkService()
-    {
-        Services.Unregister<NetworkService>();
-    }
-    #endregion
-
     #region 注册/注销玩家摄像机服务
     private void RegisterPlayerCameraService()
     {
@@ -176,27 +204,16 @@ public class GameRoot : MonoBehaviour
     }
     #endregion
 
-    #region 注册/注销 UI 服务
-    private void RegisterUIService()
+    #region 注册/注销物品服务
+    private void RegisterItemService()
     {
-        _uiService = new UIService(transform, _uiDatabase);
-        Services.Register(_uiService);
-        EventBus<LocalPlayerBoundEvent>.Subscribe(OnLocalPlayerBound);
-        EventBus<LocalPlayerUnboundEvent>.Subscribe(OnLocalPlayerUnbound);
+        _itemService = new ItemService(_itemDatabase);
+        Services.Register(_itemService);
     }
 
-    private void UnregisterUIService()
+    private void UnregisterItemService()
     {
-        EventBus<LocalPlayerBoundEvent>.Unsubscribe(OnLocalPlayerBound);
-        EventBus<LocalPlayerUnboundEvent>.Unsubscribe(OnLocalPlayerUnbound);
-        Services.Unregister<UIService>();
+        Services.Unregister<ItemService>();
     }
-
-    private void OnLocalPlayerBound(LocalPlayerBoundEvent e_) =>
-        _uiService.SpawnUiView<UI_InGameUI>("InGameUI", EUILayerCanvas.Hud).
-            Initialize(e_.Player.PlayerStatsControl);
-
-    private void OnLocalPlayerUnbound(LocalPlayerUnboundEvent _) =>
-        _uiService.ClearAllLayerView();
     #endregion
 }

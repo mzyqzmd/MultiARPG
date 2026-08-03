@@ -145,6 +145,78 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EquipHotKey1"",
+                    ""type"": ""Button"",
+                    ""id"": ""adc63dbe-d2f1-4f9c-8f4e-4775495072a8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EquipHotKey2"",
+                    ""type"": ""Button"",
+                    ""id"": ""80be2bca-5ac5-4b06-8fa0-aa1332df9846"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EquipHotKey3"",
+                    ""type"": ""Button"",
+                    ""id"": ""9b7e0a39-5572-4411-b64b-791acc33003c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EquipHotKey4"",
+                    ""type"": ""Button"",
+                    ""id"": ""36d2ada0-409b-47c7-94dc-28a62c55aa4c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EquipHotKey5"",
+                    ""type"": ""Button"",
+                    ""id"": ""0fa7948d-0de0-4cd1-8482-9ed2a9f61e49"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NormalApply"",
+                    ""type"": ""Button"",
+                    ""id"": ""e4482027-ecb7-447e-ae21-5675dc01deb1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpecialApply"",
+                    ""type"": ""Button"",
+                    ""id"": ""f702d2ac-90a2-4114-afe3-1a5df5746196"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AimOrParry"",
+                    ""type"": ""Button"",
+                    ""id"": ""b5ec5efb-1626-4f99-a605-cdc9cd468fad"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -444,6 +516,204 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""action"": ""TestButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5ceb39cf-6435-4813-80ce-d0b06d5ab076"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""EquipHotKey1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""716c4d9f-5f09-4f21-ba3b-503d01316e93"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""EquipHotKey1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c792fc0c-c249-48ca-9151-df54a9c548f1"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""EquipHotKey2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0e1769e4-cbe1-47fe-b072-716c3a125360"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""EquipHotKey2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""693ea322-736f-4b89-8ee7-2a4a2239d615"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""EquipHotKey3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fa72a1a9-27a8-44c8-8ce7-713d2ff63a0d"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""EquipHotKey3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d0e55d7a-dc9f-42b2-8dd9-05cca266c25f"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""EquipHotKey4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4c41a01c-effb-46f9-b87c-eeb18ad0b1f4"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""EquipHotKey4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5362f5cd-2faa-424f-bfc9-a833a2e07e0f"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""EquipHotKey5"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1ae7a12e-f145-4869-b505-febf01263d32"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EquipHotKey5"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bcce9ede-a9a2-4342-b332-336306a08edf"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""NormalApply"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""817d91d1-fda5-4f20-b03c-188a2fc587b1"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""NormalApply"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f4328d30-1a78-4716-a005-1e967ee2ace2"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""AimOrParry"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""01e0fbfe-a2a6-4e70-920f-3dda11cfdbb9"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""AimOrParry"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""92c50d2f-19fc-49cc-a137-4631fe61a440"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpecialApply"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""51f90dea-c173-4705-b5b5-536fbbe5e9b8"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""SpecialApply"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""a80805f6-c903-4cf9-916a-7483cf9bf67f"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""SpecialApply"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a35e8a80-d1b6-4c13-a826-fba5f2c8134a"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""SpecialApply"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -525,6 +795,14 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         m_Player_DodgeTrigger = m_Player.FindAction("DodgeTrigger", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_TestButton = m_Player.FindAction("TestButton", throwIfNotFound: true);
+        m_Player_EquipHotKey1 = m_Player.FindAction("EquipHotKey1", throwIfNotFound: true);
+        m_Player_EquipHotKey2 = m_Player.FindAction("EquipHotKey2", throwIfNotFound: true);
+        m_Player_EquipHotKey3 = m_Player.FindAction("EquipHotKey3", throwIfNotFound: true);
+        m_Player_EquipHotKey4 = m_Player.FindAction("EquipHotKey4", throwIfNotFound: true);
+        m_Player_EquipHotKey5 = m_Player.FindAction("EquipHotKey5", throwIfNotFound: true);
+        m_Player_NormalApply = m_Player.FindAction("NormalApply", throwIfNotFound: true);
+        m_Player_SpecialApply = m_Player.FindAction("SpecialApply", throwIfNotFound: true);
+        m_Player_AimOrParry = m_Player.FindAction("AimOrParry", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_ClickSelectedButton = m_UI.FindAction("ClickSelectedButton", throwIfNotFound: true);
@@ -615,6 +893,14 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_DodgeTrigger;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_TestButton;
+    private readonly InputAction m_Player_EquipHotKey1;
+    private readonly InputAction m_Player_EquipHotKey2;
+    private readonly InputAction m_Player_EquipHotKey3;
+    private readonly InputAction m_Player_EquipHotKey4;
+    private readonly InputAction m_Player_EquipHotKey5;
+    private readonly InputAction m_Player_NormalApply;
+    private readonly InputAction m_Player_SpecialApply;
+    private readonly InputAction m_Player_AimOrParry;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -650,6 +936,38 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/TestButton".
         /// </summary>
         public InputAction @TestButton => m_Wrapper.m_Player_TestButton;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/EquipHotKey1".
+        /// </summary>
+        public InputAction @EquipHotKey1 => m_Wrapper.m_Player_EquipHotKey1;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/EquipHotKey2".
+        /// </summary>
+        public InputAction @EquipHotKey2 => m_Wrapper.m_Player_EquipHotKey2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/EquipHotKey3".
+        /// </summary>
+        public InputAction @EquipHotKey3 => m_Wrapper.m_Player_EquipHotKey3;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/EquipHotKey4".
+        /// </summary>
+        public InputAction @EquipHotKey4 => m_Wrapper.m_Player_EquipHotKey4;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/EquipHotKey5".
+        /// </summary>
+        public InputAction @EquipHotKey5 => m_Wrapper.m_Player_EquipHotKey5;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/NormalApply".
+        /// </summary>
+        public InputAction @NormalApply => m_Wrapper.m_Player_NormalApply;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SpecialApply".
+        /// </summary>
+        public InputAction @SpecialApply => m_Wrapper.m_Player_SpecialApply;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/AimOrParry".
+        /// </summary>
+        public InputAction @AimOrParry => m_Wrapper.m_Player_AimOrParry;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -694,6 +1012,30 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @TestButton.started += instance.OnTestButton;
             @TestButton.performed += instance.OnTestButton;
             @TestButton.canceled += instance.OnTestButton;
+            @EquipHotKey1.started += instance.OnEquipHotKey1;
+            @EquipHotKey1.performed += instance.OnEquipHotKey1;
+            @EquipHotKey1.canceled += instance.OnEquipHotKey1;
+            @EquipHotKey2.started += instance.OnEquipHotKey2;
+            @EquipHotKey2.performed += instance.OnEquipHotKey2;
+            @EquipHotKey2.canceled += instance.OnEquipHotKey2;
+            @EquipHotKey3.started += instance.OnEquipHotKey3;
+            @EquipHotKey3.performed += instance.OnEquipHotKey3;
+            @EquipHotKey3.canceled += instance.OnEquipHotKey3;
+            @EquipHotKey4.started += instance.OnEquipHotKey4;
+            @EquipHotKey4.performed += instance.OnEquipHotKey4;
+            @EquipHotKey4.canceled += instance.OnEquipHotKey4;
+            @EquipHotKey5.started += instance.OnEquipHotKey5;
+            @EquipHotKey5.performed += instance.OnEquipHotKey5;
+            @EquipHotKey5.canceled += instance.OnEquipHotKey5;
+            @NormalApply.started += instance.OnNormalApply;
+            @NormalApply.performed += instance.OnNormalApply;
+            @NormalApply.canceled += instance.OnNormalApply;
+            @SpecialApply.started += instance.OnSpecialApply;
+            @SpecialApply.performed += instance.OnSpecialApply;
+            @SpecialApply.canceled += instance.OnSpecialApply;
+            @AimOrParry.started += instance.OnAimOrParry;
+            @AimOrParry.performed += instance.OnAimOrParry;
+            @AimOrParry.canceled += instance.OnAimOrParry;
         }
 
         /// <summary>
@@ -723,6 +1065,30 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @TestButton.started -= instance.OnTestButton;
             @TestButton.performed -= instance.OnTestButton;
             @TestButton.canceled -= instance.OnTestButton;
+            @EquipHotKey1.started -= instance.OnEquipHotKey1;
+            @EquipHotKey1.performed -= instance.OnEquipHotKey1;
+            @EquipHotKey1.canceled -= instance.OnEquipHotKey1;
+            @EquipHotKey2.started -= instance.OnEquipHotKey2;
+            @EquipHotKey2.performed -= instance.OnEquipHotKey2;
+            @EquipHotKey2.canceled -= instance.OnEquipHotKey2;
+            @EquipHotKey3.started -= instance.OnEquipHotKey3;
+            @EquipHotKey3.performed -= instance.OnEquipHotKey3;
+            @EquipHotKey3.canceled -= instance.OnEquipHotKey3;
+            @EquipHotKey4.started -= instance.OnEquipHotKey4;
+            @EquipHotKey4.performed -= instance.OnEquipHotKey4;
+            @EquipHotKey4.canceled -= instance.OnEquipHotKey4;
+            @EquipHotKey5.started -= instance.OnEquipHotKey5;
+            @EquipHotKey5.performed -= instance.OnEquipHotKey5;
+            @EquipHotKey5.canceled -= instance.OnEquipHotKey5;
+            @NormalApply.started -= instance.OnNormalApply;
+            @NormalApply.performed -= instance.OnNormalApply;
+            @NormalApply.canceled -= instance.OnNormalApply;
+            @SpecialApply.started -= instance.OnSpecialApply;
+            @SpecialApply.performed -= instance.OnSpecialApply;
+            @SpecialApply.canceled -= instance.OnSpecialApply;
+            @AimOrParry.started -= instance.OnAimOrParry;
+            @AimOrParry.performed -= instance.OnAimOrParry;
+            @AimOrParry.canceled -= instance.OnAimOrParry;
         }
 
         /// <summary>
@@ -927,6 +1293,62 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTestButton(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EquipHotKey1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEquipHotKey1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EquipHotKey2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEquipHotKey2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EquipHotKey3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEquipHotKey3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EquipHotKey4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEquipHotKey4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EquipHotKey5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEquipHotKey5(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "NormalApply" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnNormalApply(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SpecialApply" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSpecialApply(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AimOrParry" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAimOrParry(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -10,11 +10,11 @@ public class PlayerFallState : PlayerActionState
     private readonly PlayerVerticalMotionControl _jumpControl;
 
     public PlayerFallState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl playerState_, CharacterController characterController_,
-        PlayerStatsControl playerStats_, Animator anim_, InputService inputService_,
+        PlayerStateControl stateControl_, CharacterController characterController_,
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_,
         PlayerVerticalMotionControl jumpControl_) :
-        base(stateMachine_, playerState_, characterController_, playerStats_,
+        base(stateMachine_, stateControl_, characterController_, statsControl_,
             anim_, inputService_, playerCameraService_, audioService_)
     {
         _jumpControl = jumpControl_;
@@ -22,13 +22,13 @@ public class PlayerFallState : PlayerActionState
 
     public override void Enter()
     {
-        _playerStateControl.IsFalling = true;
+        _stateControl.IsBusy = true;
         _anim.SetBool("FallState", true);
     }
 
     public override void Exit()
     {
-        _playerStateControl.IsFalling = false;
+        _stateControl.IsBusy = false;
         _anim.SetBool("FallState", false);
     }
 
@@ -42,7 +42,7 @@ public class PlayerFallState : PlayerActionState
         {
             Vector3 moveDir = GetMoveDirection(input);
             Move(moveDir * _statsControl.NormalMoveSpeed + _jumpControl.VerticalVelocity);
-            RotateTowards(moveDir, _playerStateControl.IsInCombat);
+            RotateTowards(moveDir, _stateControl.IsInCombat);
         }
         else
         {
@@ -52,7 +52,7 @@ public class PlayerFallState : PlayerActionState
         if (_jumpControl.HasLanded())
         {
             _jumpControl.Reset();
-            _stateMachine.ChangeState(_playerStateControl.MovementState);
+            _stateMachine.ChangeState(_stateControl.MovementState);
         }
     }
 }

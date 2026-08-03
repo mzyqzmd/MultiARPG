@@ -9,13 +9,13 @@
 public abstract class PlayerBaseState<TState> : IState where TState : IState
 {
     protected readonly StateMachine<TState> _stateMachine;
-    protected readonly PlayerStateControl _playerStateControl;
+    protected readonly PlayerStateControl _stateControl;
     protected float _stateDuration;
 
-    protected PlayerBaseState(StateMachine<TState> stateMachine_, PlayerStateControl playerState_)
+    protected PlayerBaseState(StateMachine<TState> stateMachine_, PlayerStateControl stateControl_)
     {
         _stateMachine = stateMachine_;
-        _playerStateControl = playerState_;
+        _stateControl = stateControl_;
     }
 
     public virtual void Enter()

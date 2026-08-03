@@ -35,7 +35,7 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
     public float GetRotationDelta() => RotationSpeed * Time.deltaTime;
     #endregion
 
-    #region 生命值体系（纯本地，不跨端同步）
+    #region 生命值体系（本地权威：数值仅本机修改，跨端扣血经 Character.RequestDamageServerRpc → TakeDamageClientRpc 事件驱动本地 TakeDamage）
     /// <summary>当前生命值变化事件（old, new），供 UI 订阅；上限变化夹取后亦会触发。</summary>
     public event Action<int, int> OnCurrentHealthChanged;
     public int CurrentHealth => _currentHealth;

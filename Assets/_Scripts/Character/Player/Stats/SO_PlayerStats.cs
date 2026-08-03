@@ -25,6 +25,12 @@ public class SO_PlayerStats : SO_CharacterStats
     [Tooltip("主动跳跃一次性消耗的耐力值。耐力不足时跳跃请求被丢弃，无法起跳。")]
     [SerializeField] private int _jumpStaminaCost = 20;
 
+    [Header("轻击参数")]
+    [Tooltip("单次轻击一次性消耗的耐力值。耐力不足时轻击请求被丢弃，无法挥砍。")]
+    [SerializeField] private int _normalAttackStaminaCost = 15;
+    [Tooltip("轻击动画持续时间（秒）。同时与动画 NormalAttackSpeed 对齐，使动画恰好在该时长内播完。")]
+    [SerializeField] private float _normalAttackDuration = 0.8f;
+
     [Header("耐力参数")]
     [Tooltip("耐力上限。用于跑步 / 闪避 / 跳跃等消耗性动作的通用资源。")]
     [SerializeField] private int _maxStamina = 100;
@@ -45,6 +51,8 @@ public class SO_PlayerStats : SO_CharacterStats
     public float JumpHeight => _jumpHeight;
     public float Gravity => _gravity;
     public int JumpStaminaCost => _jumpStaminaCost;
+    public int NormalAttackStaminaCost => _normalAttackStaminaCost;
+    public float NormalAttackDuration => _normalAttackDuration;
 
     public int MaxStamina => _maxStamina;
     public int DodgeStaminaCost => _dodgeStaminaCost;

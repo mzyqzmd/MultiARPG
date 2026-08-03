@@ -5,10 +5,10 @@ public class PlayerDeadState : PlayerActionState
 {
     private readonly UIService _uiService;
     public PlayerDeadState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl playerState_, CharacterController characterController_,
-        PlayerStatsControl playerStats_, Animator anim_, InputService inputService_,
+        PlayerStateControl stateControl_, CharacterController characterController_,
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_, UIService uiService_) :
-        base(stateMachine_, playerState_, characterController_, playerStats_, anim_,
+        base(stateMachine_, stateControl_, characterController_, statsControl_, anim_,
             inputService_, playerCameraService_, audioService_)
     {
         _uiService = uiService_;
@@ -17,7 +17,6 @@ public class PlayerDeadState : PlayerActionState
     public override void Enter()
     {
         _inputService.DisableAllMode();
-        _playerStateControl.IsDeadState = true;
         _uiService.SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay).
             Initialize("寄!", Color.red, 1.5f, false);
         _anim.SetBool("DeadState", true);
@@ -26,7 +25,6 @@ public class PlayerDeadState : PlayerActionState
     public override void Exit()
     {
         _inputService.EnablePlayerMode();
-        _playerStateControl.IsDeadState = false;
         _anim.SetBool("DeadState", false);
     }
 }

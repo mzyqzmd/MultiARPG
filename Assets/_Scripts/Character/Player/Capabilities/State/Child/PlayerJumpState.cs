@@ -13,11 +13,11 @@ public class PlayerJumpState : PlayerActionState
     private bool _animSpeedReady;
 
     public PlayerJumpState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl playerState_, CharacterController characterController_,
-        PlayerStatsControl playerStats_, Animator anim_, InputService inputService_,
+        PlayerStateControl stateControl_, CharacterController characterController_,
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_,
         PlayerVerticalMotionControl verticalMotionControl_) :
-        base(stateMachine_, playerState_, characterController_, playerStats_,
+        base(stateMachine_, stateControl_, characterController_, statsControl_,
             anim_, inputService_, playerCameraService_, audioService_)
     {
         _verticalMotionControl = verticalMotionControl_;
@@ -28,9 +28,9 @@ public class PlayerJumpState : PlayerActionState
         base.Enter();
         _verticalMotionControl.Reset();               // 清零残留垂直速度
         _verticalMotionControl.Launch();              // 赋向上初速度
-        _playerStateControl.IsJumping = true;
-        _playerStateControl.ConsumeJump();
-        _statsControl.SpendStamina(_playerStateControl.JumpStaminaCost);
+        _stateControl.IsBusy = true;
+        _stateControl.ConsumeJump();
+        _statsControl.SpendStamina(_stateControl.JumpStaminaCost);
         _anim.SetBool("JumpState", true);
         // 已缓存 clip 长度则立即设倍速，避免首帧跳变
         _animSpeedReady = _jumpLiftClipLength > 0f;
@@ -44,7 +44,7 @@ public class PlayerJumpState : PlayerActionState
     public override void Exit()
     {
         _anim.SetBool("JumpState", false);
-        _playerStateControl.IsJumping = false;
+        _stateControl.IsBusy = false;
     }
 
     public override void Update()
@@ -71,7 +71,7 @@ public class PlayerJumpState : PlayerActionState
         {
             Vector3 moveDir = GetMoveDirection(input);
             Move(moveDir * _statsControl.NormalMoveSpeed + _verticalMotionControl.VerticalVelocity);
-            RotateTowards(moveDir, _playerStateControl.IsInCombat);
+            RotateTowards(moveDir, _stateControl.IsInCombat);
         }
         else
         {
@@ -82,7 +82,7 @@ public class PlayerJumpState : PlayerActionState
         // 到达顶点转入坠落（自然继承当前垂直速度）
         if (_verticalMotionControl.VerticalVelocity.y <= 0f && !_verticalMotionControl.HasLanded())
         {
-            _stateMachine.ChangeState(_playerStateControl.FallState);
+            _stateMachine.ChangeState(_stateControl.FallState);
             return;
         }
 
@@ -90,7 +90,7 @@ public class PlayerJumpState : PlayerActionState
         if (_verticalMotionControl.HasLanded())
         {
             _verticalMotionControl.Reset();
-            _stateMachine.ChangeState(_playerStateControl.MovementState);
+            _stateMachine.ChangeState(_stateControl.MovementState);
         }
     }
 }

@@ -18,6 +18,14 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     public event Action OnJumpTriggered;
     /// <summary>测试按钮点击事件（performed 时触发一次）。</summary>
     public event Action OnTestButtonClicked;//NOTE:测试用的到时候删掉
+    /// <summary>热键栏触发：参数为对应装备槽位（1=LeftHand / 2=LeftHip / 3=Back / 4=RightHip / 5=RightHand）。</summary>
+    public event Action<EEquipmentSlot> OnHotbarTriggered;
+    /// <summary>轻击触发事件（performed 时触发一次）。</summary>
+    public event Action OnNormalApplyTriggered;
+    /// <summary>重击触发事件（performed 时触发一次，本次仅暴露不接线）。</summary>
+    public event Action OnSpecialApplyTriggered;
+    /// <summary>瞄准/格挡触发事件（performed 时触发一次，本次仅暴露不接线）。</summary>
+    public event Action OnAimOrParryTriggered;
     /// <summary>活跃设备切换事件（键盘 ↔ 手柄）。</summary>
     public event Action<EActiveDevice> OnActiveDeviceChanged;
 
@@ -115,8 +123,58 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
         if (context.performed) OnJumpTriggered?.Invoke();
     }
 
+    #region 装备栏热键触发
+    public void OnEquipHotKey1(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnHotbarTriggered?.Invoke(EEquipmentSlot.LeftHand);
+    }
+
+    public void OnEquipHotKey2(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnHotbarTriggered?.Invoke(EEquipmentSlot.LeftHip);
+    }
+
+    public void OnEquipHotKey3(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnHotbarTriggered?.Invoke(EEquipmentSlot.Back);
+    }
+
+    public void OnEquipHotKey4(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnHotbarTriggered?.Invoke(EEquipmentSlot.RightHip);
+    }
+
+    public void OnEquipHotKey5(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnHotbarTriggered?.Invoke(EEquipmentSlot.RightHand);
+    }
+    #endregion
+
     public void OnTestButton(InputAction.CallbackContext context)
     {
         if (context.performed) OnTestButtonClicked?.Invoke();
+    }
+
+    public void OnNormalApply(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnNormalApplyTriggered?.Invoke();
+    }
+
+    public void OnSpecialApply(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnSpecialApplyTriggered?.Invoke();
+    }
+
+    public void OnAimOrParry(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnAimOrParryTriggered?.Invoke();
     }
 }

@@ -25,5 +25,5 @@ public abstract class SO_BaseEffect : ScriptableObject
     /// <summary>效果被移除时回滚（如属性修正型减回上限）。默认空实现；仅属性修正类需要 override。source_ 同 Execute。</summary>
     public virtual void OnRemove(IEffectTarget target_, IEffectSource source_) { }
 
-    private void OnValidate() => _id = name;
+    protected void OnValidate() => _id = name;
 }

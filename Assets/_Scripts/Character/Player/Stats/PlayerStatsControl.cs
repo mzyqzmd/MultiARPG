@@ -40,6 +40,8 @@ public class PlayerStatsControl : CharacterStatsControl
     public float Gravity => _stats.Gravity;
 
     public int JumpStaminaCost => _stats.JumpStaminaCost;
+    public int NormalAttackStaminaCost => _stats.NormalAttackStaminaCost;
+    public float NormalAttackDuration => _stats.NormalAttackDuration;
     public int DodgeStaminaCost => _stats.DodgeStaminaCost;
     public int RunStaminaDrain => _stats.RunStaminaDrain;
     public float StaminaRegenDelay => _stats.StaminaRegenDelay; 

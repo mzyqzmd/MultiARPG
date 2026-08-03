@@ -3,9 +3,13 @@ using UnityEngine;
 
 public class Player : Character
 {
+    [Header("测试")]
+    [SerializeField] private BaseItem _mainWeapon;
+
     [Header("玩家配置")]
     [SerializeField] private SO_PlayerStats _soPlayerStats;
     [SerializeField] private CinemachineFreeLook _freeLookCamera;
+    [SerializeField] private PlayerAnimationEventControl _animationControl; //动画控制
     [SerializeField] private PlayerNetworkSaveControl _playerNetworkSaveControl;//网络存档
     [SerializeField] private PlayerNetworkStatsControl _playerNetworkStatsControl;//玩家网络属性控制
 
@@ -24,6 +28,7 @@ public class Player : Character
     private GameSaveService _saveService;
     private SceneControlService _sceneControlService;
     private NetworkService _networkService;
+    private ItemService _itemService;
 
     // 组件
     private PlayerStatsControl _playerStatsControl;//玩家数据控制(含耐力)
@@ -34,6 +39,9 @@ public class Player : Character
     private PlayerGroundCheck _groundCheck;// 玩家地面检测
     private PlayerVerticalMotionControl _verticalMotion;// 玩家垂直运动控制
     private PlayerEquipmentControl _equipmentControl;// 玩家装备控制
+
+    private BaseItem _pendingItem;// 当前切换流程中待提交挂载的物品
+    private EEquipmentSlot _pendingSlot;// 当前切换流程的目标槽位
 
     /// <summary>本地玩家属性控制(含耐力与生命，供 UI 访问)。</summary>
     public PlayerStatsControl PlayerStatsControl => _playerStatsControl;
@@ -50,12 +58,12 @@ public class Player : Character
         _saveService = Services.Get<GameSaveService>();
         _sceneControlService = Services.Get<SceneControlService>();
         _networkService = Services.Get<NetworkService>();
+        _itemService = Services.Get<ItemService>();
         #endregion
 
         #region 注册组件
         // 属性控制
         _playerStatsControl = new PlayerStatsControl(_soPlayerStats);
-        _playerStatsControl.OnExhausted += OnStaminaExhausted;
         _statsControl = _playerStatsControl;// 供基类分流本地属性修正（同时作为 IEffectTarget / IEffectSource）
         _networkStatsControl = _playerNetworkStatsControl;
 
@@ -66,24 +74,15 @@ public class Player : Character
         //状态机控制
         _groundCheck = new PlayerGroundCheck(_characterController);
         _verticalMotion = new PlayerVerticalMotionControl(_playerStatsControl, _groundCheck);
+
+        //装备控制（挂载权威，需在状态机之前实例化以便传入）
+        _equipmentControl = new PlayerEquipmentControl(_leftHand, _rightHand, _leftHip, _rightHip, _back, this);
+
         _stateControl = new PlayerStateControl(_inputService, _playerCameraService,
-            _characterController, _playerStatsControl, _anim, _audioService, _uiService, _verticalMotion);
-
-        //装备控制
-        _equipmentControl = new PlayerEquipmentControl(_leftHand, _rightHand, _leftHip, _rightHip, _back);
+            _characterController, _playerStatsControl, _anim, _audioService, _uiService, _verticalMotion, _equipmentControl);
         #endregion
-
     }
     #endregion
-
-    private void TestButtonClicked()
-    {
-        if (!IsOwner) return;
-        Debug.Log("TestButtonClicked");
-        ApplyEffect("StatModifierEffect");
-        ApplyEffect("DamageEffect");
-        //ApplyEffect("HealEffect");
-    }
 
     #region Update 更新
     protected override void Update()
@@ -97,10 +96,8 @@ public class Player : Character
         // 仅在世界场景累计游玩时长（供存档点 / 返回主菜单存档使用，主菜单不累计）
         _saveControl.TickPlayTime(Time.deltaTime);
 
-        // 跑步缓慢消耗耐力；否则(walk/站立/闪避后)经过延迟自动回复
-        if (_stateControl.IsRunning)
-            _playerStatsControl.DrainStamina(_playerStatsControl.RunStaminaDrain, Time.deltaTime);
-        else
+        // 非跑步期间(walk/站立/闪避/跳跃/坠落)经过延迟自动回复耐力
+        if (!_stateControl.IsRunning)
             _playerStatsControl.RecoverStamina(Time.deltaTime);
     }
     #endregion
@@ -114,12 +111,19 @@ public class Player : Character
         _freeLookCamera.enabled = IsOwner;
 
         if (!IsOwner) return;
+        _playerStatsControl.OnExhausted += OnStaminaExhausted;
         _playerStatsControl.ResetStamina();
 
         _uiService.BindLocalPlayer(this);
 
         // 订阅"即将返回主菜单"信号：Host 端协调各端存档，客人端仅上报自身
         EventBus<ReturningToMainMenuEvent>.Subscribe(OnReturningToMainMenu);
+
+        // 热键栏：装备/使用物品（仅本地玩家触发拔刀/收刀表现）
+        _inputService.OnHotbarTriggered += OnHotbarTriggered;
+        //动画事件接收器：订阅两个 Animation Event 出口，由 Player 桥接编排（装备控制与动画控制互不依赖）
+        _animationControl.OnToggleFrame += OnToggleFrame;
+        _animationControl.OnAnimationFinished += OnAnimationFinished;
 
         //NOTE:测试用的（仅本地玩家订阅，避免远端副本误触发）
         _inputService.OnTestButtonClicked += TestButtonClicked;
@@ -131,19 +135,66 @@ public class Player : Character
 
         if (IsOwner)
         {
+            _playerStatsControl.OnExhausted -= OnStaminaExhausted;
+
             EventBus<ReturningToMainMenuEvent>.Unsubscribe(OnReturningToMainMenu);
 
             // 仅解绑本地玩家 UI
             _uiService.UnbindLocalPlayer();
+
+            // 热键栏对称反订阅
+            _inputService.OnHotbarTriggered -= OnHotbarTriggered;
+            _animationControl.OnToggleFrame -= OnToggleFrame;
+            _animationControl.OnAnimationFinished -= OnAnimationFinished;
 
             //NOTE:测试用的（与 OnNetworkSpawn 订阅对称反订阅）
             _inputService.OnTestButtonClicked -= TestButtonClicked;
         }
     }
 
+    private void TestButtonClicked()
+    {
+        if (!IsOwner) return;
+        Debug.Log("TestButtonClicked");
+        //ApplyEffect("StatModifierEffect");
+        //ApplyEffect("DamageEffect");
+        _stateControl.CombatLocked = !_stateControl.CombatLocked;
+        //ApplyEffect("HealEffect");
+    }
+
     /// <summary>返回主菜单信号回调：统一经存档组件按 IsHost/IsOwner 分流（Host 协调全体，客人仅上报自身）。</summary>
     private void OnReturningToMainMenu(ReturningToMainMenuEvent _) =>
         _playerNetworkSaveControl.RequestSave();
+    #endregion
+
+    #region 装备切换控制
+    /// <summary>热键栏回调：本地玩家切换指定槽位装备（拔刀/收刀表现），远端副本不响应。
+    /// 仅做状态决策（翻转占用表）并播动画，真实挂载在 OnToggleFrame 帧事件提交。</summary>
+    private void OnHotbarTriggered(EEquipmentSlot slot_)
+    {
+        if (!IsOwner) return;
+        BaseItem item = _mainWeapon;//NOTE:临时测试用
+        if (item == null) return; // 未提供则不切换
+        _equipmentControl.Toggle(slot_);
+        _pendingItem = item;
+        _pendingSlot = slot_;
+        _stateControl.IsBusy = true;
+        _animationControl.Equip1HandWeapon();
+    }
+
+    /// <summary>动画切换落点帧：提交真实挂载/卸下，并清 IsBusy。</summary>
+    private void OnToggleFrame()
+    {
+        if (_pendingItem == null) return;
+        if (_equipmentControl.IsSlotTaken(_pendingSlot))
+            _equipmentControl.Equip(_pendingItem);
+        else
+            _equipmentControl.Unequip(_pendingItem);
+        _pendingItem = null;
+    }
+
+    /// <summary>动画播放完成：清除忙状态。</summary>
+    private void OnAnimationFinished() => _stateControl.IsBusy = false;
     #endregion
 
     #region 力竭事件回调

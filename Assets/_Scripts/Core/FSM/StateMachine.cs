@@ -133,6 +133,8 @@ public class StateMachine<TState> where TState : IState
             //如果当前状态为指定状态则切换
             if (t.from == null || EqualityComparer<TState>.Default.Equals(t.from, CurrentState))
             {
+                //目标态已是当前态则跳过，避免 AnyTransition 自循环重入（如死亡态每帧重入）。
+                if (EqualityComparer<TState>.Default.Equals(t.to, CurrentState)) continue;
                 ChangeState(t.to);
                 break;
             }

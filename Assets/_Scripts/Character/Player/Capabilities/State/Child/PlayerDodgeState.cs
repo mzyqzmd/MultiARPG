@@ -14,10 +14,10 @@ public class PlayerDodgeState : PlayerActionState
     private float _dodgeClipLength;
 
     public PlayerDodgeState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl playerState_, CharacterController characterController_,
-        PlayerStatsControl playerStats_, Animator anim_, InputService inputService_,
+        PlayerStateControl stateControl_, CharacterController characterController_,
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_) :
-        base(stateMachine_, playerState_, characterController_, playerStats_,
+        base(stateMachine_, stateControl_, characterController_, statsControl_,
             anim_, inputService_, playerCameraService_, audioService_)
     {
     }
@@ -30,9 +30,9 @@ public class PlayerDodgeState : PlayerActionState
         _dodgeVelocity = dir * _statsControl.DodgeSpeed;
         _stateDuration = _statsControl.DodgeDuration;
 
-        _playerStateControl.IsDodging = true;
-        _playerStateControl.ConsumeDodge();
-        _statsControl.SpendStamina(_playerStateControl.DodgeStaminaCost);
+        _stateControl.IsBusy = true;
+        _stateControl.ConsumeDodge();
+        _statsControl.SpendStamina(_stateControl.DodgeStaminaCost);
 
         _audioService.PlayAudio("Player", "DodgeSFX", _characterController.gameObject.transform);
 
@@ -43,7 +43,7 @@ public class PlayerDodgeState : PlayerActionState
             _anim.SetFloat(DodgeAnimSpeedParam, _dodgeClipLength / _statsControl.DodgeDuration);
     }
 
-    public override void Exit() => _playerStateControl.IsDodging = false;
+    public override void Exit() => _stateControl.IsBusy = false;
 
     public override void Update()
     {
@@ -65,7 +65,7 @@ public class PlayerDodgeState : PlayerActionState
         if (_stateDuration <= 0f)
         {
             _anim.SetBool("DodgeState", false);
-            _stateMachine.ChangeState(_playerStateControl.MovementState);
+            _stateMachine.ChangeState(_stateControl.MovementState);
         }
     }
 }

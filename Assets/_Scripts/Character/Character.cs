@@ -71,4 +71,24 @@ public abstract class Character : NetworkBehaviour
         _statsControl?.RemoveEffect(effectId_);
     }
     #endregion
+
+    #region 跨端伤害中转（攻击者 owner 发起 → Host 定位目标 → 目标 owner 本地扣血）
+    /// <summary>攻击者本机命中后发起：把伤害发给 Host（RequireOwnership=false 允许非目标 owner 调用），由 Host 按 targetId 找到目标对象并定向转发给其 owner 本地扣血。</summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestDamageServerRpc(ulong targetId_, DamageInfo damage_)
+    {
+        if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) return;
+        if (!targetObj.TryGetComponent<Character>(out var targetCharacter)) return;
+        var param = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new[] { targetObj.OwnerClientId } }
+        };
+        targetCharacter.TakeDamageClientRpc(damage_, param);
+    }
+
+    /// <summary>目标 owner 本地扣血：接收 Host 转发来的伤害，作用于自身 StatsControl（本地权威）。归零时既有 OnCurrentHealthChanged → ReportDeath 自然驱动死亡广播。</summary>
+    [ClientRpc]
+    public void TakeDamageClientRpc(DamageInfo damage_, ClientRpcParams param_ = default) =>
+        _statsControl?.TakeDamage(damage_);
+    #endregion
 }
