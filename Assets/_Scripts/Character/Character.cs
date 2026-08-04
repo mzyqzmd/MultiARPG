@@ -3,9 +3,9 @@ using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
-/// 角色基类（NetworkBehaviour）：组合 CharacterStatsControl 与 CharacterNetworkStatsControl。
+/// 角色基类（NetworkBehaviour）：组合 CharacterStatsControl 与 CharacterNetworkCombatControl。
 /// 网络外观层——StatsControl 数值本地权威（owner 端应用与驱动），本类仅负责：
-/// 死亡上报（本地血量归零经 _networkStatsControl 上报 server 广播）、自身/环境效果本地施加入口、跨玩家伤害占位。
+/// 自身/环境效果本地施加入口、受击扣血钩子。
 /// 自身不再实现 IEffectTarget（效果目标/来源已下沉到 CharacterStatsControl）。
 /// _statsControl 由子类在 Awake 中赋值（如 Player 赋 PlayerStatsControl）。
 /// </summary>
@@ -15,18 +15,19 @@ public abstract class Character : NetworkBehaviour
     [SerializeField] protected CharacterController _characterController;
     [SerializeField] protected Animator _anim;
 
-    // 效果查表服务
+    // 服务
     protected EffectService _effectService;
+    protected VFXService _vfxService;
 
     // 属性控制
     protected CharacterStatsControl _statsControl;// 本地属性控制（子类 Awake 赋值），同时是 IEffectTarget / IEffectSource
-    protected CharacterNetworkStatsControl _networkStatsControl;// 网络属性控制
 
     public CharacterStatsControl StatsControl => _statsControl;
 
     protected virtual void Awake()
     {
         _effectService = Services.Get<EffectService>();
+        _vfxService= Services.Get<VFXService>();
     }
     protected virtual void Update()
     {
@@ -34,25 +35,25 @@ public abstract class Character : NetworkBehaviour
         if (IsOwner) _statsControl?.TickEffects(Time.deltaTime);
     }
 
-    #region 死亡上报（本地血量归零 → 经网络状态组件上报 server 广播，使队友端进入死亡态）
-    /// <summary>网络生命周期：server 复位死亡状态并订阅本地血量变化（死亡上报用）。</summary>
+    #region 本地血量变化订阅（驱动回调，如复活/死亡态由子类 FSM 本地判定）
     public override void OnNetworkSpawn()
     {
-        if (IsServer) _networkStatsControl.SetAlive();
         _statsControl.OnCurrentHealthChanged += OnCurrentHealthChanged;
     }
 
     public override void OnNetworkDespawn()
     {
-        if (_statsControl != null)
-            _statsControl.OnCurrentHealthChanged -= OnCurrentHealthChanged;
+        _statsControl.OnCurrentHealthChanged -= OnCurrentHealthChanged;
     }
 
-    /// <summary>本地血量归零即上报死亡（_networkStats 为 null 的非联网角色静默忽略）。</summary>
-    private void OnCurrentHealthChanged(int _, int new_)
-    {
-        if (new_ <= 0) _networkStatsControl.ReportDeath();
-    }
+    /// <summary>本地血量变化回调钩子（子类可重写；基类默认空实现）。</summary>
+    protected virtual void OnCurrentHealthChanged(int _, int new_) { }
+    #endregion
+
+    #region 受击入口（命中链路统一钩子：扣血 + 进受击态）
+    /// <summary>受击钩子：由 NetworkHub 在 Host 侧经目标 NetworkObjectId 定位后调用，统一驱动扣血（基类默认）与进受击态（子类重写先播动画再 base 扣血）。contactPoint 供受击态按位置选方向动画。</summary>
+    public virtual void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_) =>
+        _statsControl?.TakeDamage(damage_);
     #endregion
 
     #region 效果施加入口
@@ -70,25 +71,5 @@ public abstract class Character : NetworkBehaviour
         if (!IsOwner) return;
         _statsControl?.RemoveEffect(effectId_);
     }
-    #endregion
-
-    #region 跨端伤害中转（攻击者 owner 发起 → Host 定位目标 → 目标 owner 本地扣血）
-    /// <summary>攻击者本机命中后发起：把伤害发给 Host（RequireOwnership=false 允许非目标 owner 调用），由 Host 按 targetId 找到目标对象并定向转发给其 owner 本地扣血。</summary>
-    [ServerRpc(RequireOwnership = false)]
-    public void RequestDamageServerRpc(ulong targetId_, DamageInfo damage_)
-    {
-        if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) return;
-        if (!targetObj.TryGetComponent<Character>(out var targetCharacter)) return;
-        var param = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams { TargetClientIds = new[] { targetObj.OwnerClientId } }
-        };
-        targetCharacter.TakeDamageClientRpc(damage_, param);
-    }
-
-    /// <summary>目标 owner 本地扣血：接收 Host 转发来的伤害，作用于自身 StatsControl（本地权威）。归零时既有 OnCurrentHealthChanged → ReportDeath 自然驱动死亡广播。</summary>
-    [ClientRpc]
-    public void TakeDamageClientRpc(DamageInfo damage_, ClientRpcParams param_ = default) =>
-        _statsControl?.TakeDamage(damage_);
     #endregion
 }

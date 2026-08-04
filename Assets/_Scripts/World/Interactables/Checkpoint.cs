@@ -8,15 +8,20 @@ using UnityEngine;
 /// </summary>
 public class Checkpoint : MonoBehaviour
 {
+    private UIService _uiService;
+
+    private void Awake() => _uiService = Services.Get<UIService>();
+
     #region 玩家进入触发范围 → 手动存档
     private void OnTriggerEnter(Collider other_)
     {
         var player = other_.GetComponent<Player>();
         // 仅本地玩家触发（经 UIService.LocalPlayer 判定，避免读取网络层 IsOwner）
-        if (player != null && player == Services.Get<UIService>().LocalPlayer)
+        bool isLocal = player != null && player == _uiService.LocalPlayer;
+        if (isLocal)
         {
-            player.ManualSaveCheckpoint();
-            Services.Get<UIService>().SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay)
+            player.RequestSave();
+            _uiService.SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay)
                 .Initialize("已保存存档点", Color.white);
         }
     }

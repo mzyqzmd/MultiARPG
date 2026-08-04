@@ -15,8 +15,8 @@ MonoBehaviour:
   _effectType: 0
   _duration: 0
   _id: RapierDamage
-  _physicalDamage: 1
-  _magicalDamage: 2
-  _fireDamage: 3
-  _iceDamage: 4
-  _lightningDamage: 5
+  _physicalDamage: 0
+  _magicalDamage: 0
+  _fireDamage: 0
+  _iceDamage: 0
+  _lightningDamage: 0

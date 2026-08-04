@@ -14,11 +14,15 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
     protected readonly InputService _inputService;
     protected readonly PlayerCameraService _playerCameraService;
     protected readonly AudioService _audioService;
+    protected readonly UIService _uiService;
+    protected readonly VFXService _vfxService;
+
 
     protected PlayerActionState(StateMachine<PlayerActionState> stateMachine_,
         PlayerStateControl stateControl_, CharacterController characterController_,
         PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
-        PlayerCameraService playerCameraService_, AudioService audioService_) :
+        PlayerCameraService playerCameraService_, AudioService audioService_,
+        UIService uiService_,VFXService vfxService_) :
         base(stateMachine_, stateControl_)
     {
         _characterController = characterController_;
@@ -27,6 +31,8 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
         _inputService = inputService_;
         _playerCameraService = playerCameraService_;
         _audioService = audioService_;
+        _uiService = uiService_;
+        _vfxService = vfxService_;
     }
 
     #region 由相机朝向与输入向量算出水平移动方向

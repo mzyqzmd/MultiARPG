@@ -14,11 +14,12 @@ public class PlayerNormalAttackState : PlayerActionState
     private const string NormalAttackStateTag = "NormalAttack";
 
     public PlayerNormalAttackState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl stateControl_, CharacterController characterController_,
-        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
-        PlayerCameraService playerCameraService_, AudioService audioService_) :
-        base(stateMachine_, stateControl_, characterController_, statsControl_,
-            anim_, inputService_, playerCameraService_, audioService_)
+         PlayerStateControl stateControl_, CharacterController characterController_,
+         PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
+         PlayerCameraService playerCameraService_, AudioService audioService_,
+         UIService uiService_, VFXService vfxService_) : base(stateMachine_,
+             stateControl_, characterController_, statsControl_, anim_,
+             inputService_, playerCameraService_, audioService_, uiService_, vfxService_)
     {
     }
 

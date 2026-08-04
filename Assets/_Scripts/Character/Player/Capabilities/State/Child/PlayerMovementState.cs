@@ -7,17 +7,17 @@ using UnityEngine;
 /// </summary>
 public class PlayerMovementState : PlayerActionState
 {
-    private readonly PlayerVerticalMotionControl _jumpControl;
+    private readonly PlayerVerticalMotionControl _verticalMotionControl;
 
     public PlayerMovementState(StateMachine<PlayerActionState> stateMachine_,
         PlayerStateControl stateControl_, CharacterController characterController_,
         PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_,
-        PlayerVerticalMotionControl jumpControl_) :
+        UIService uiService_, VFXService vfxService_, PlayerVerticalMotionControl verticalMotionControlControl_) :
         base(stateMachine_, stateControl_, characterController_, statsControl_, anim_,
-            inputService_, playerCameraService_, audioService_)
+            inputService_, playerCameraService_, audioService_, uiService_, vfxService_)
     {
-        _jumpControl = jumpControl_;
+        _verticalMotionControl = verticalMotionControlControl_;
     }
 
     public override void Enter()
@@ -30,7 +30,7 @@ public class PlayerMovementState : PlayerActionState
     {
         base.Update();
         // 走出平台边缘(地面丢失)自动坠落
-        if (!_jumpControl.CanJump)
+        if (!_verticalMotionControl.CanJump)
         {
             _stateMachine.ChangeState(_stateControl.FallState);
             return;
@@ -53,12 +53,12 @@ public class PlayerMovementState : PlayerActionState
     // 读输入驱动移动：战斗态 strafe 面向相机，自由态面向移动方向
     private void HandleMovement(bool strafe_, bool running_)
     {
-        _jumpControl.SnapToGround();
+        _verticalMotionControl.SnapToGround();
         Vector2 input = _inputService.MoveInputVector2;
         if (input == Vector2.zero) return;
         Vector3 moveDir = GetMoveDirection(input);
         float speed = _statsControl.GetMoveSpeed(running_);
-        Move(speed * moveDir + _jumpControl.VerticalVelocity);
+        Move(speed * moveDir + _verticalMotionControl.VerticalVelocity);
         RotateTowards(moveDir, strafe_);
     }
 

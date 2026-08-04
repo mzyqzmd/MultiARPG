@@ -1080,7 +1080,8 @@ Animator:
   m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
     are already bound by a Humanoid avatar. These transforms can only be changed
     by Humanoid clips.\n\tTransform 'Eyebrows'\n\tTransform 'Eyes'\n\tTransform 'Eyebrows'\n\tTransform
-    'Eyes'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom animation clip 'core_main_idle_01'"
+    'Eyes'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom
+    animation clip 'core_main_idle_01'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -1102,7 +1103,7 @@ MonoBehaviour:
     Layer: 1
     OriginatingState: -1419695372
     DestinationState: -666646986
-    TransitionDuration: 0
+    TransitionDuration: 0.15
     TriggerNameHash: 1027433098
     TransitionIndex: 0
   m_Animator: {fileID: 2024655551899241446}
@@ -1933,8 +1934,6 @@ GameObject:
   - component: {fileID: 4396566689771381515}
   - component: {fileID: 8396383607180807719}
   - component: {fileID: 584404837969333627}
-  - component: {fileID: 7921344542658179007}
-  - component: {fileID: 8844220099887766551}
   - component: {fileID: 1909072648176362660}
   - component: {fileID: 213266303699851825}
   m_Layer: 8
@@ -2000,37 +1999,11 @@ MonoBehaviour:
   _soPlayerStats: {fileID: 11400000, guid: 6fcb049a7cd3b8940bdba85565b847e3, type: 2}
   _freeLookCamera: {fileID: 6174310483427124090}
   _animationControl: {fileID: 5932469945283014108}
-  _playerNetworkSaveControl: {fileID: 7921344542658179007}
-  _playerNetworkStatsControl: {fileID: 8844220099887766551}
   _leftHand: {fileID: 8580341165961062880}
   _rightHand: {fileID: 664214206033113219}
   _leftHip: {fileID: 1682214006340859936}
   _rightHip: {fileID: 2408548020303811873}
   _back: {fileID: 8325920925655404530}
---- !u!114 &7921344542658179007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4396566689771487019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 621d9f8dd01a5c0469e49160c9296917, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8844220099887766551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4396566689771487019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e7d9993b5faae14c9bd62eef27b2262, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!143 &1909072648176362660
 CharacterController:
   m_ObjectHideFlags: 0

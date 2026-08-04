@@ -7,17 +7,17 @@
 /// </summary>
 public class PlayerFallState : PlayerActionState
 {
-    private readonly PlayerVerticalMotionControl _jumpControl;
+    private readonly PlayerVerticalMotionControl _verticalMotionControl;
 
     public PlayerFallState(StateMachine<PlayerActionState> stateMachine_,
         PlayerStateControl stateControl_, CharacterController characterController_,
         PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
         PlayerCameraService playerCameraService_, AudioService audioService_,
-        PlayerVerticalMotionControl jumpControl_) :
-        base(stateMachine_, stateControl_, characterController_, statsControl_,
-            anim_, inputService_, playerCameraService_, audioService_)
+        UIService uiService_, VFXService vfxService_, PlayerVerticalMotionControl verticalMotionControlControl_) :
+        base(stateMachine_, stateControl_, characterController_, statsControl_, anim_,
+            inputService_, playerCameraService_, audioService_, uiService_, vfxService_)
     {
-        _jumpControl = jumpControl_;
+        _verticalMotionControl = verticalMotionControlControl_;
     }
 
     public override void Enter()
@@ -35,23 +35,23 @@ public class PlayerFallState : PlayerActionState
     public override void Update()
     {
         base.Update();
-        _jumpControl.TickGravity(Time.deltaTime);
+        _verticalMotionControl.TickGravity(Time.deltaTime);
 
         Vector2 input = _inputService.MoveInputVector2;
         if (input != Vector2.zero)
         {
             Vector3 moveDir = GetMoveDirection(input);
-            Move(moveDir * _statsControl.NormalMoveSpeed + _jumpControl.VerticalVelocity);
+            Move(moveDir * _statsControl.NormalMoveSpeed + _verticalMotionControl.VerticalVelocity);
             RotateTowards(moveDir, _stateControl.IsInCombat);
         }
         else
         {
-            Move(_jumpControl.VerticalVelocity);
+            Move(_verticalMotionControl.VerticalVelocity);
         }
 
-        if (_jumpControl.HasLanded())
+        if (_verticalMotionControl.HasLanded())
         {
-            _jumpControl.Reset();
+            _verticalMotionControl.Reset();
             _stateMachine.ChangeState(_stateControl.MovementState);
         }
     }

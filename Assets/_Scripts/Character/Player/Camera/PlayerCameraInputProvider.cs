@@ -13,9 +13,13 @@ public class PlayerCameraInputProvider : CinemachineInputProvider
     private InputService _inputService;
     private Vector2 _gain = Vector2.one;
 
-    private void Start()
+    private void Awake()
     {
         _inputService = Services.Get<InputService>();
+    }
+
+    private void Start()
+    {
         ApplyGain(_inputService.ActiveDevice);
         _inputService.OnActiveDeviceChanged += OnActiveDeviceChanged;
     }

@@ -7,14 +7,19 @@ using UnityEngine;
 /// </summary>
 public class GameRoot : MonoBehaviour
 {
+    [Header("数据库设置")]
     [SerializeField] private SO_AudioDatabase _audioDatabase;
+    [SerializeField] private SO_VFXDatabase _vfxDatabase;
     [SerializeField] private SO_UIDatabase _uiDatabase;
     [SerializeField] private SO_EffectDatabase _effectDatabase;
     [SerializeField] private SO_ItemDatabase _itemDatabase;
+    [Header("网络中转站预制体")]
+    [SerializeField] private NetworkHub _networkHubPrefab;
 
     private static bool _alive;
     private SettingsSaveService _settingsService;
     private AudioService _audioService;
+    private VFXService _vfxService;
     private InputService _inputService;
     private SceneControlService _sceneControlService;
     private NetworkService _networkService;
@@ -42,6 +47,7 @@ public class GameRoot : MonoBehaviour
         RegisterUIService();                   // 须在 SceneControlService 之前：场景服务构造注入 UIService 以驱动场景切换黑幕
         RegisterNetworkService();              // 须在 SceneControlService 之前：场景服务构造注入 NetworkService 以收归场景加载
         RegisterAudioService();
+        RegisterVFXService();
         RegisterInputService();
         RegisterSceneControlService();
         RegisterPlayerCameraService();
@@ -58,6 +64,7 @@ public class GameRoot : MonoBehaviour
         UnregisterSceneControlService();
         UnregisterInputService();
         UnregisterAudioService();
+        UnregisterVFXService();
         UnregisterNetworkService();
         UnregisterUIService();
         UnregisterSaveService();
@@ -127,7 +134,7 @@ public class GameRoot : MonoBehaviour
     #region 注册/注销网络服务
     private void RegisterNetworkService()
     {
-        _networkService = new NetworkService();
+        _networkService = new NetworkService(_networkHubPrefab, _uiService);
         Services.Register(_networkService);
     }
 
@@ -146,6 +153,19 @@ public class GameRoot : MonoBehaviour
     public void UnregisterAudioService()
     {
         Services.Unregister<AudioService>();
+    }
+    #endregion
+
+    #region 注册/注销视觉特效服务
+    private void RegisterVFXService()
+    {
+        _vfxService = new VFXService(_vfxDatabase, transform);
+        Services.Register(_vfxService);
+    }
+
+    private void UnregisterVFXService()
+    {
+        Services.Unregister<VFXService>();
     }
     #endregion
 

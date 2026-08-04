@@ -15,6 +15,7 @@ MonoBehaviour:
   _normalMoveSpeed: 2
   _rotationSpeed: 500
   _maxHealth: 100
+  _hitDuration: 0.8
   _runSpeed: 5
   _dodgeSpeed: 12
   _dodgeDuration: 0.6

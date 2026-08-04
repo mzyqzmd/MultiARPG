@@ -13,14 +13,14 @@ public class PlayerJumpState : PlayerActionState
     private bool _animSpeedReady;
 
     public PlayerJumpState(StateMachine<PlayerActionState> stateMachine_,
-        PlayerStateControl stateControl_, CharacterController characterController_,
-        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
-        PlayerCameraService playerCameraService_, AudioService audioService_,
-        PlayerVerticalMotionControl verticalMotionControl_) :
-        base(stateMachine_, stateControl_, characterController_, statsControl_,
-            anim_, inputService_, playerCameraService_, audioService_)
+         PlayerStateControl stateControl_, CharacterController characterController_,
+         PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
+         PlayerCameraService playerCameraService_, AudioService audioService_, UIService uiService_,
+         VFXService vfxService_, PlayerVerticalMotionControl verticalMotionControlControl_) :
+        base(stateMachine_, stateControl_, characterController_, statsControl_, anim_,
+             inputService_, playerCameraService_, audioService_, uiService_, vfxService_)
     {
-        _verticalMotionControl = verticalMotionControl_;
+        _verticalMotionControl = verticalMotionControlControl_;
     }
 
     public override void Enter()

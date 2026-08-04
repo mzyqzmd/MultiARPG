@@ -7,4 +7,5 @@ public enum EStatType
     DodgeSpeed,
     MaxStamina,
     StaminaRegenRate,
+    HitDuration,
 }

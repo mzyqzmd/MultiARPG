@@ -9,7 +9,7 @@ using UnityEngine;
 /// Player 与未来 Enemy 各自派生 StatsControl 经 RegisterStat 扩展专属可修正属性与派生逻辑。
 /// 同时实现 IEffectSource（攻击者来源）与 IEffectTarget（效果作用目标）：效果最终修改的数据均在此，
 /// 故数据持有者即唯一的效果目标/来源。本类为纯本地数据中心，零网络依赖；
-/// 数值修改权归 owner 本地，死亡上报由 Character 经 _networkStatsControl 完成（见 Character.OnCurrentHealthChanged）。
+/// 数值修改权归 owner 本地，死亡态由本地 _currentHealth 驱动（Character 订阅 OnCurrentHealthChanged 本地判定）。
 /// </summary>
 public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
 {
@@ -20,11 +20,14 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
     private int _currentHealth;
     public float NormalMoveSpeed => _modifiableStats[EStatType.NormalMoveSpeed].Current;
     public float RotationSpeed => _stats.RotationSpeed;
+    /// <summary>受击硬直时长（秒）：配置基础值可被硬直延长 / 缩短类效果经 EStatType.HitDuration 运行时修正。</summary>
+    public float HitDuration => _modifiableStats[EStatType.HitDuration].Current;
     public CharacterStatsControl(SO_CharacterStats stats_)
     {
         _stats = stats_;
         _modifiableStats[EStatType.NormalMoveSpeed] = new(_stats.NormalMoveSpeed);
         _modifiableStats[EStatType.MaxHealth] = new(_stats.MaxHealth);
+        _modifiableStats[EStatType.HitDuration] = new(_stats.HitDuration);
         _currentHealth = MaxHealth;
     }
 
@@ -35,7 +38,7 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
     public float GetRotationDelta() => RotationSpeed * Time.deltaTime;
     #endregion
 
-    #region 生命值体系（本地权威：数值仅本机修改，跨端扣血经 Character.RequestDamageServerRpc → TakeDamageClientRpc 事件驱动本地 TakeDamage）
+    #region 生命值体系（本地权威：数值仅本机修改，跨端扣血经 Character.CombatControl.RequestDamageServerRpc → TakeDamageClientRpc 事件驱动本地 TakeDamage）
     /// <summary>当前生命值变化事件（old, new），供 UI 订阅；上限变化夹取后亦会触发。</summary>
     public event Action<int, int> OnCurrentHealthChanged;
     public int CurrentHealth => _currentHealth;

@@ -3,15 +3,14 @@
 /// <summary>玩家死亡态：停摆移动并驱动死亡动画参数 DeadState；复活后自动切回移动态。</summary>
 public class PlayerDeadState : PlayerActionState
 {
-    private readonly UIService _uiService;
     public PlayerDeadState(StateMachine<PlayerActionState> stateMachine_,
         PlayerStateControl stateControl_, CharacterController characterController_,
         PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
-        PlayerCameraService playerCameraService_, AudioService audioService_, UIService uiService_) :
-        base(stateMachine_, stateControl_, characterController_, statsControl_, anim_,
-            inputService_, playerCameraService_, audioService_)
+        PlayerCameraService playerCameraService_, AudioService audioService_,
+        UIService uiService_, VFXService vfxService_) : base(stateMachine_, stateControl_,
+            characterController_, statsControl_, anim_, inputService_, playerCameraService_,
+            audioService_, uiService_, vfxService_)
     {
-        _uiService = uiService_;
     }
 
     public override void Enter()
