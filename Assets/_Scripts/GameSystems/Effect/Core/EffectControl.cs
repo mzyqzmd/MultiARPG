@@ -44,14 +44,6 @@ public class EffectControl
     #endregion
 
     #region 按照id移除效果
-    /// <summary>按效果 id 手动移除，返回是否实际移除了匹配项（供调用方判断效果是否存在）。</summary>
-    public bool TryRemoveEffect(string id_, IEffectTarget target_)
-    {
-        bool removed = false;
-        RemoveEffect(id_, target_);
-        return removed;
-    }
-
     /// <summary>按效果 id 手动移除（倒序遍历，命中即 OnRemove 回滚并从列表移除全部同名匹配，适配叠加层）。Static 效果由此主动撤除；Instant/Timed 同样可按 id 移除，无副作用。</summary>
     public void RemoveEffect(string id_, IEffectTarget target_)
     {

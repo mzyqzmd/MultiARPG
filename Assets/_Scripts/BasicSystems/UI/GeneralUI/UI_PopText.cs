@@ -10,11 +10,11 @@ public class UI_PopText : UI_BaseView
 {
     [SerializeField] private TextMeshProUGUI _text;
 
-    public void Initialize(string message_, Color color_, float targetScale_ = 1f, bool _needDestroy_ = true)
+    public void Initialize(string message_, Color color_, float targetScale_ = 1f, bool needDestroy_ = true)
     {
         _text.text = message_;
         _text.color = color_;
-        PlayPop(targetScale_, _needDestroy_);
+        PlayPop(targetScale_, needDestroy_);
     }
 
     #region 弹出并渐隐后自销毁

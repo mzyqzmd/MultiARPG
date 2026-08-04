@@ -1,9 +1,5 @@
 ﻿using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
-using Sirenix.Serialization;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BaseItem", menuName = "MultiARPG/Item/BaseItem")]
@@ -15,17 +11,17 @@ public class SO_BaseItem : SerializedScriptableObject
     [Header("图标")]
     [SerializeField] protected Sprite _itemSprite;
     [Header("描述")]
-    [TextArea(3, 10)] protected string _itemDescription;
+    [TextArea(3, 10), SerializeField] protected string _itemDescription;
     [Header("类型")]
     [SerializeField] protected EItemType _itemType;
     [Header("被装备上时需要挂载的槽位(类型为材料时则不启用)；IsOccupying=false 仅表现挂不占槽。")]
-    [EnableIf("@_itemType != EItemType.Material"), OdinSerialize]
+    [EnableIf("@_itemType != EItemType.Material"), SerializeField]
     protected EquipSlot[] _equipTargetSlots = new[] { new EquipSlot(EEquipmentSlot.RightHand, true) };
     [Header("被卸下时需要挂载的槽位(类型为材料时则不启用)；IsOccupying=false 仅表现挂不占槽。")]
-    [EnableIf("@_itemType != EItemType.Material"), OdinSerialize]
+    [EnableIf("@_itemType != EItemType.Material"), SerializeField]
     protected EquipSlot[] _unequipTargetSlots = new[] { new EquipSlot(EEquipmentSlot.LeftHip, true) };
     [Header("改物品被使用时触发的效果(类型为材料时则不启用)")]
-    [EnableIf("@_itemType != EItemType.Material"), OdinSerialize]
+    [EnableIf("@_itemType != EItemType.Material"), SerializeField]
     protected List<SO_BaseEffect> _effects = new();
 
     public EquipSlot[] EquipTargetSlots => _equipTargetSlots;

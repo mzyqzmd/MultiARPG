@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
-/// 角色基类（NetworkBehaviour）：组合 CharacterStatsControl 与 CharacterNetworkCombatControl。
+/// 角色基类（NetworkBehaviour）
 /// 网络外观层——StatsControl 数值本地权威（owner 端应用与驱动），本类仅负责：
 /// 自身/环境效果本地施加入口、受击扣血钩子。
 /// 自身不再实现 IEffectTarget（效果目标/来源已下沉到 CharacterStatsControl）。

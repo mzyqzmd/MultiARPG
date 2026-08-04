@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>场景中的物品实例：承载跨子类共享的运行时状态（持有者、装备态），并持有一个对应的 SO_BaseItem 数据引用。</summary>

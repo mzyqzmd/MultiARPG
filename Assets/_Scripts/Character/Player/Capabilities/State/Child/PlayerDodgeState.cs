@@ -44,7 +44,11 @@ public class PlayerDodgeState : PlayerActionState
             _anim.SetFloat(DodgeAnimSpeedParam, _dodgeClipLength / _statsControl.DodgeDuration);
     }
 
-    public override void Exit() => _stateControl.IsBusy = false;
+    public override void Exit()
+    {
+        _anim.SetBool("DodgeState", false);
+        _stateControl.IsBusy = false;
+    }
 
     public override void Update()
     {

@@ -16,7 +16,7 @@ public class PlayerSaveData : INetworkSerializable
     //CharacterName
     public string characterName;
 
-    //CurrentHealth（server 权威 NV 同步值；读档时还原为存档生命值）
+    //CurrentHealth
     public int currentHealth;
 
     //WorldCoordinates
