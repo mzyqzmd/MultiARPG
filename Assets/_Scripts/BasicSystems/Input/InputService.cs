@@ -26,6 +26,8 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     public event Action OnSpecialApplyTriggered;
     /// <summary>瞄准/格挡触发事件（performed 时触发一次，本次仅暴露不接线）。</summary>
     public event Action OnAimOrParryTriggered;
+    /// <summary>锁定目标触发事件（performed 时触发一次）。</summary>
+    public event Action OnLockOnTargetTriggered;
     /// <summary>活跃设备切换事件（键盘 ↔ 手柄）。</summary>
     public event Action<EActiveDevice> OnActiveDeviceChanged;
 
@@ -176,5 +178,10 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     {
         UpdateActiveDevice(context);
         if (context.performed) OnAimOrParryTriggered?.Invoke();
+    }
+    public void OnLockOnTarget(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnLockOnTargetTriggered?.Invoke();
     }
 }

@@ -131,6 +131,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LockOnTarget",
+                    "type": "Button",
+                    "id": "92b3f905-8b1b-419a-8dbf-b290781dbeda",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -626,6 +635,28 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "SpecialApply",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1761a12a-7dcd-4a40-8c85-a2f7d4d4feae",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "LockOnTarget",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d8cd6faa-9383-4a22-a0ea-46c7a37d270d",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "LockOnTarget",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

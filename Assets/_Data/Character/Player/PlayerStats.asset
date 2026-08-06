@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerStats
   m_EditorClassIdentifier: 
   _normalMoveSpeed: 2
-  _rotationSpeed: 500
+  _rotationSpeed: 600
   _maxHealth: 100
   _hitDuration: 0.8
   _runSpeed: 5

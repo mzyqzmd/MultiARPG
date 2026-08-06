@@ -35,11 +35,10 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
         _vfxService = vfxService_;
     }
 
-    #region 由相机朝向与输入向量算出水平移动方向
+    #region 由相机朝向与输入向量算出水平移动方向（过渡期用缓存锁定朝向，否则实时）
     protected Vector3 GetMoveDirection(Vector2 input_)
     {
-        Transform camTransform = _playerCameraService.PlayerCamera.transform;
-        Vector3 moveDir = camTransform.forward * input_.y + camTransform.right * input_.x;
+        Vector3 moveDir = _playerCameraService.MoveForward * input_.y + _playerCameraService.MoveRight * input_.x;
         moveDir.y = 0;
         return moveDir.normalized;
     }
@@ -49,15 +48,21 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
     protected void Move(Vector3 velocity_) => _characterController.Move(velocity_ * Time.deltaTime);
     #endregion
 
-    #region 转向：strafe(战斗)面向相机前方；自由面向移动方向
+    #region 转向：锁定时严格朝向目标；strafe(战斗)面向相机前方；自由面向移动方向
     protected void RotateTowards(Vector3 moveDir_, bool strafe_)
     {
         Transform playerTransform = _characterController.transform;
         Quaternion targetRotation;
-        if (strafe_)
+        var lockTarget = _playerCameraService.CurrentLockTarget;
+        if (lockTarget != null && lockTarget.LockCenter != null)
         {
-            Vector3 camFwd = _playerCameraService.PlayerCamera.transform.forward;
-            camFwd.y = 0;
+            Vector3 toTarget = lockTarget.LockCenter.position - playerTransform.position;
+            toTarget.y = 0f;
+            targetRotation = toTarget == Vector3.zero ? playerTransform.rotation : Quaternion.LookRotation(toTarget);
+        }
+        else if (strafe_)
+        {
+            Vector3 camFwd = _playerCameraService.MoveForward;
             targetRotation = camFwd == Vector3.zero ? playerTransform.rotation : Quaternion.LookRotation(camFwd);
         }
         else

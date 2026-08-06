@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// 玩家状态机编排：父层(姿态)=Free/Combat，子层(动作)=Movement/Dodge/Jump/Fall。
@@ -12,7 +13,7 @@ public class PlayerStateControl
     private readonly InputService _inputService;
     private readonly PlayerStatsControl _playerStats;
     private readonly PlayerVerticalMotionControl _verticalMotion;
-    private readonly PlayerEquipmentControl _equipmentControl;
+    private readonly PlayerEquipmentComponent _equipmentControl;
     private readonly CharacterController _characterController;
 
     private bool _dodgeRequested;
@@ -49,11 +50,16 @@ public class PlayerStateControl
     /// <summary>是否正处于不可被新一次性动作打断的动作中(Dodge/Jump/Fall/Draw 等)。各动作态 Enter 置 true、Exit 置 false；死亡态由 _playerStats.IsDead 判定，不在此维护。</summary>
     public bool IsBusy { get; set; }
 
+    /// <summary>动作破锁请求事件：Dodge/Jump 进入时触发，由 Player 桥接 _lockOnComponent.ForceUnlock。状态机零反向依赖锁定组件，仅发信号。</summary>
+    public event Action OnLockBreakRequested;
+    /// <summary>请求解除锁定（进入 Dodge/Jump 时调用，触发 OnLockBreakRequested 事件）。</summary>
+    public void RequestLockBreak() => OnLockBreakRequested?.Invoke();
+
     public PlayerStateControl(InputService inputService_,
         PlayerCameraService playerCameraService_, CharacterController characterController_,
         PlayerStatsControl playerStats_, Animator anim_, AudioService audioService_,
         UIService uiService_, VFXService vfxService_, PlayerVerticalMotionControl verticalMotionControl_,
-        PlayerEquipmentControl equipmentControl_)
+        PlayerEquipmentComponent equipmentControl_)
     {
         _inputService = inputService_;
         _playerStats = playerStats_;

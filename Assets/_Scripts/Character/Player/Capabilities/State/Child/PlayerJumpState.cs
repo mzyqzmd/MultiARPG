@@ -26,6 +26,8 @@ public class PlayerJumpState : PlayerActionState
     public override void Enter()
     {
         base.Enter();
+        // 进入即破锁：触发事件经 Player 桥接 ForceUnlock 解除锁定 + FreeLook 过渡相机
+        _stateControl.RequestLockBreak();
         _verticalMotionControl.Reset();               // 清零残留垂直速度
         _verticalMotionControl.Launch();              // 赋向上初速度
         _stateControl.IsBusy = true;
@@ -67,16 +69,19 @@ public class PlayerJumpState : PlayerActionState
 
         #region 跳跃期间移动
         Vector2 input = _inputService.MoveInputVector2;
+        Vector3 moveDir;
         if (input != Vector2.zero)
         {
-            Vector3 moveDir = GetMoveDirection(input);
+            moveDir = GetMoveDirection(input);
             Move(moveDir * _statsControl.NormalMoveSpeed + _verticalMotionControl.VerticalVelocity);
-            RotateTowards(moveDir, _stateControl.IsInCombat);
         }
         else
         {
+            // 无输入：朝相机前向水平位移，保持原垂直速度
+            moveDir = _playerCameraService.MoveForward;
             Move(_verticalMotionControl.VerticalVelocity);
         }
+        RotateTowards(moveDir, _stateControl.IsInCombat);
         #endregion
 
         // 到达顶点转入坠落（自然继承当前垂直速度）

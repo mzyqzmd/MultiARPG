@@ -80,15 +80,9 @@ public class NetworkHub : NetworkBehaviour
             {
                 t = 0f;
                 if (id == localId)
-                {
                     RefreshHostCache();
-                    Debug.Log($"[HUB] 周期到期 Host 自身缓存已刷新(未落盘) clientId={id}");
-                }
                 else
-                {
                     RequestSilentReportClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { id } } });
-                    Debug.Log($"[HUB] 周期到期 已向客人发送静默催报 clientId={id}");
-                }
             }
             _saveTimers[id] = t;
         }
@@ -98,7 +92,6 @@ public class NetworkHub : NetworkBehaviour
     [ClientRpc]
     private void RequestSilentReportClientRpc(ClientRpcParams _ = default)
     {
-        Debug.Log("[HUB] 客人收到静默催报，准备上报本地数据");
         ReportSaveSilently(_localDataProvider());
     }
 
@@ -107,7 +100,6 @@ public class NetworkHub : NetworkBehaviour
     private void ReportSaveSilentServerRpc(PlayerSaveData data_, ServerRpcParams params_ = default)
     {
         _clientSaves[params_.Receive.SenderClientId] = data_;
-        Debug.Log($"[HUB] 静默上报已更新内存缓存(未落盘) clientId={params_.Receive.SenderClientId}");
     }
 
     /// <summary>本地玩家数据提供方：由各端本地 Player(owner) 注册，ClientRpc 催报时取最新数据，避免 Hub 反向依赖 Player 类型。</summary>
@@ -134,19 +126,20 @@ public class NetworkHub : NetworkBehaviour
         if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) return;
         if (!targetObj.TryGetComponent<Character>(out var target)) return;
 
-        // 被击者即 Host 自身（owner 在 Host 进程）：本机直接驱动受击态 + 扣血 + 本地播受击表现
+        // 被击者 owner 端进受击态 + 扣血 + 本地播受击表现：
+        // 被击者即本进程（如 Host 拥有的假人）本机直接驱动；否则定向 ClientRpc 让其 owner 端响应。
         if (target.IsOwner)
         {
             target.OnHitReceived(damage_, damage_.contactPoint);
             PlayHitReactionLocal(damage_.contactPoint);
-            return;
+        }
+        else
+        {
+            NotifyHitClientRpc(targetId_, damage_);
         }
 
-        // 被击者是远端 Client：让目标 owner 客户端本地进受击态（ClientNetworkAnimator 为 owner 权威，
-        // 只有 owner 端驱动的 HitState 才会同步给其他人；Host 副本本地调不会反向同步给 Client）
-        NotifyHitClientRpc(targetId_, damage_);
-
-        // 旁观端（排除攻击者与被击者 owner）统一播受击表现 VFX/音效
+        // 旁观端（排除攻击者与被击者 owner）统一播受击表现 VFX/音效：
+        // 无论被击者归属 Host 还是远端 Client，其他端都应收得到，保证跨端表现对称。
         var spectators = new System.Collections.Generic.List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
         spectators.Remove(attackerId_);
         spectators.Remove(target.OwnerClientId);
@@ -235,7 +228,6 @@ public class NetworkHub : NetworkBehaviour
         _clientSaves[params_.Receive.SenderClientId] = data_;
         _saveService.UpsertPlayer(data_);
         _saveService.SaveCurrentSlot();
-        Debug.Log($"[HUB] 真正落盘 SaveCurrentSlot (检查点/返回菜单) clientId={params_.Receive.SenderClientId}");
     }
 
     /// <summary>定向下发：仅目标客人 owner 端还原自身坐标与生命（生命为纯本地，owner 端直接 RestoreHealth，无需回 server）。</summary>

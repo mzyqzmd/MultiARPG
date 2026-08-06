@@ -12,11 +12,15 @@ public abstract class SO_BaseEffect : ScriptableObject
     [Tooltip("仅 Timed 类型使用：效果持续秒数。非 Timed 时灰显禁用，配置了也不生效。")]
     [EnableIf("@EffectType == EEffectType.Timed")]
     [SerializeField] private float _duration;
+    [Tooltip("仅 Timed 类型使用：持续期间 Execute 的触发间隔（秒）。<=0 时退化为一次性（仅施加时 Execute 一次）。")]
+    [EnableIf("@EffectType == EEffectType.Timed")]
+    [SerializeField] private float _tickInterval;
     [Tooltip("效果唯一标识：自动同步为资产文件名，与 SO_EffectDatabase 字典 key 保持一致，供外部按 id 移除（如卸下装备撤除 Static 效果）。")]
     [SerializeField] private string _id;
 
     public EEffectType EffectType => _effectType;
     public float Duration => _duration;
+    public float TickInterval => _tickInterval;
     public string Id => _id;
 
     /// <summary>将效果作用于目标。Instant 立即执行一次；Timed 仅由 Apply 执行一次、到期走 OnRemove 回滚；Static 仅由 Apply 执行一次（挂载态，不每帧重作用于）。source_ 为攻击者来源，环境伤害为 null。</summary>

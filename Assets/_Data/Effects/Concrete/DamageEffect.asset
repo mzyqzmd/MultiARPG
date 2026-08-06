@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66381becf620db041b782ffbe9f72213, type: 3}
   m_Name: DamageEffect
   m_EditorClassIdentifier: 
-  _effectType: 0
-  _duration: 0
+  _effectType: 1
+  _duration: 4
+  _tickInterval: 1
+  _id: DamageEffect
   _physicalDamage: 5
-  _magicalDamage: 5
-  _fireDamage: 5
-  _iceDamage: 5
-  _lightningDamage: 5
+  _magicalDamage: 0
+  _fireDamage: 0
+  _iceDamage: 0
+  _lightningDamage: 0

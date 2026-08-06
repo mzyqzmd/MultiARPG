@@ -26,7 +26,6 @@ public class Weapon_Rapier : BaseItem
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer != LayerMask.NameToLayer("Damageable")) return;
         //仅攻击者本机结算命中：消除多端重复结算（远端副本不触发，IsEquipped 是否同步无关紧要）。
         if (Owner == null || !Owner.IsOwner) return;
 

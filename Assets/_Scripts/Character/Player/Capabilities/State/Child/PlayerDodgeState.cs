@@ -13,21 +13,28 @@ public class PlayerDodgeState : PlayerActionState
     private bool _animSpeedReady;
     private float _dodgeClipLength;
 
-    public PlayerDodgeState(StateMachine<PlayerActionState> stateMachine_, 
+    public PlayerDodgeState(StateMachine<PlayerActionState> stateMachine_,
         PlayerStateControl stateControl_, CharacterController characterController_,
-        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_, 
-        PlayerCameraService playerCameraService_, AudioService audioService_, 
+        PlayerStatsControl statsControl_, Animator anim_, InputService inputService_,
+        PlayerCameraService playerCameraService_, AudioService audioService_,
         UIService uiService_, VFXService vfxService_) : base(stateMachine_,
-            stateControl_, characterController_, statsControl_, anim_, 
+            stateControl_, characterController_, statsControl_, anim_,
             inputService_, playerCameraService_, audioService_, uiService_, vfxService_)
     {
     }
 
     public override void Enter()
     {
-        // 有输入则朝输入方向闪避，否则朝当前面向
+        // 进入即破锁：触发事件经 Player 桥接 ForceUnlock 解除锁定 + FreeLook 过渡相机
+        _stateControl.RequestLockBreak();
+
+        //位移
+        // 有移动输入则朝输入方向闪避，否则朝相机前向
         Vector3 dir = GetMoveDirection(_inputService.MoveInputVector2);
-        if (dir == Vector3.zero) dir = _characterController.transform.forward;
+        if (dir == Vector3.zero) dir = _playerCameraService.MoveForward;
+        // 翻滚无八向动画（固定向前翻滚），进入瞬间把玩家朝向硬切到 dir，使翻滚朝正确方向
+        if (dir != Vector3.zero)
+            _characterController.transform.rotation = Quaternion.LookRotation(dir);
         _dodgeVelocity = dir * _statsControl.DodgeSpeed;
         _stateDuration = _statsControl.DodgeDuration;
 
@@ -35,8 +42,10 @@ public class PlayerDodgeState : PlayerActionState
         _stateControl.ConsumeDodge();
         _statsControl.SpendStamina(_stateControl.DodgeStaminaCost);
 
+        // 音效
         _audioService.PlayAudio("Player", "DodgeSFX", _characterController.transform.position);
 
+        //动画
         _anim.SetBool("DodgeState", true);
         // 已缓存 clip 长度则立即设定倍速，避免首帧用默认倍速 1 的跳变
         _animSpeedReady = _dodgeClipLength > 0f;
