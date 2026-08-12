@@ -11,23 +11,24 @@ using UnityEngine;
 /// 故数据持有者即唯一的效果目标/来源。本类为纯本地数据中心，零网络依赖；
 /// 数值修改权归 owner 本地，死亡态由本地 _currentHealth 驱动（Character 订阅 OnCurrentHealthChanged 本地判定）。
 /// </summary>
-public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
+public abstract class CharacterStatsControl : MonoBehaviour, IEffectSource, IEffectTarget
 {
+    [Header("基础配置")]
+    [SerializeField] protected SO_CharacterStats _characterStats;
+
     protected readonly Dictionary<EStatType, ModifiableStat> _modifiableStats = new();
 
-    private readonly SO_CharacterStats _stats;
     private readonly EffectControl _effectControl = new();
     private int _currentHealth;
     public float NormalMoveSpeed => _modifiableStats[EStatType.NormalMoveSpeed].Current;
-    public float RotationSpeed => _stats.RotationSpeed;
+    public float RotationSpeed => _characterStats.RotationSpeed;
     /// <summary>受击硬直时长（秒）：配置基础值可被硬直延长 / 缩短类效果经 EStatType.HitDuration 运行时修正。</summary>
     public float HitDuration => _modifiableStats[EStatType.HitDuration].Current;
-    public CharacterStatsControl(SO_CharacterStats stats_)
+    protected virtual void Awake()
     {
-        _stats = stats_;
-        _modifiableStats[EStatType.NormalMoveSpeed] = new(_stats.NormalMoveSpeed);
-        _modifiableStats[EStatType.MaxHealth] = new(_stats.MaxHealth);
-        _modifiableStats[EStatType.HitDuration] = new(_stats.HitDuration);
+        _modifiableStats[EStatType.NormalMoveSpeed] = new(_characterStats.NormalMoveSpeed);
+        _modifiableStats[EStatType.MaxHealth] = new(_characterStats.MaxHealth);
+        _modifiableStats[EStatType.HitDuration] = new(_characterStats.HitDuration);
         _currentHealth = MaxHealth;
     }
 
@@ -69,7 +70,7 @@ public abstract class CharacterStatsControl : IEffectSource, IEffectTarget
         if (clamped == _currentHealth) return;
         int old = _currentHealth;
         _currentHealth = clamped;
-        Debug.Log($"{nameof(CharacterStatsControl)}: {old} -> {_currentHealth}");
+        Debug.Log($"Health:{old} -> {_currentHealth}");
         OnCurrentHealthChanged?.Invoke(old, _currentHealth);
     }
     #endregion

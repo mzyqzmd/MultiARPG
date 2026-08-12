@@ -17,7 +17,7 @@ public class FakeMan : Character
     protected override void Awake()
     {
         base.Awake();
-        _fakeManStatsControl = new FakeManStatsControl(_soFakeManStats);
+        _fakeManStatsControl = GetComponent<FakeManStatsControl>();
         _statsControl = _fakeManStatsControl;
         _fsm = new StateMachine<IState>();
         IdleState = new FakeManIdleState(_anim);
@@ -31,8 +31,11 @@ public class FakeMan : Character
         _fsm.Update();
     }
 
-    public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_) =>
+    public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
+    {
+        base.OnHitReceived(damage_, contactPoint_);
         EnterHitState(contactPoint_);
+    }
     public void EnterHitState(Vector3 contactPoint_)
     {
         var local = _capsuleCollider.transform.InverseTransformDirection(

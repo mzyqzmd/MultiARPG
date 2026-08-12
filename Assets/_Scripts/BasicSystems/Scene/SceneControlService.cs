@@ -86,4 +86,20 @@ public class SceneControlService : IService
         }
     }
     #endregion
+
+    #region 应用焦点变化（由 GameRoot 转发 Unity 消息）
+    /// <summary>应用焦点变化：失焦禁用全部输入，回焦按当前场景恢复对应输入模式。</summary>
+    public void OnApplicationFocusChanged(bool focus_)
+    {
+        if (focus_)
+        {
+            if (CurrentActiveScene.name == SceneMainMenu)
+                _inputService.EnableUIMode();
+            else
+                _inputService.EnablePlayerMode();
+        }
+        else _inputService.DisableAllMode();
+    }
+    #endregion
+
 }

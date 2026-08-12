@@ -9,76 +9,75 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b04549d06794ea4996d41a1317c72ca, type: 3}
+  m_Script: {fileID: 11500000, guid: 7fdc02545eb282d4bab854cdf3962d55, type: 3}
   m_Name: Papier
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 11400000, guid: 4dbbb785c8d85b74c82205a7d7ba7917, type: 2}
+    - {fileID: 7400000, guid: e6a5f22cedaf66449ae2c7478f586e0c, type: 2}
+    - {fileID: 7400000, guid: be3dba11399bd2e4cb06351b651ecfa1, type: 2}
+    - {fileID: 7400000, guid: 8a123122865b8e3458039bbeb0699a0c, type: 2}
+    - {fileID: 7400000, guid: af639c57a74221c4cbcb783884bc010c, type: 2}
+    - {fileID: 7400000, guid: c1d6be0f773a6ed448d210383afaeb41, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: _equipTargetSlots
+    - Name: _weaponAnimations
       Entry: 7
-      Data: 0|EquipSlot[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[Animancer.ClipTransition,
+        Kybernetik.Animancer]], mscorlib
+    - Name: comparer
       Entry: 7
-      Data: EquipSlot, Assembly-CSharp
-    - Name: Slot
-      Entry: 3
-      Data: 1
-    - Name: IsOccupying
-      Entry: 5
-      Data: true
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 12
+      Data: 5
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Normal_0
+    - Name: $v
+      Entry: 7
+      Data: 2|Animancer.ClipTransition, Kybernetik.Animancer
+    - Name: _FadeDuration
+      Entry: 4
+      Data: 0.25
+    - Name: _Speed
+      Entry: 4
+      Data: 1
+    - Name: _Events
+      Entry: 7
+      Data: 3|Animancer.AnimancerEvent+Sequence+Serializable, Kybernetik.Animancer
+    - Name: _NormalizedTimes
+      Entry: 7
+      Data: 4|System.Single[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.731282
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
-    - Name: _unequipTargetSlots
+    - Name: _Callbacks
       Entry: 7
-      Data: 1|EquipSlot[], Assembly-CSharp
+      Data: 5|Animancer.IInvokable[], Kybernetik.Animancer
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: EquipSlot, Assembly-CSharp
-    - Name: Slot
-      Entry: 3
-      Data: 2
-    - Name: IsOccupying
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: _effects
-      Entry: 7
-      Data: 2|System.Collections.Generic.List`1[[SO_BaseEffect, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 10
       Data: 0
     - Name: 
       Entry: 13
@@ -86,6 +85,326 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: _Names
+      Entry: 7
+      Data: 6|Animancer.StringAsset[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Clip
+      Entry: 10
+      Data: 0
+    - Name: _NormalizedStartTime
+      Entry: 4
+      Data: NaN
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Normal_1
+    - Name: $v
+      Entry: 7
+      Data: 7|Animancer.ClipTransition, Kybernetik.Animancer
+    - Name: _FadeDuration
+      Entry: 4
+      Data: 0.25
+    - Name: _Speed
+      Entry: 4
+      Data: 1
+    - Name: _Events
+      Entry: 7
+      Data: 8|Animancer.AnimancerEvent+Sequence+Serializable, Kybernetik.Animancer
+    - Name: _NormalizedTimes
+      Entry: 7
+      Data: 9|System.Single[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Callbacks
+      Entry: 7
+      Data: 10|Animancer.IInvokable[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Names
+      Entry: 7
+      Data: 11|Animancer.StringAsset[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Clip
+      Entry: 10
+      Data: 1
+    - Name: _NormalizedStartTime
+      Entry: 4
+      Data: NaN
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Heavy_Charge
+    - Name: $v
+      Entry: 7
+      Data: 12|Animancer.ClipTransition, Kybernetik.Animancer
+    - Name: _FadeDuration
+      Entry: 4
+      Data: 0.25
+    - Name: _Speed
+      Entry: 4
+      Data: 1
+    - Name: _Events
+      Entry: 7
+      Data: 13|Animancer.AnimancerEvent+Sequence+Serializable, Kybernetik.Animancer
+    - Name: _NormalizedTimes
+      Entry: 7
+      Data: 14|System.Single[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Callbacks
+      Entry: 7
+      Data: 15|Animancer.IInvokable[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Names
+      Entry: 7
+      Data: 16|Animancer.StringAsset[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Clip
+      Entry: 10
+      Data: 2
+    - Name: _NormalizedStartTime
+      Entry: 4
+      Data: NaN
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Heavy_Hold
+    - Name: $v
+      Entry: 7
+      Data: 17|Animancer.ClipTransition, Kybernetik.Animancer
+    - Name: _FadeDuration
+      Entry: 4
+      Data: 0.25
+    - Name: _Speed
+      Entry: 4
+      Data: 1
+    - Name: _Events
+      Entry: 7
+      Data: 18|Animancer.AnimancerEvent+Sequence+Serializable, Kybernetik.Animancer
+    - Name: _NormalizedTimes
+      Entry: 7
+      Data: 19|System.Single[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Callbacks
+      Entry: 7
+      Data: 20|Animancer.IInvokable[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Names
+      Entry: 7
+      Data: 21|Animancer.StringAsset[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Clip
+      Entry: 10
+      Data: 3
+    - Name: _NormalizedStartTime
+      Entry: 4
+      Data: NaN
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Heavy_Release
+    - Name: $v
+      Entry: 7
+      Data: 22|Animancer.ClipTransition, Kybernetik.Animancer
+    - Name: _FadeDuration
+      Entry: 4
+      Data: 0.25
+    - Name: _Speed
+      Entry: 4
+      Data: 1
+    - Name: _Events
+      Entry: 7
+      Data: 23|Animancer.AnimancerEvent+Sequence+Serializable, Kybernetik.Animancer
+    - Name: _NormalizedTimes
+      Entry: 7
+      Data: 24|System.Single[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Callbacks
+      Entry: 7
+      Data: 25|Animancer.IInvokable[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Names
+      Entry: 7
+      Data: 26|Animancer.StringAsset[], Kybernetik.Animancer
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _Clip
+      Entry: 10
+      Data: 4
+    - Name: _NormalizedStartTime
+      Entry: 4
+      Data: NaN
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   _itemID: Papier
-  _itemSprite: {fileID: 595903167, guid: 8793b245c89630341b6f5163e55266aa, type: 3}
+  _itemSprite: {fileID: 21300000, guid: 5514f8f41b3dd394ea7d6547395c16ab, type: 3}
+  _itemDescription: "\u4E00\u628A\u8D81\u624B\u7684\u957F\u5251"
   _itemType: 0
+  _equipTargetSlots:
+  - Slot: 1
+    IsOccupying: 1
+  _unequipTargetSlots:
+  - Slot: 2
+    IsOccupying: 0
+  _effects:
+  - {fileID: 11400000, guid: 4dbbb785c8d85b74c82205a7d7ba7917, type: 2}
+  _shortChargeMulti: 1.5
+  _longChargeMulti: 3

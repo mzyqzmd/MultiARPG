@@ -24,9 +24,6 @@ public class NetworkHub : NetworkBehaviour
     /// <summary>每个联机玩家的静默上报计时器：key=clientId，value=累计未上报时长（秒），到期由 Hub 集中驱动刷新缓存。</summary>
     private readonly Dictionary<ulong, float> _saveTimers = new();
 
-    /// <summary>Host 自身玩家数据缓存（由 Host 的 Player 每帧刷入，Update 到期时搬入 _clientSaves 统一结构，不写盘）。</summary>
-    private PlayerSaveData _hostCache;
-
     /// <summary>静默上报周期（秒）：到期仅刷新内存缓存，不触发落盘。</summary>
     private const float AutoSaveInterval = 5f;
 
@@ -102,17 +99,18 @@ public class NetworkHub : NetworkBehaviour
         _clientSaves[params_.Receive.SenderClientId] = data_;
     }
 
-    /// <summary>本地玩家数据提供方：由各端本地 Player(owner) 注册，ClientRpc 催报时取最新数据，避免 Hub 反向依赖 Player 类型。</summary>
+    /// <summary>本地玩家数据提供方：由各端本地 Player(owner) 在 OnNetworkSpawn 注册，Host 到期拉取与客人 ClientRpc 催报共用同一入口，避免 Hub 反向依赖 Player 类型。</summary>
     private System.Func<PlayerSaveData> _localDataProvider;
 
-    /// <summary>本地 Player(owner) 注册自身数据提供方（每帧刷 _hostCache + 供 ClientRpc 取数）。</summary>
+    /// <summary>本地 Player(owner) 注册自身数据提供方（Host 到期现取 + 客人 ClientRpc 催报共用）。</summary>
     public void RegisterLocalDataProvider(System.Func<PlayerSaveData> provider_) => _localDataProvider = provider_;
 
-    /// <summary>Host 自身数据刷新入口：Player(Host) 每帧调用，仅更新本地缓存不落盘。</summary>
-    public void UpdateHostCache(PlayerSaveData hostData_) => _hostCache = hostData_;
-
-    /// <summary>到期把 Host 本地缓存搬入统一 _clientSaves 结构（不写盘）。</summary>
-    private void RefreshHostCache() => _clientSaves[NetworkManager.Singleton.LocalClientId] = _hostCache;
+    /// <summary>到期现取 Host 本地最新数据写入统一 _clientSaves（不写盘）；provider 未注册完成时跳过本轮，避免极早期时序 NRE。</summary>
+    private void RefreshHostCache()
+    {
+        if (_localDataProvider == null) return;
+        _clientSaves[NetworkManager.Singleton.LocalClientId] = _localDataProvider();
+    }
 
     /// <summary>静默上报公开入口（供 ClientRpc 回调调用）：经 ServerRpc 写内存缓存。</summary>
     private void ReportSaveSilently(PlayerSaveData data_) => ReportSaveSilentServerRpc(data_);

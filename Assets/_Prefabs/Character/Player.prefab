@@ -430,7 +430,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 901100698445960993}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.6324858, y: 0.57854766, z: 0.37547132, w: -0.3525135}
+  m_LocalRotation: {x: 0.63248575, y: 0.57854766, z: 0.37547126, w: -0.3525135}
   m_LocalPosition: {x: -5.801534, y: -4.191418, z: 7.44715}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -466,7 +466,7 @@ Transform:
   m_GameObject: {fileID: 1269227089142673460}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.62, z: -3}
+  m_LocalPosition: {x: -1.3901415, y: 2.5709133, z: -2.7944853}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -515,7 +515,7 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_YAxis:
-    Value: 1
+    Value: 0.9457742
     m_SpeedMode: 1
     m_MaxSpeed: 0.001
     m_AccelTime: 0.1
@@ -539,7 +539,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0
+    Value: 26.449097
     m_SpeedMode: 1
     m_MaxSpeed: 0.15
     m_AccelTime: 0.05
@@ -1037,6 +1037,7 @@ GameObject:
   - component: {fileID: 2024655551899241446}
   - component: {fileID: 5402924338443506806}
   - component: {fileID: 5932469945283014108}
+  - component: {fileID: 6909882413691234336}
   m_Layer: 8
   m_Name: Renderer
   m_TagString: Untagged
@@ -1071,17 +1072,13 @@ Animator:
   m_GameObject: {fileID: 1954078910054791483}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: d288a0e4a2d923b46898986e979da643, type: 3}
-  m_Controller: {fileID: 9100000, guid: e08ee874d499e2e4493ae737cb5d3b65, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
-    are already bound by a Humanoid avatar. These transforms can only be changed
-    by Humanoid clips.\n\tTransform 'Eyebrows'\n\tTransform 'Eyes'\n\tTransform 'Eyebrows'\n\tTransform
-    'Eyes'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom
-    animation clip 'core_main_idle_01'"
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -1098,14 +1095,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a1b2d3e4f5475869708a9b0c1d2e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 1
-    OriginatingState: -1419695372
-    DestinationState: -666646986
-    TransitionDuration: 0.15
-    TriggerNameHash: 1027433098
-    TransitionIndex: 0
+  TransitionStateInfoList: []
   m_Animator: {fileID: 2024655551899241446}
 --- !u!114 &5932469945283014108
 MonoBehaviour:
@@ -1116,10 +1106,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 1954078910054791483}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a066f9eb686160e46b0daf58b4645395, type: 3}
+  m_Script: {fileID: 11500000, guid: 2fc17a642661cc54bab0d966eb2f58c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 2024655551899241446}
+  _player: {fileID: 584404837969333627}
+--- !u!114 &6909882413691234336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954078910054791483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ad7b53f86f9da4da426b673c422513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Animator: {fileID: 2024655551899241446}
+  _Transitions: {fileID: 0}
+  _ActionOnDisable: 0
+  _PlayAutomatically: 0
+  _Names: []
+  _Animations: []
+  _Controller:
+    _FadeDuration: 0.25
+    _Speed: 1
+    _Events:
+      _NormalizedTimes: []
+      _Callbacks: []
+      _Names: []
+    _Controller: {fileID: 9100000, guid: e08ee874d499e2e4493ae737cb5d3b65, type: 2}
+    _ParameterBindings:
+      _Mode: 0
+      _Bindings: []
+    _ActionsOnStop: 
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &2498346982572378157
 GameObject:
   m_ObjectHideFlags: 0
@@ -1233,8 +1256,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2595198441445423990}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.18008448, y: 0.012671443, z: -0.0023200563, w: 0.9835668}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.16689433, y: 0.24170278, z: -0.042241532, w: 0.9549564}
+  m_LocalPosition: {x: -0.000031352043, y: 0, z: 0.000015497208}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1342,7 +1365,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3022467105600228691}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.57854766, y: 0.6324858, z: -0.3525135, w: -0.37547135}
+  m_LocalRotation: {x: -0.5785476, y: 0.63248575, z: -0.35251346, w: -0.3754713}
   m_LocalPosition: {x: -5.8011727, y: -4.1914477, z: -7.447154}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1409,7 +1432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 2.62, z: -3}
+  m_FollowOffset: {x: 0, y: 2.5709133, z: -3.1211603}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -1429,7 +1452,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0
+    Value: 26.449097
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -1597,8 +1620,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3406318732949993259}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17724082, y: 0.050307184, z: -0.009072173, w: 0.98283905}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.15730259, y: 0.27447543, z: -0.045565814, w: 0.94754577}
+  m_LocalPosition: {x: -0.000031352043, y: 0, z: 0.000015497208}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1966,8 +1989,11 @@ GameObject:
   - component: {fileID: 4396566689771381515}
   - component: {fileID: 8396383607180807719}
   - component: {fileID: 584404837969333627}
-  - component: {fileID: 7459454565040028074}
+  - component: {fileID: 9209229479180519588}
+  - component: {fileID: 2181013100342294013}
   - component: {fileID: 6359203548249226517}
+  - component: {fileID: 6496075465617513603}
+  - component: {fileID: 2412945708432968532}
   - component: {fileID: 213266303699851825}
   - component: {fileID: 1909072648176362660}
   m_Layer: 8
@@ -2030,14 +2056,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _anim: {fileID: 2024655551899241446}
   _lockCenter: {fileID: 4801955007021443544}
-  _mainWeapon: {fileID: 299346366260235516}
-  _characterController: {fileID: 1909072648176362660}
-  _soPlayerStats: {fileID: 11400000, guid: 6fcb049a7cd3b8940bdba85565b847e3, type: 2}
+  _statsControl: {fileID: 9209229479180519588}
   _freeLookCamera: {fileID: 6174310483427124090}
-  _animEventComponent: {fileID: 5932469945283014108}
-  _lockOnComponent: {fileID: 7459454565040028074}
+  _animancer: {fileID: 6909882413691234336}
+  _animEventControl: {fileID: 5932469945283014108}
+  _lockOnTarget: {fileID: 2181013100342294013}
   _equipmentControl: {fileID: 6359203548249226517}
---- !u!114 &7459454565040028074
+  _saveControl: {fileID: 6496075465617513603}
+  _stateControl: {fileID: 2412945708432968532}
+--- !u!114 &9209229479180519588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4396566689771487019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b14b3cfb3bcaeb468f48090633150d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _characterStats: {fileID: 11400000, guid: 6fcb049a7cd3b8940bdba85565b847e3, type: 2}
+  _player: {fileID: 584404837969333627}
+--- !u!114 &2181013100342294013
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2049,12 +2090,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e654e1c281e433e4b85dbfe5d809a245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _freeLookCamera: {fileID: 6174310483427124090}
+  _player: {fileID: 584404837969333627}
   _checkStartPoint: {fileID: 6750485316512293947}
   _lockRadius: 20
   _blockingLayers:
     serializedVersion: 2
-    m_Bits: 193
+    m_Bits: 129
   _frontFovHalfAngle: 90
   _lostSightTimeout: 5
 --- !u!114 &6359203548249226517
@@ -2069,11 +2110,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ed60969e016474d89b089fde598692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _player: {fileID: 584404837969333627}
+  _defaultWeapon: {fileID: 299346366260235516}
   _leftHand: {fileID: 8580341165961062880}
   _rightHand: {fileID: 664214206033113219}
   _leftHip: {fileID: 1682214006340859936}
   _rightHip: {fileID: 2408548020303811873}
   _back: {fileID: 8325920925655404530}
+--- !u!114 &6496075465617513603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4396566689771487019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43fd6491b4da6384985c6eca54f0ca0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 584404837969333627}
+--- !u!114 &2412945708432968532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4396566689771487019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18a797c5936a0194b870c138a2eff589, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 584404837969333627}
+  _characterController: {fileID: 1909072648176362660}
 --- !u!114 &213266303699851825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2638,7 +2708,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 2.62, z: -3}
+  m_FollowOffset: {x: 0, y: 2.5709133, z: -3.1211603}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -2658,7 +2728,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0
+    Value: 26.449097
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -2857,8 +2927,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7425007597203722037}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.14901856, y: 0.050546378, z: -0.0076276003, w: 0.98751223}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.000031352043, y: 0, z: 0.000015497208}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3233,7 +3303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 2.62, z: -3}
+  m_FollowOffset: {x: 0, y: 2.5709133, z: -3.1211603}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -3253,7 +3323,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0
+    Value: 26.449097
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1

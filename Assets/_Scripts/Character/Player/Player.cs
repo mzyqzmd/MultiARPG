@@ -1,41 +1,44 @@
+using Animancer;
 using Cinemachine;
 using UnityEngine;
 
 public class Player : Character
 {
-    [Header("测试")]
-    [SerializeField] private BaseItem _mainWeapon;
-
-    [Header("玩家配置")]
-    [SerializeField] protected CharacterController _characterController;
-    [SerializeField] private SO_PlayerStats _soPlayerStats;
+    [Header("基础配置")]
     [SerializeField] private CinemachineFreeLook _freeLookCamera;
-    [Header("玩家必须组件")]
-    [SerializeField] private PlayerAnimationEventComponent _animEventComponent; // 动画事件组件
-    [SerializeField] private PlayerLockOnTargetComponent _lockOnComponent; // 锁定目标组件
-    [SerializeField] private PlayerEquipmentComponent _equipmentControl; // 装备控制组件(Mono, 挂载 Player.prefab, Inspector 配挂载点)
+    [Header("动画")]
+    [SerializeField] private HybridAnimancerComponent _animancer;
 
-    // 服务
-    private InputService _inputService;
-    private PlayerCameraService _playerCameraService;
+    [Header("玩家依赖组件")]
+    [SerializeField] private PlayerAnimationControl _animEventControl;
+    [SerializeField] private PlayerLockOnTarget _lockOnTarget;
+    [SerializeField] private PlayerEquipmentControl _equipmentControl;
+    [SerializeField] private PlayerSaveControl _saveControl;// 玩家存档控制（纯本地数据组装/还原）
+    [SerializeField] private PlayerStateControl _stateControl;// 玩家状态控制（挂 Player.prefab 同对象，Inspector 拖入）
+                                                              // 服务
     private AudioService _audioService;
     private UIService _uiService;
+    private InputService _inputService;                 // 输入
+    private PlayerCameraService _playerCameraService;   // 相机
     private GameSaveService _saveService;
     private SceneControlService _sceneControlService;
 
-    private PlayerStatsControl _playerStatsControl;//玩家数据控制(含耐力)
-    private PlayerSaveControl _saveControl;// 玩家存档控制（纯本地数据组装/还原）
+    //组件
+    public new PlayerStatsControl StatsControl => _statsControl as PlayerStatsControl;
+    public PlayerAnimationControl AnimationEventControl => _animEventControl;
+    public PlayerLockOnTarget LockOnTarget => _lockOnTarget;
+    public PlayerEquipmentControl EquipmentControl => _equipmentControl;
+    public PlayerSaveControl SaveControl => _saveControl;
+    public PlayerStateControl StateControl => _stateControl;
+    public HybridAnimancerComponent Animancer => _animancer;
 
-    // 状态
-    private PlayerStateControl _stateControl;// 玩家状态控制
-    private PlayerGroundCheck _groundCheck;// 玩家地面检测
-    private PlayerVerticalMotionControl _verticalMotion;// 玩家垂直运动控制
-
-    private BaseItem _pendingItem;// 当前切换流程中待提交挂载的物品
-    private EEquipmentSlot _pendingSlot;// 当前切换流程的目标槽位
-
-    /// <summary>本地玩家属性控制(含耐力与生命，供 UI 访问)。</summary>
-    public PlayerStatsControl PlayerStatsControl => _playerStatsControl;
+    //服务
+    public AudioService AudioService => _audioService;
+    public UIService UIService => _uiService;
+    public InputService InputService => _inputService;
+    public PlayerCameraService PlayerCameraService => _playerCameraService;
+    public GameSaveService SaveService => _saveService;
+    public SceneControlService SceneControlService => _sceneControlService;
 
     public override bool CanBeLocked => false;
 
@@ -43,52 +46,14 @@ public class Player : Character
     protected override void Awake()
     {
         base.Awake();
-        #region 获取服务
-        _inputService = Services.Get<InputService>();
-        _playerCameraService = Services.Get<PlayerCameraService>();
         _audioService = Services.Get<AudioService>();
         _uiService = Services.Get<UIService>();
+        _inputService = Services.Get<InputService>();
+        _playerCameraService = Services.Get<PlayerCameraService>();
         _saveService = Services.Get<GameSaveService>();
         _sceneControlService = Services.Get<SceneControlService>();
-        #endregion
-
-        #region 注册组件
-        // 属性控制
-        _playerStatsControl = new PlayerStatsControl(_soPlayerStats);
-        _statsControl = _playerStatsControl;// 供基类分流本地属性修正（同时作为 IEffectTarget / IEffectSource）
-
-        // 存档数据组装/还原能力（纯本地，不含网络字段；写盘统一由 Host 侧 SaveService 单文件落盘，经 NetworkHub 编排）
-        _saveControl = new PlayerSaveControl(_sceneControlService, transform, _playerStatsControl);
-
-        //状态机控制
-        _groundCheck = new PlayerGroundCheck(_characterController);
-        _verticalMotion = new PlayerVerticalMotionControl(_playerStatsControl, _groundCheck);
-        _stateControl = new PlayerStateControl(_inputService, _playerCameraService,
-            _characterController, _playerStatsControl, _anim, _audioService, _uiService,
-            _vfxService, _verticalMotion, _equipmentControl);
-
-        #endregion
     }
 
-    #endregion
-
-    #region Update 更新
-    protected override void Update()
-    {
-        if (!IsOwner) return;
-
-        // Host 自身每帧刷 NetworkHub 本地缓存（数据新鲜度由 Player 保证，计时落盘仍由 Hub 集中驱动）
-        if (IsHost)
-            NetworkHub.Instance.UpdateHostCache(_saveControl.BuildPlayerSaveData(LocalPlayerId.Value));
-
-        _stateControl.Update();
-        // 非跑步期间(walk/站立/闪避/跳跃/坠落)经过延迟自动回复耐力
-        if (!_stateControl.IsRunning)
-            _playerStatsControl.RecoverStamina(Time.deltaTime);
-
-        // 仅在世界场景累计游玩时长（供存档点 / 返回主菜单存档使用，主菜单不累计）
-        _saveControl.TickPlayTime(Time.deltaTime);
-    }
     #endregion
 
     #region 玩家从网络中创建或销毁时执行
@@ -96,30 +61,17 @@ public class Player : Character
     {
         // 仅本地玩家启用跟随虚拟相机，避免多玩家 vcam 抢占
         _freeLookCamera.enabled = IsOwner;
-
         if (!IsOwner) return;
-
-        #region 本地玩家初始化
-        _playerStatsControl.OnExhausted += OnStaminaExhausted;
-        _playerStatsControl.ResetStamina();
-
+        //状态control和lockOn相互绑定
+        _stateControl.OnLockBreakRequested += _lockOnTarget.ForceUnlock;
+        _lockOnTarget.OnLockStateChanged += _stateControl.OnLockStateChange;
+        //给UI服务绑定
         _uiService.BindLocalPlayer(this);
 
         // 注册本地玩家数据提供方给 NetworkHub（供周期静默上报/Host 缓存刷新取最新数据）
         if (NetworkHub.Instance != null)
-            NetworkHub.Instance.RegisterLocalDataProvider(() => _saveControl.BuildPlayerSaveData(LocalPlayerId.Value));
-
-        // 热键栏：装备/使用物品（仅本地玩家触发拔刀/收刀表现）
-        _inputService.OnHotbarTriggered += OnHotbarTriggered;
-        //动画事件接收器：订阅两个 Animation Event 出口，由 Player 桥接编排（装备控制与动画控制互不依赖）
-        _animEventComponent.OnToggleFrame += OnToggleFrame;
-        _animEventComponent.OnAnimationFinished += OnAnimationFinished;
-
-        // 锁定目标：组件发锁定状态事件 → 桥接战斗姿态（仅本地玩家，远端不误设 CombatLocked）
-        _lockOnComponent.OnLockStateChanged += OnLockStateChanged;
-        // 动作破锁：Dodge/Jump 进入时经状态机事件 → 桥接 ForceUnlock（仅本地玩家触发，避免 Host/远端重复解锁）
-        _stateControl.OnLockBreakRequested += OnLockBreakRequested;
-        #endregion
+            NetworkHub.Instance.RegisterLocalDataProvider(() =>
+            _saveControl.BuildPlayerSaveData(LocalPlayerId.Value));
 
         #region 网络存档相关（订阅 + 还原 + 进世界上报）
         // Host 自身存档还原：上线即读本地存档记录还原坐标/生命/世界时长（原 PlayerNetworkSaveControl.HostRestoreSelf 等价）
@@ -129,12 +81,12 @@ public class Player : Character
             if (self != null)
             {
                 _saveControl.RestoreFromPlayer(self);
-                _playerStatsControl.RestoreHealth(self.currentHealth);
+                StatsControl.RestoreHealth(self.currentHealth);
                 _saveControl.RestoreWorldTime(_saveService.GetWorld()?.secondsPlayed ?? 0f);
             }
             else
             {
-                _playerStatsControl.ApplyDefaultHealth();
+                StatsControl.ApplyDefaultHealth();
                 _saveService.UpsertPlayer(_saveControl.BuildPlayerSaveData(LocalPlayerId.Value));
             }
         }
@@ -150,34 +102,15 @@ public class Player : Character
         // 订阅"即将返回主菜单"信号：Host 端协调各端存档，客人端仅上报自身
         EventBus<ReturningToMainMenuEvent>.Subscribe(OnReturningToMainMenu);
         #endregion
-
-        #region 测试代码
-        //NOTE:测试用订阅（仅本地玩家，避免远端副本误触发）
-        _inputService.OnTestButtonClicked += TestButtonClicked;
-        #endregion
     }
 
     public override void OnNetworkDespawn()
     {
         _freeLookCamera.enabled = false;
-
         if (!IsOwner) return;
-
-        #region 反订阅本地玩家输入/动画
-        _playerStatsControl.OnExhausted -= OnStaminaExhausted;
-
-        _inputService.OnHotbarTriggered -= OnHotbarTriggered;
-        _animEventComponent.OnToggleFrame -= OnToggleFrame;
-        _animEventComponent.OnAnimationFinished -= OnAnimationFinished;
-
-        // 反订阅锁定状态事件（与 OnNetworkSpawn 对称）
-        if (_lockOnComponent != null)
-        {
-            _lockOnComponent.OnLockStateChanged -= OnLockStateChanged;
-            _stateControl.OnLockBreakRequested -= OnLockBreakRequested;
-        }
-        #endregion
-
+        //状态control和lockOn相互取消绑定
+        _stateControl.OnLockBreakRequested -= _lockOnTarget.ForceUnlock;
+        _lockOnTarget.OnLockStateChanged -= _stateControl.OnLockStateChange;
         #region 反订阅网络存档相关
         EventBus<ReturningToMainMenuEvent>.Unsubscribe(OnReturningToMainMenu);
 
@@ -186,11 +119,6 @@ public class Player : Character
 
         if (NetworkHub.Instance != null)
             NetworkHub.Instance.OnPlayerRestore -= OnPlayerRestored;
-        #endregion
-
-        #region 测试代码
-        //NOTE:测试用反订阅（与 OnNetworkSpawn 对称）
-        _inputService.OnTestButtonClicked -= TestButtonClicked;
         #endregion
     }
 
@@ -202,17 +130,7 @@ public class Player : Character
     {
         if (!IsOwner) return;
         _saveControl.RestoreFromPlayer(data_);
-        _playerStatsControl.RestoreHealth(data_.currentHealth);
-    }
-
-    /// <summary>锁定状态事件回调：桥接战斗姿态（锁定→Combat 八向 strafe，解除→Free）。</summary>
-    private void OnLockStateChanged(bool locked_) => _stateControl.CombatLocked = locked_;
-
-    /// <summary>动作破锁事件回调：Dodge/Jump 进入时触发，转调锁定组件强制解除并播放 FreeLook 过渡相机（仅本地玩家执行）。</summary>
-    private void OnLockBreakRequested()
-    {
-        if (!IsOwner) return;
-        _lockOnComponent.ForceUnlock();
+        StatsControl.RestoreHealth(data_.currentHealth);
     }
 
     /// <summary>本地存档入口（Checkpoint 调用）：Host 协调全体（自身 + 各客人缓存 + 世界状态）落盘；客人仅上报自身。</summary>
@@ -232,76 +150,12 @@ public class Player : Character
     }
     #endregion
 
-    #region 装备切换控制
-    /// <summary>热键栏回调：本地玩家切换指定槽位装备（拔刀/收刀表现），远端副本不响应。
-    /// 仅做状态决策（翻转占用表）并播动画，真实挂载在 OnToggleFrame 帧事件提交。</summary>
-    private void OnHotbarTriggered(EEquipmentSlot slot_)
-    {
-        if (!IsOwner) return;
-        BaseItem item = _mainWeapon;//NOTE:临时测试用
-        if (item == null) return; // 未提供则不切换
-        _equipmentControl.Toggle(slot_);
-        _pendingItem = item;
-        _pendingSlot = slot_;
-        _stateControl.IsBusy = true;
-        _animEventComponent.Equip1HandWeapon();
-    }
-
-    /// <summary>动画切换落点帧：提交真实挂载/卸下，并清 IsBusy。</summary>
-    private void OnToggleFrame()
-    {
-        if (_pendingItem == null) return;
-        if (_equipmentControl.IsSlotTaken(_pendingSlot))
-            _equipmentControl.Equip(_pendingItem);
-        else
-            _equipmentControl.Unequip(_pendingItem);
-        _pendingItem = null;
-    }
-
-    /// <summary>动画播放完成：清除忙状态。</summary>
-    private void OnAnimationFinished() => _stateControl.IsBusy = false;
-    #endregion
-
-    #region 力竭事件回调
-    private void OnStaminaExhausted() =>
-        _audioService.PlayAudio("Player", "ExhaustedBreath", transform.position);
-    #endregion
-
     #region 受击入口（重写基类钩子：先播受击动画再 base 本地扣血）
     /// <summary>受击钩子重写：进受击态（按 contactPoint 选方向动画）后交由基类统一本地扣血，死亡链路由基类 OnCurrentHealthChanged 自然触发。</summary>
     public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
     {
         _stateControl.EnterHitState(contactPoint_);
         base.OnHitReceived(damage_, contactPoint_);
-    }
-    #endregion
-
-    #region 应用焦点切换时恢复输入
-    private void OnApplicationFocus(bool focus_)
-    {
-        if (focus_)
-        {
-            if (_sceneControlService.CurrentActiveScene.name == SceneControlService.SceneMainMenu)
-                _inputService.EnableUIMode();
-            else
-                _inputService.EnablePlayerMode();
-        }
-        else
-            _inputService.DisableAllMode();
-    }
-    #endregion
-
-    #region 测试代码
-    /// <summary>测试用：本地玩家点击测试按钮，仅本地玩家触发。</summary>
-    private void TestButtonClicked()
-    {
-        if (!IsOwner) return;
-        Debug.Log("TestButtonClicked");
-        //ApplyEffect("StatModifierEffect");
-        //ApplyEffect("DamageEffect");
-        //_stateControl.CombatLocked = !_stateControl.CombatLocked;
-        _sceneControlService.ReturnToMainMenu();
-        //ApplyEffect("HealEffect");
     }
     #endregion
 }

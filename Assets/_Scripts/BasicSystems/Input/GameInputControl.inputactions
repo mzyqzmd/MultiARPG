@@ -106,7 +106,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "NormalApply",
+                    "name": "NormalAttack",
                     "type": "Button",
                     "id": "e4482027-ecb7-447e-ae21-5675dc01deb1",
                     "expectedControlType": "",
@@ -115,7 +115,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SpecialApply",
+                    "name": "SpecialAttack",
                     "type": "Button",
                     "id": "f702d2ac-90a2-4114-afe3-1a5df5746196",
                     "expectedControlType": "",
@@ -557,7 +557,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard",
-                    "action": "NormalApply",
+                    "action": "NormalAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -568,7 +568,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "NormalApply",
+                    "action": "NormalAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -595,37 +595,15 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "One Modifier",
-                    "id": "92c50d2f-19fc-49cc-a137-4631fe61a440",
-                    "path": "OneModifier",
+                    "name": "",
+                    "id": "68729b63-8d51-4eec-981f-e00a6bf0fe0e",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "SpecialApply",
-                    "isComposite": true,
+                    "groups": ";Keyboard",
+                    "action": "SpecialAttack",
+                    "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier",
-                    "id": "51f90dea-c173-4705-b5b5-536fbbe5e9b8",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "SpecialApply",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "binding",
-                    "id": "a80805f6-c903-4cf9-916a-7483cf9bf67f",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "SpecialApply",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
@@ -634,7 +612,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "SpecialApply",
+                    "action": "SpecialAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

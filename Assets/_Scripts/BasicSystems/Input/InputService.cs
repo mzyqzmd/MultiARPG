@@ -21,9 +21,11 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     /// <summary>热键栏触发：参数为对应装备槽位（1=LeftHand / 2=LeftHip / 3=Back / 4=RightHip / 5=RightHand）。</summary>
     public event Action<EEquipmentSlot> OnHotbarTriggered;
     /// <summary>轻击触发事件（performed 时触发一次）。</summary>
-    public event Action OnNormalApplyTriggered;
-    /// <summary>重击触发事件（performed 时触发一次，本次仅暴露不接线）。</summary>
-    public event Action OnSpecialApplyTriggered;
+    public event Action OnNormalAttackTriggered;
+    /// <summary>重击开始事件（按键按下 started 相位触发，用于进入蓄力态并开始计时）。</summary>
+    public event Action OnSpecialAttackTriggered;
+    /// <summary>重击取消/松开事件（按键 released/canceled 相位触发，用于按蓄力时长结算并重击）。</summary>
+    public event Action OnSpecialAttackCanceled;
     /// <summary>瞄准/格挡触发事件（performed 时触发一次，本次仅暴露不接线）。</summary>
     public event Action OnAimOrParryTriggered;
     /// <summary>锁定目标触发事件（performed 时触发一次）。</summary>
@@ -162,16 +164,17 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
         if (context.performed) OnTestButtonClicked?.Invoke();
     }
 
-    public void OnNormalApply(InputAction.CallbackContext context)
+    public void OnNormalAttack(InputAction.CallbackContext context)
     {
         UpdateActiveDevice(context);
-        if (context.performed) OnNormalApplyTriggered?.Invoke();
+        if (context.performed) OnNormalAttackTriggered?.Invoke();
     }
 
-    public void OnSpecialApply(InputAction.CallbackContext context)
+    public void OnSpecialAttack(InputAction.CallbackContext context)
     {
         UpdateActiveDevice(context);
-        if (context.performed) OnSpecialApplyTriggered?.Invoke();
+        if (context.started) OnSpecialAttackTriggered?.Invoke();
+        else if (context.canceled) OnSpecialAttackCanceled?.Invoke();
     }
 
     public void OnAimOrParry(InputAction.CallbackContext context)

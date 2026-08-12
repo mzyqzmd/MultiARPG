@@ -4,7 +4,5 @@ using UnityEngine;
 
 public class FakeManStatsControl : CharacterStatsControl
 {
-    public FakeManStatsControl(SO_CharacterStats stats_) : base(stats_)
-    {
-    }
+  
 }

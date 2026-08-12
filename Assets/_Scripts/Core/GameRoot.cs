@@ -125,7 +125,7 @@ public class GameRoot : MonoBehaviour
 
     private void OnLocalPlayerBound(LocalPlayerBoundEvent e_) =>
         _uiService.SpawnUiView<UI_InGameUI>("InGameUI", EUILayerCanvas.Hud).
-            Initialize(e_.Player.PlayerStatsControl);
+            Initialize(e_.Player);
 
     private void OnLocalPlayerUnbound(LocalPlayerUnboundEvent _) =>
         _uiService.ClearAllLayerView();
@@ -236,4 +236,7 @@ public class GameRoot : MonoBehaviour
         Services.Unregister<ItemService>();
     }
     #endregion
+
+    private void OnApplicationFocus(bool focus) =>
+        _sceneControlService?.OnApplicationFocusChanged(focus);
 }

@@ -8,14 +8,16 @@ public class UI_InGameUI : UI_BaseView
 {
     [SerializeField] private UI_StaminaBar _staminaBar;
     [SerializeField] private UI_HealthBar _healthBar;
+    [SerializeField] private UI_WeaponQuickPanel _weaponQuickPanel;
 
     private InGameUIPresenter _presenter;
 
     public UI_StaminaBar StaminaBar => _staminaBar;
     public UI_HealthBar HealthBar => _healthBar;
+    public UI_WeaponQuickPanel WeaponQuickPanel => _weaponQuickPanel;
 
-    public void Initialize(PlayerStatsControl statsControl_) =>
-        _presenter = new InGameUIPresenter(statsControl_, this);
+    public void Initialize(Player player_) =>
+        _presenter = new InGameUIPresenter(this, player_);
 
     private void Update() => _presenter?.Tick(Time.deltaTime);
 

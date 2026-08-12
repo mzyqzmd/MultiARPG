@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _effectType: 0
   _duration: 0
+  _tickInterval: 0
   _id: RapierDamage
-  _physicalDamage: 0
+  _physicalDamage: 2
   _magicalDamage: 0
   _fireDamage: 0
   _iceDamage: 0

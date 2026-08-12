@@ -6,26 +6,29 @@
 /// </summary>
 public class InGameUIPresenter
 {
-    private readonly PlayerStatsControl _statsControl;
+    private readonly Player _player;
     private readonly UI_StaminaBar _staminaBar;
     private readonly UI_HealthBar _healthBar;
+    private readonly UI_WeaponQuickPanel _weaponQuickPanel;
 
     private float _staminaRatio;
     private float _targetStaminaRatio;
     private float _healthRatio;
     private float _targetHealthRatio;
 
-    public InGameUIPresenter(PlayerStatsControl statsControl_, UI_InGameUI view_)
+    public InGameUIPresenter(UI_InGameUI view_, Player player_)
     {
-        _statsControl = statsControl_;
+        _player = player_;
         _staminaBar = view_.StaminaBar;
         _healthBar = view_.HealthBar;
+        _weaponQuickPanel= view_.WeaponQuickPanel;
 
-        _statsControl.OnStaminaChanged += OnStaminaChanged;
-        _statsControl.OnCurrentHealthChanged += OnHealthChanged;
+        _player.StatsControl.OnStaminaChanged += OnStaminaChanged;
+        _player.StatsControl.OnCurrentHealthChanged += OnHealthChanged;
+        _weaponQuickPanel.Initialize(_player.EquipmentControl);
         // 除零守卫：构造时 MaxHealth 可能尚未初始化，默认满值
-        _staminaRatio = _targetStaminaRatio = _statsControl.MaxStamina > 0f ? _statsControl.StaminaRatio : 1f;
-        _healthRatio = _targetHealthRatio = _statsControl.MaxHealth > 0f ? _statsControl.HealthRatio : 1f;
+        _staminaRatio = _targetStaminaRatio = _player.StatsControl.MaxStamina > 0f ? _player.StatsControl.StaminaRatio : 1f;
+        _healthRatio = _targetHealthRatio = _player.StatsControl.MaxHealth > 0f ? _player.StatsControl.HealthRatio : 1f;
     }
 
     public void Tick(float deltaTime_)
@@ -38,20 +41,20 @@ public class InGameUIPresenter
 
     private void OnStaminaChanged(int _, int newStamina_)
     {
-        if (_statsControl.MaxStamina > 0f) _targetStaminaRatio = (float)newStamina_ / _statsControl.MaxStamina;
+        if (_player.StatsControl.MaxStamina > 0f) _targetStaminaRatio = (float)newStamina_ / _player.StatsControl.MaxStamina;
     }
 
     private void OnHealthChanged(int _, int newHealth_)
     {
-        if (_statsControl.MaxHealth > 0f) _targetHealthRatio = (float)newHealth_ / _statsControl.MaxHealth;
+        if (_player.StatsControl.MaxHealth > 0f) _targetHealthRatio = (float)newHealth_ / _player.StatsControl.MaxHealth;
     }
 
     #region 生命周期
     /// <summary>UI 解绑销毁时调用：退订两个事件，避免悬空回调与内存泄漏。</summary>
     public void Dispose()
     {
-        _statsControl.OnStaminaChanged -= OnStaminaChanged;
-        _statsControl.OnCurrentHealthChanged -= OnHealthChanged;
+        _player.StatsControl.OnStaminaChanged -= OnStaminaChanged;
+        _player.StatsControl.OnCurrentHealthChanged -= OnHealthChanged;
     }
     #endregion
 }

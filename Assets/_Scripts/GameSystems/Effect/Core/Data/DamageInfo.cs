@@ -31,9 +31,9 @@ public struct DamageInfo : INetworkSerializable
         target = target_;
     }
 
-    /// <summary>从效果集合聚合五类伤害（仅累加 SO_DamageEffect，忽略非伤害效果），供武器侧一次性构建伤害。保持与"武器仅传伤害"语义一致。</summary>
+    /// <summary>从效果集合聚合五类伤害（仅累加 SO_DamageEffect，忽略非伤害效果），供武器侧一次性构建伤害。保持与"武器仅传伤害"语义一致。multiplier_ 为蓄力倍率（默认 1，轻击兼容），对五类同比例缩放供抗性预留。</summary>
     public static DamageInfo FromEffects(IEnumerable<SO_BaseEffect> effects_, Vector3 contactPoint_,
-        IEffectSource source_, IEffectTarget target_)
+        IEffectSource source_, IEffectTarget target_, float multiplier_ = 1f)
     {
         int p = 0, m = 0, f = 0, i = 0, l = 0;
         foreach (var effect in effects_)
@@ -47,7 +47,13 @@ public struct DamageInfo : INetworkSerializable
                 l += dmg.LightningDamage;
             }
         }
-        return new DamageInfo(p, m, f, i, l, contactPoint_, source_, target_);
+        return new DamageInfo(
+            Mathf.RoundToInt(p * multiplier_),
+            Mathf.RoundToInt(m * multiplier_),
+            Mathf.RoundToInt(f * multiplier_),
+            Mathf.RoundToInt(i * multiplier_),
+            Mathf.RoundToInt(l * multiplier_),
+            contactPoint_, source_, target_);
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> s_) where T : IReaderWriter

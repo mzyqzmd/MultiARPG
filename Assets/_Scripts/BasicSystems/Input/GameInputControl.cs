@@ -192,7 +192,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""NormalApply"",
+                    ""name"": ""NormalAttack"",
                     ""type"": ""Button"",
                     ""id"": ""e4482027-ecb7-447e-ae21-5675dc01deb1"",
                     ""expectedControlType"": """",
@@ -201,7 +201,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SpecialApply"",
+                    ""name"": ""SpecialAttack"",
                     ""type"": ""Button"",
                     ""id"": ""f702d2ac-90a2-4114-afe3-1a5df5746196"",
                     ""expectedControlType"": """",
@@ -643,7 +643,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
-                    ""action"": ""NormalApply"",
+                    ""action"": ""NormalAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -654,7 +654,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""NormalApply"",
+                    ""action"": ""NormalAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -681,37 +681,15 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""92c50d2f-19fc-49cc-a137-4631fe61a440"",
-                    ""path"": ""OneModifier"",
+                    ""name"": """",
+                    ""id"": ""68729b63-8d51-4eec-981f-e00a6bf0fe0e"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SpecialApply"",
-                    ""isComposite"": true,
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""SpecialAttack"",
+                    ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""51f90dea-c173-4705-b5b5-536fbbe5e9b8"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard"",
-                    ""action"": ""SpecialApply"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""a80805f6-c903-4cf9-916a-7483cf9bf67f"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard"",
-                    ""action"": ""SpecialApply"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
@@ -720,7 +698,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""SpecialApply"",
+                    ""action"": ""SpecialAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -831,8 +809,8 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         m_Player_EquipHotKey3 = m_Player.FindAction("EquipHotKey3", throwIfNotFound: true);
         m_Player_EquipHotKey4 = m_Player.FindAction("EquipHotKey4", throwIfNotFound: true);
         m_Player_EquipHotKey5 = m_Player.FindAction("EquipHotKey5", throwIfNotFound: true);
-        m_Player_NormalApply = m_Player.FindAction("NormalApply", throwIfNotFound: true);
-        m_Player_SpecialApply = m_Player.FindAction("SpecialApply", throwIfNotFound: true);
+        m_Player_NormalAttack = m_Player.FindAction("NormalAttack", throwIfNotFound: true);
+        m_Player_SpecialAttack = m_Player.FindAction("SpecialAttack", throwIfNotFound: true);
         m_Player_AimOrParry = m_Player.FindAction("AimOrParry", throwIfNotFound: true);
         m_Player_LockOnTarget = m_Player.FindAction("LockOnTarget", throwIfNotFound: true);
         // UI
@@ -930,8 +908,8 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_EquipHotKey3;
     private readonly InputAction m_Player_EquipHotKey4;
     private readonly InputAction m_Player_EquipHotKey5;
-    private readonly InputAction m_Player_NormalApply;
-    private readonly InputAction m_Player_SpecialApply;
+    private readonly InputAction m_Player_NormalAttack;
+    private readonly InputAction m_Player_SpecialAttack;
     private readonly InputAction m_Player_AimOrParry;
     private readonly InputAction m_Player_LockOnTarget;
     /// <summary>
@@ -990,13 +968,13 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @EquipHotKey5 => m_Wrapper.m_Player_EquipHotKey5;
         /// <summary>
-        /// Provides access to the underlying input action "Player/NormalApply".
+        /// Provides access to the underlying input action "Player/NormalAttack".
         /// </summary>
-        public InputAction @NormalApply => m_Wrapper.m_Player_NormalApply;
+        public InputAction @NormalAttack => m_Wrapper.m_Player_NormalAttack;
         /// <summary>
-        /// Provides access to the underlying input action "Player/SpecialApply".
+        /// Provides access to the underlying input action "Player/SpecialAttack".
         /// </summary>
-        public InputAction @SpecialApply => m_Wrapper.m_Player_SpecialApply;
+        public InputAction @SpecialAttack => m_Wrapper.m_Player_SpecialAttack;
         /// <summary>
         /// Provides access to the underlying input action "Player/AimOrParry".
         /// </summary>
@@ -1064,12 +1042,12 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @EquipHotKey5.started += instance.OnEquipHotKey5;
             @EquipHotKey5.performed += instance.OnEquipHotKey5;
             @EquipHotKey5.canceled += instance.OnEquipHotKey5;
-            @NormalApply.started += instance.OnNormalApply;
-            @NormalApply.performed += instance.OnNormalApply;
-            @NormalApply.canceled += instance.OnNormalApply;
-            @SpecialApply.started += instance.OnSpecialApply;
-            @SpecialApply.performed += instance.OnSpecialApply;
-            @SpecialApply.canceled += instance.OnSpecialApply;
+            @NormalAttack.started += instance.OnNormalAttack;
+            @NormalAttack.performed += instance.OnNormalAttack;
+            @NormalAttack.canceled += instance.OnNormalAttack;
+            @SpecialAttack.started += instance.OnSpecialAttack;
+            @SpecialAttack.performed += instance.OnSpecialAttack;
+            @SpecialAttack.canceled += instance.OnSpecialAttack;
             @AimOrParry.started += instance.OnAimOrParry;
             @AimOrParry.performed += instance.OnAimOrParry;
             @AimOrParry.canceled += instance.OnAimOrParry;
@@ -1120,12 +1098,12 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @EquipHotKey5.started -= instance.OnEquipHotKey5;
             @EquipHotKey5.performed -= instance.OnEquipHotKey5;
             @EquipHotKey5.canceled -= instance.OnEquipHotKey5;
-            @NormalApply.started -= instance.OnNormalApply;
-            @NormalApply.performed -= instance.OnNormalApply;
-            @NormalApply.canceled -= instance.OnNormalApply;
-            @SpecialApply.started -= instance.OnSpecialApply;
-            @SpecialApply.performed -= instance.OnSpecialApply;
-            @SpecialApply.canceled -= instance.OnSpecialApply;
+            @NormalAttack.started -= instance.OnNormalAttack;
+            @NormalAttack.performed -= instance.OnNormalAttack;
+            @NormalAttack.canceled -= instance.OnNormalAttack;
+            @SpecialAttack.started -= instance.OnSpecialAttack;
+            @SpecialAttack.performed -= instance.OnSpecialAttack;
+            @SpecialAttack.canceled -= instance.OnSpecialAttack;
             @AimOrParry.started -= instance.OnAimOrParry;
             @AimOrParry.performed -= instance.OnAimOrParry;
             @AimOrParry.canceled -= instance.OnAimOrParry;
@@ -1372,19 +1350,19 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEquipHotKey5(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "NormalApply" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "NormalAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnNormalApply(InputAction.CallbackContext context);
+        void OnNormalAttack(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "SpecialApply" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SpecialAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSpecialApply(InputAction.CallbackContext context);
+        void OnSpecialAttack(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "AimOrParry" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

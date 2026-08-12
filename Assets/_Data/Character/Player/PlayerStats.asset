@@ -24,6 +24,7 @@ MonoBehaviour:
   _jumpStaminaCost: 20
   _normalAttackStaminaCost: 15
   _normalAttackDuration: 0.7
+  _heavyAttackStaminaCost: 18
   _maxStamina: 100
   _dodgeStaminaCost: 20
   _staminaRegenRate: 20
