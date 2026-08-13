@@ -21,6 +21,7 @@ public class PlayerDodgeState : PlayerActionState
 
     public override void Enter()
     {
+        base.Enter();
         // 进入即破锁：触发事件经 Player 桥接 ForceUnlock 解除锁定 + FreeLook 过渡相机
         _player.StateControl.RequestLockBreak();
 
@@ -51,6 +52,7 @@ public class PlayerDodgeState : PlayerActionState
 
     public override void Exit()
     {
+        base.Exit();
         _player.Anim.SetBool("DodgeState", false);
         _player.StateControl.IsBusy = false;
     }
@@ -58,6 +60,7 @@ public class PlayerDodgeState : PlayerActionState
     public override void Update()
     {
         base.Update();
+        if (!_player.IsOwner) return;
         // Dodge 动画 clip 长度与配置的 DodgeDuration 可能不一致：首次需待 Animator 真正切入 Dodge 后
         // 读取 clip 原始长度并缓存，之后按 clipLength/DodgeDuration 设定 Speed Multiplier，使动画恰好在
         // DodgeDuration 内播完；后续进入直接用缓存长度在 Enter 即时设定，无首帧跳变。

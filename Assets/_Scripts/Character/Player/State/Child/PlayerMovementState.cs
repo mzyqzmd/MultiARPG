@@ -25,6 +25,7 @@ public class PlayerMovementState : PlayerActionState
     public override void Update()
     {
         base.Update();
+        if (!_player.IsOwner) return;
         // 走出平台边缘(地面丢失)自动坠落
         if (!_verticalMotionControl.CanJump)
         {

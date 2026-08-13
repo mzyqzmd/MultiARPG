@@ -11,6 +11,7 @@ public class PlayerDeadState : PlayerActionState
 
     public override void Enter()
     {
+        base.Enter();
         _player.InputService.DisableAllMode();
         _player.UIService.SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay).
             Initialize("寄!", Color.red, 1.5f, false);
@@ -19,6 +20,7 @@ public class PlayerDeadState : PlayerActionState
 
     public override void Exit()
     {
+        base.Exit();
         _player.InputService.EnablePlayerMode();
         _player.Anim.SetBool("DeadState", false);
     }

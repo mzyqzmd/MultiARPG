@@ -1,4 +1,3 @@
-using Animancer;
 using Cinemachine;
 using UnityEngine;
 
@@ -6,8 +5,6 @@ public class Player : Character
 {
     [Header("基础配置")]
     [SerializeField] private CinemachineFreeLook _freeLookCamera;
-    [Header("动画")]
-    [SerializeField] private HybridAnimancerComponent _animancer;
 
     [Header("玩家依赖组件")]
     [SerializeField] private PlayerAnimationControl _animEventControl;
@@ -30,7 +27,6 @@ public class Player : Character
     public PlayerEquipmentControl EquipmentControl => _equipmentControl;
     public PlayerSaveControl SaveControl => _saveControl;
     public PlayerStateControl StateControl => _stateControl;
-    public HybridAnimancerComponent Animancer => _animancer;
 
     //服务
     public AudioService AudioService => _audioService;
@@ -65,6 +61,10 @@ public class Player : Character
         //状态control和lockOn相互绑定
         _stateControl.OnLockBreakRequested += _lockOnTarget.ForceUnlock;
         _lockOnTarget.OnLockStateChanged += _stateControl.OnLockStateChange;
+        //输入事件订阅（IsOwner 已可靠的时机，避免 Awake 阶段 IsOwner 为假导致订阅跳过）
+        _stateControl.BindInput();
+        _equipmentControl.BindInput();
+        _lockOnTarget.BindInput();
         //给UI服务绑定
         _uiService.BindLocalPlayer(this);
 
@@ -111,6 +111,10 @@ public class Player : Character
         //状态control和lockOn相互取消绑定
         _stateControl.OnLockBreakRequested -= _lockOnTarget.ForceUnlock;
         _lockOnTarget.OnLockStateChanged -= _stateControl.OnLockStateChange;
+        //反订阅输入事件（与 OnNetworkSpawn 配对，防重 spawn 累积）
+        _stateControl.UnbindInput();
+        _equipmentControl.UnbindInput();
+        _lockOnTarget.UnbindInput();
         #region 反订阅网络存档相关
         EventBus<ReturningToMainMenuEvent>.Unsubscribe(OnReturningToMainMenu);
 

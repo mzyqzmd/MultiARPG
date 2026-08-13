@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1334357270717808445}
   - component: {fileID: 1660438135450198842}
   - component: {fileID: 6420988217269086089}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Item_Weapon_Rapier
   m_TagString: Untagged
   m_Icon: {fileID: 0}

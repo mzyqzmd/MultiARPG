@@ -32,16 +32,12 @@ public class PlayerLockOnTarget : MonoBehaviour
     /// <summary>检测原点：未指定时回退到组件自身 Transform。</summary>
     private Transform CheckOrigin => _checkStartPoint != null ? _checkStartPoint : transform;
 
-    #region 生命周期
-    private void Awake()
-    {
-        _player.InputService.OnLockOnTargetTriggered += ToggleLock;
-    }
+    #region 输入事件绑定（由 Player.OnNetworkSpawn/OnNetworkDespawn 在 IsOwner 可靠后转发调用）
+    /// <summary>订阅本地玩家锁定目标触发事件（仅 owner 调用）。</summary>
+    public void BindInput() => _player.InputService.OnLockOnTargetTriggered += ToggleLock;
 
-    private void OnDestroy()
-    {
-        _player.InputService.OnLockOnTargetTriggered -= ToggleLock;
-    }
+    /// <summary>反订阅锁定目标触发事件（与 BindInput 配对，防重 spawn 累积）。</summary>
+    public void UnbindInput() => _player.InputService.OnLockOnTargetTriggered -= ToggleLock;
     #endregion
 
     #region 每帧：失效校验 + 轴驱动

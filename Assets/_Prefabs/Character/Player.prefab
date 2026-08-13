@@ -1037,7 +1037,6 @@ GameObject:
   - component: {fileID: 2024655551899241446}
   - component: {fileID: 5402924338443506806}
   - component: {fileID: 5932469945283014108}
-  - component: {fileID: 6909882413691234336}
   m_Layer: 8
   m_Name: Renderer
   m_TagString: Untagged
@@ -1072,13 +1071,17 @@ Animator:
   m_GameObject: {fileID: 1954078910054791483}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: d288a0e4a2d923b46898986e979da643, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e08ee874d499e2e4493ae737cb5d3b65, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'Eyebrows'\n\tTransform 'Eyes'\n\tTransform 'Eyebrows'\n\tTransform
+    'Eyes'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom animation clip 'core_main_idle_01'\n\tFrom
+    animation clip 'core_main_idle_01'\n\tFrom animation clip 'HeavyAttackIdle'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -1095,7 +1098,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a1b2d3e4f5475869708a9b0c1d2e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 1
+    OriginatingState: -1419695372
+    DestinationState: -666646986
+    TransitionDuration: 0.15
+    TriggerNameHash: 1027433098
+    TransitionIndex: 0
   m_Animator: {fileID: 2024655551899241446}
 --- !u!114 &5932469945283014108
 MonoBehaviour:
@@ -1110,39 +1120,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _player: {fileID: 584404837969333627}
---- !u!114 &6909882413691234336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1954078910054791483}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6ad7b53f86f9da4da426b673c422513, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _Animator: {fileID: 2024655551899241446}
-  _Transitions: {fileID: 0}
-  _ActionOnDisable: 0
-  _PlayAutomatically: 0
-  _Names: []
-  _Animations: []
-  _Controller:
-    _FadeDuration: 0.25
-    _Speed: 1
-    _Events:
-      _NormalizedTimes: []
-      _Callbacks: []
-      _Names: []
-    _Controller: {fileID: 9100000, guid: e08ee874d499e2e4493ae737cb5d3b65, type: 2}
-    _ParameterBindings:
-      _Mode: 0
-      _Bindings: []
-    _ActionsOnStop: 
-  references:
-    version: 2
-    RefIds: []
 --- !u!1 &2498346982572378157
 GameObject:
   m_ObjectHideFlags: 0
@@ -1996,6 +1973,7 @@ GameObject:
   - component: {fileID: 2412945708432968532}
   - component: {fileID: 213266303699851825}
   - component: {fileID: 1909072648176362660}
+  - component: {fileID: 2283823529198760012}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -2058,7 +2036,6 @@ MonoBehaviour:
   _lockCenter: {fileID: 4801955007021443544}
   _statsControl: {fileID: 9209229479180519588}
   _freeLookCamera: {fileID: 6174310483427124090}
-  _animancer: {fileID: 6909882413691234336}
   _animEventControl: {fileID: 5932469945283014108}
   _lockOnTarget: {fileID: 2181013100342294013}
   _equipmentControl: {fileID: 6359203548249226517}
@@ -2188,7 +2165,7 @@ CharacterController:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -2197,10 +2174,23 @@ CharacterController:
   m_Height: 2
   m_Radius: 0.25
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.15
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.975, z: 0}
+--- !u!114 &2283823529198760012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4396566689771487019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e34cca7a329233948a7b9e8f1e00d395, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 584404837969333627}
 --- !u!1 &4492265498052151517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2927,7 +2917,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7425007597203722037}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.13009937, y: 0.27566788, z: -0.037685864, w: 0.95166236}
   m_LocalPosition: {x: -0.000031352043, y: 0, z: 0.000015497208}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3543,7 +3533,7 @@ PrefabInstance:
     - target: {fileID: 8364483458913367027, guid: cfb918ea2c500804bad4ffafb8e8fbcc,
         type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8364483458913674147, guid: cfb918ea2c500804bad4ffafb8e8fbcc,
         type: 3}

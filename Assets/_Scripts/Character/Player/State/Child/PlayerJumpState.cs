@@ -40,6 +40,7 @@ public class PlayerJumpState : PlayerActionState
 
     public override void Exit()
     {
+        base.Exit();
         _player.Anim.SetBool("JumpState", false);
         _player.StateControl.IsBusy = false;
     }
@@ -47,6 +48,7 @@ public class PlayerJumpState : PlayerActionState
     public override void Update()
     {
         base.Update();
+        if (!_player.IsOwner) return;
         _verticalMotionControl.TickGravity(Time.deltaTime);
 
         // 首次进入 lift 后读取 clip 原始长度并缓存

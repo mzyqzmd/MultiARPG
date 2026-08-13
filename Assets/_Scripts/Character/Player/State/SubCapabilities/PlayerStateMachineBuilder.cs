@@ -78,17 +78,16 @@ public class PlayerStateMachineBuilder
         ChildFsm.AddAnyTransition(JumpState,
             () => _stateControl.JumpRequested && !_stateControl.IsBusy && _verticalMotion.CanJump && !_player.StatsControl.IsDead,
             ETransitionPriority.High);
-        // 轻击为 High 优先级任意态抢断；进行中不可再次进入(互斥)；死亡态/无右手装备禁用；任意姿态(Free/Combat)均可触发
+        // 轻击为 High 优先级任意态抢断；死亡态/无右手装备禁用；任意姿态(Free/Combat)均可触发。
+        // 仅负责从 Movement 等外部态首次切入 NormalAttack_01；连段进 02 由 Animator 子状态机内部过渡处理(OnComboWindow 期间再按轻击)，
+        // C# 已处于该态时 AnyTransition 不重触发，连段不依赖此守卫。
         ChildFsm.AddAnyTransition(NormalAttackState,
             () => _stateControl.NormalAttackRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead &&
-                  _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) != null,
-            ETransitionPriority.High);
+                  _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) != null, ETransitionPriority.High);
         // 重击(蓄力)为 High 优先级任意态抢断；进入后由状态内部计时；死亡态/无右手装备/耐力不足禁用；任意姿态均可触发
         ChildFsm.AddAnyTransition(HeavyAttackState,
             () => _stateControl.HeavyAttackRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead &&
-                   _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) != null &&
-                  _player.StatsControl.CanAffordStamina(_player.StatsControl.HeavyAttackStaminaCost),
-            ETransitionPriority.High);
+                   _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) != null, ETransitionPriority.High);
         #endregion
     }
     #endregion

@@ -40,6 +40,7 @@ public class PlayerHitState : PlayerActionState
     public override void Update()
     {
         base.Update();
+        if (!_player.IsOwner) return;
         // 首次 IsTag("Hit") 命中后取 blend tree 当前真实 clip 长度缓存一次（blend tree 下 stateInfo.length 是归一化时长，
         // 必须用 clipInfo 取真实秒长；四方向 clip 长度一致，取第一个即可）；倍速用当前 HitDuration 实时算
         if (!_animSpeedReady)

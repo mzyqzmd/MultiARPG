@@ -8,7 +8,7 @@
 ![Netcode](https://img.shields.io/badge/Netcode%20for%20GameObjects-1.12.2-2196F3)
 ![URP](https://img.shields.io/badge/URP-14.0.12-4CAF50)
 ![C#](https://img.shields.io/badge/C%23-116%20files%20%2F%207.4k%20lines-239120)
-![架构评分](https://img.shields.io/badge/Architecture-80%2F100%20%28B%29-21a0c0)
+![架构评分](https://img.shields.io/badge/Architecture-81%2F100%20%28B%29-21a0c0)
 
 ---
 
@@ -20,7 +20,7 @@
 | **领域 NGO-free** | Stats / Effect / Item / Save 组装 / Input / Audio / UI / FSM 全部不引用网络库，可单机独立运行与推演 |
 | **组合根 + 服务容器** | `GameRoot` 按显式依赖顺序构建并注册 **11 个服务**，构造注入而非静态单例；场景卸载时逆序注销 |
 | **分层状态机** | 父层管姿态（Free / Combat），子层管动作（Move / Jump / Fall / Dodge / Attack / Hit / Dead），带优先级抢断的 `AnyTransition` |
-| **数据驱动** | 角色属性、效果、物品、音频、UI、VFX 全部由 `SO_*` 数据库按 key 查表，配置与运行时状态分离（蓄力倍率 / 武器动画字典已接通运行时） |
+| **数据驱动** | 角色属性、效果、物品、音频、UI、VFX 全部由 `SO_*` 数据库按 key 查表，配置与运行时状态分离；`SO_Weapon` 蓄力倍率、武器动画字典、**武器动画覆盖控制器（`OverrideController`）均已接通运行时** |
 | **零 GC 事件总线** | `EventBus` 仅承载 3 个游戏级信号，参数为只读 `struct`，避免退化为「事件版服务定位器」 |
 | **锁定目标系统** | `ILockableTarget` 接口 + `OverlapSphere` 检测 + `Linecast` 遮挡剔除，经 `Action<bool>` 事件桥接状态机，**零反向编译期依赖** |
 | **干净可编译** | 全仓零 `using UnityEditor`、无编译级错误、无悬空引用——当前代码状态可无障碍进入 Unity Play 模式与 Standalone 打包 |
@@ -89,7 +89,7 @@ Assets/
 │   │   ├── Player/
 │   │   │   ├── Animation/           动画事件薄转发器
 │   │   │   ├── Camera/              锁定目标系统（含 ILockableTarget）
-│   │   │   ├── Equipment/           装备挂载权威
+│   │   │   ├── Equipment/           装备挂载权威（含武器动画覆盖控制器切换）
 │   │   │   ├── State/               分层状态机（Parent 姿态 / Child 动作 + SubCapabilities 协作类）
 │   │   │   ├── Stats/               玩家属性计算中心
 │   │   │   └── Save/                纯本地存档组装 / 还原
@@ -102,7 +102,7 @@ Assets/
 │   │   ├── EventBus/                零 GC 事件总线
 │   │   └── ObjectPool/              Mono 对象池
 │   │
-│   ├── GameSystems/                 游戏系统（22 文件 / 532 行）
+│   ├── GameSystems/                 游戏系统（22 文件 / 532 行，SO_Weapon 新增动画覆盖控制器）
 │   │   ├── Effect/                  效果系统（Core / Concrete / DamageInfo）
 │   │   ├── Item/                    物品与武器（BaseItem · Weapon_Rapier · SO_Weapon 蓄力倍率）
 │   │   └── Stats/                   属性修饰器（ModifiableStat · StatModifier）
@@ -177,24 +177,24 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | 模块 | 文件数 | 行数 |
 |------|-------:|-----:|
 | BasicSystems | 39 | 3675 |
-| Character | 38 | 2434 |
+| Character | 38 | 2335 |
 | Core | 13 | 546 |
 | GameSystems | 22 | 532 |
 | Utility | 3 | 199 |
 | World | 1 | 29 |
-| **合计** | **116** | **7415** |
+| **合计** | **116** | **7316** |
 
-> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 6019 行。
+> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 5920 行。
 
 ## 当前进度
 
 | 状态 | 内容 |
 |------|------|
 | ✅ 已具备 | SO 数据驱动体系；组合根与服务容器；分层状态机；零 GC 事件总线；集中式网络 Hub；客户端权威变换/动画同步；Host 单一数据源存档；MVP 事件驱动 UI；锁定目标系统；效果与属性修饰器；VFX / 音频服务；对象池与计时器；**代码状态干净可编译（无编译 / 打包阻断）** |
-| 🚧 进行中 | 战斗手感打磨（蓄力重击倍率 / 连段窗口）；装备系统与网络链路对接；敌人 AI（当前仅训练木桩）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，待以更稳妥方案重新设计） |
+| 🚧 进行中 | 战斗手感打磨（**连段 / 蓄力流程已下沉至 Animator Controller + 动画 Clip 事件驱动，攻击态薄化为胶水**；蓄力重击倍率 / 连段窗口）；**`SO_Weapon` 动画覆盖控制器（`OverrideController`）已接通**（装备时切换武器专属动画）；敌人 AI（当前仅训练木桩）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，连段现由 Animator Controller 本地驱动，待以更稳妥方案重新设计） |
 | 📋 规划中 | 死亡 / 血量数值的跨端同步补齐；`NetworkHub` 按域拆分（战斗中继 / 存档）；关卡内容与示例场景 |
 
-**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)）综合评分 **80 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」74.5/94。当前为项目自引入实验性技能系统以来**首次以无编译阻断的状态触及 B 档线**。
+**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)）综合评分 **81 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」75/94。当前为项目**连续两版维持无编译阻断状态，并在干净基线上借 `SO_Weapon` 数据驱动增益推至历史最高分 81**。
 
 ## 已知限制
 

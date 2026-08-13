@@ -33202,7 +33202,7 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0
-    functionName: ReturnToIdleState
+    functionName: ReturnToMovementState
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

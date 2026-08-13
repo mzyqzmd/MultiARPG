@@ -65,13 +65,16 @@ public class PlayerStateControl : MonoBehaviour
     public int HeavyAttackStaminaCost => _player.StatsControl.HeavyAttackStaminaCost;
     #endregion
 
-    /// <summary>待消费受击方向：0=前 1=后 2=左 3=右（基于受击接触点相对玩家本地空间计算，EnterHitState 写入、PlayerHitState.Enter 消费）。</summary>
-    private int _pendingHitDirection;
+    /// <summary>轻击连段窗口是否开启：仅窗口期内允许 AnyTransition 重入进下一段；窗口外按键不计入连段。</summary>
+    public bool ComboWindowOpen { get; private set; }
+    /// <summary>待消费受击方向(EnterHitState 写入、PlayerHitState.Enter 读取，用于选方向动画)。</summary>
+    public int PendingHitDirection { get; private set; }
     /// <summary>战斗姿态锁定标志：true=进入战斗(八向strafe)，false=自由。后续绑定输入/锁定目标。</summary>
     public bool CombatLocked { get; set; }
 
     /// <summary>动作破锁请求事件：Dodge/Jump 进入时触发，由 PlayerLockOnTarget 经 [SerializeField] 自订阅 ForceUnlock。状态机零反向依赖锁定组件，仅发信号。</summary>
     public event Action OnLockBreakRequested;
+
     /// <summary>请求解除锁定（进入 Dodge/Jump 时调用，触发 OnLockBreakRequested 事件）。</summary>
     public void RequestLockBreak() => OnLockBreakRequested?.Invoke();
 
@@ -83,27 +86,6 @@ public class PlayerStateControl : MonoBehaviour
         _builder = new(_player, _characterController, _verticalMotion, this);
         _builder.Build();
         _stateAnimEventControl = new(_player, _builder);
-
-        #region 事件订阅
-        // 输入响应订阅
-        _player.InputService.OnDodgeTriggered += OnDodgeTriggered;
-        _player.InputService.OnJumpTriggered += OnJumpTriggered;
-        _player.InputService.OnNormalAttackTriggered += OnNormalAttackTriggered;
-        _player.InputService.OnSpecialAttackTriggered += OnSpecialAttackTriggered;
-        _player.InputService.OnSpecialAttackCanceled += OnSpecialAttackCanceled;
-        #endregion
-    }
-
-    private void OnDestroy()
-    {
-        #region 事件取消订阅
-        // 输入响应取消订阅
-        _player.InputService.OnDodgeTriggered -= OnDodgeTriggered;
-        _player.InputService.OnJumpTriggered -= OnJumpTriggered;
-        _player.InputService.OnNormalAttackTriggered -= OnNormalAttackTriggered;
-        _player.InputService.OnSpecialAttackTriggered -= OnSpecialAttackTriggered;
-        _player.InputService.OnSpecialAttackCanceled -= OnSpecialAttackCanceled;
-        #endregion
     }
 
     #region Update
@@ -114,9 +96,10 @@ public class PlayerStateControl : MonoBehaviour
         {
             _jumpRequested = false;
             _dodgeRequested = false;
-            // _normalAttackRequested 不清空：IsBusy 期间玩家在连段窗口内再次按下时，
-            // 必须由当前 NormalAttackState 自己消费来连段；StateControl 不能在 Update 头清掉它，
-            // 否则帧序为 InputAction.performed → StateControl.Update 清请求 → AttackState.Update 看不到。
+            // 连段窗口未开启时清空轻击请求：窗口期外（含攻击前摇/后摇）的按键不计入连段，
+            // 避免窗口关闭后残留请求等到下次窗口开启又误连；窗口开启期间保留供 AnyTransition 消费。
+            if (!ComboWindowOpen)
+                _normalAttackRequested = false;
             _heavyAttackRequested = false;
             _hitRequested = false;
         }
@@ -141,6 +124,28 @@ public class PlayerStateControl : MonoBehaviour
     }
     #endregion
 
+    #region 输入事件绑定（由 Player.OnNetworkSpawn/OnNetworkDespawn 在 IsOwner 可靠后转发调用）
+    /// <summary>订阅本地玩家一次性动作输入事件（仅 owner 调用）。</summary>
+    public void BindInput()
+    {
+        _player.InputService.OnDodgeTriggered += OnDodgeTriggered;
+        _player.InputService.OnJumpTriggered += OnJumpTriggered;
+        _player.InputService.OnNormalAttackTriggered += OnNormalAttackTriggered;
+        _player.InputService.OnSpecialAttackTriggered += OnSpecialAttackTriggered;
+        _player.InputService.OnSpecialAttackCanceled += OnSpecialAttackCanceled;
+    }
+
+    /// <summary>反订阅一次性动作输入事件（与 BindInput 配对，防重 spawn 累积）。</summary>
+    public void UnbindInput()
+    {
+        _player.InputService.OnDodgeTriggered -= OnDodgeTriggered;
+        _player.InputService.OnJumpTriggered -= OnJumpTriggered;
+        _player.InputService.OnNormalAttackTriggered -= OnNormalAttackTriggered;
+        _player.InputService.OnSpecialAttackTriggered -= OnSpecialAttackTriggered;
+        _player.InputService.OnSpecialAttackCanceled -= OnSpecialAttackCanceled;
+    }
+    #endregion
+
     #region 绑定到输入服务的方法
     private void OnDodgeTriggered() => _dodgeRequested = true;
     private void OnJumpTriggered() => _jumpRequested = true;
@@ -148,12 +153,12 @@ public class PlayerStateControl : MonoBehaviour
     private void OnSpecialAttackTriggered()
     {
         _heavyAttackRequested = true;
+        _player.Anim.SetBool("IsChargingHeavyAttack", true);
     }
     private void OnSpecialAttackCanceled()
     {
         _heavyAttackRequested = false;
-        if (_builder.ChildFsm.CurrentState == _builder.HeavyAttackState)
-            _builder.HeavyAttackState.OnSpecialReleased();
+        _player.Anim.SetBool("IsChargingHeavyAttack", false);
     }
     public void OnLockStateChange(bool isLocked_) => CombatLocked = isLocked_;
     #endregion
@@ -171,31 +176,26 @@ public class PlayerStateControl : MonoBehaviour
     public void ConsumeHit() => _hitRequested = false;
     #endregion
 
-
-    /// <summary>轻击连击窗口开启：转发至当前轻击态（非轻击态时无效）。</summary>
-    public void OpenComboWindow()
-    {
-        if (_builder.ChildFsm.CurrentState is PlayerNormalAttackState normal)
-            normal.OpenComboWindow();
-    }
-    /// <summary>轻击段结束（窗口关闭）：转发至当前轻击态（非轻击态时无效）。</summary>
+    #region 动画事件转发
+    /// <summary>轻击连段窗口开启（动画事件 OnComboWindowOpen 驱动）：置标志，AnyTransition 此刻起允许消费轻击请求连段。</summary>
+    public void OpenComboWindow() => ComboWindowOpen = true;
+    /// <summary>轻击段结束（窗口关闭，动画事件 OnComboWindowClose 驱动）：关标志并清残留请求，避免窗口外误连。</summary>
     public void CloseComboWindow()
     {
-        if (_builder.ChildFsm.CurrentState is PlayerNormalAttackState normal)
-            normal.CloseComboWindow();
+        ComboWindowOpen = false;
+        _normalAttackRequested = false;
     }
     /// <summary>动画事件驱动的蓄力结算：按 tier 写倍率到右手武器并扣耐力。tier>=2=满蓄(LongChargeMulti)，否则短蓄(ShortChargeMulti)。不在此切状态——倍率写完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
     public void EndHeavyChargeByTier(int tier_) => _stateAnimEventControl.EndHeavyChargeByTier(tier_);
-
-    /// <summary>待消费受击方向(EnterHitState 写入、PlayerHitState.Enter 读取，用于选方向动画)。</summary>
-    public int PendingHitDirection => _pendingHitDirection;
+    public void ReturnToMovementState() => _stateAnimEventControl.ReturnToMovementState();
+    #endregion
 
     /// <summary>受击入口：按接触点相对玩家本地空间算出前/后/左/右方向并缓存，置标志后切入受击态（不向状态传参，方向经 PendingHitDirection 在 Enter 时消费）。</summary>
     public void EnterHitState(Vector3 contactPoint_)
     {
         var local = _characterController.transform.InverseTransformDirection(
             (contactPoint_ - _characterController.transform.position).normalized);
-        _pendingHitDirection = local.z >= Mathf.Abs(local.x) ? (local.z >= 0 ? 0 : 1)
+        PendingHitDirection = local.z >= Mathf.Abs(local.x) ? (local.z >= 0 ? 0 : 1)
             : (local.x >= 0 ? 3 : 2);
         _hitRequested = true;
     }

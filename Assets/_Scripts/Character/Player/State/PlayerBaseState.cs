@@ -28,6 +28,9 @@ public abstract class PlayerBaseState<TState> : IState where TState : IState
 
     public virtual void Update()
     {
+        // 非 owner 角色不本地驱动状态机/动画参数：位置由 ClientNetworkTransform 同步、动画由 ClientNetworkAnimator 同步，
+        // 本地读取全局输入写 Animator 会污染远端表现（串台）。
+        if (!_player.IsOwner) return;
         if (_stateDuration > 0) _stateDuration -= Time.deltaTime;
     }
 }

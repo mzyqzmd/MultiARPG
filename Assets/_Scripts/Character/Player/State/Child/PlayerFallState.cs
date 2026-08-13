@@ -18,12 +18,14 @@ public class PlayerFallState : PlayerActionState
 
     public override void Enter()
     {
+        base.Enter();
         _player.StateControl.IsBusy = true;
         _player.Anim.SetBool("FallState", true);
     }
 
     public override void Exit()
     {
+        base.Exit();
         _player.StateControl.IsBusy = false;
         _player.Anim.SetBool("FallState", false);
     }
@@ -31,6 +33,7 @@ public class PlayerFallState : PlayerActionState
     public override void Update()
     {
         base.Update();
+        if (!_player.IsOwner) return;
         _verticalMotionControl.TickGravity(Time.deltaTime);
 
         Vector2 input = _player.InputService.MoveInputVector2;

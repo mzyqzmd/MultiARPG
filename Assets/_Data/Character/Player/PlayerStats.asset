@@ -22,8 +22,8 @@ MonoBehaviour:
   _jumpHeight: 1.5
   _gravity: -20
   _jumpStaminaCost: 20
-  _normalAttackStaminaCost: 15
-  _normalAttackDuration: 0.7
+  _normalAttackStaminaCost: 12
+  _normalAttackDuration: 1
   _heavyAttackStaminaCost: 18
   _maxStamina: 100
   _dodgeStaminaCost: 20

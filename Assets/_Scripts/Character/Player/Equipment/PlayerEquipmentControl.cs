@@ -23,6 +23,8 @@ public class PlayerEquipmentControl : MonoBehaviour
     public BaseItem PendingItem { get; set; }
     /// <summary>当前切换流程的目标槽位。</summary>
     public EEquipmentSlot PendingSlot { get; private set; }
+    /// <summary>常驻覆盖控制器：以 AC_Player 为基类包一层壳，运行期引用恒定，仅 ApplyOverrides 改特定 clip 映射。</summary>
+    private AnimatorOverrideController _overrideController;
 
     /// <summary>槽位占用表：真实槽位是否被占用（IsOccupying==false 的表现挂不写入，可无限叠加）。</summary>
     private readonly Dictionary<EEquipmentSlot, bool> _slotTaken = new();
@@ -35,19 +37,23 @@ public class PlayerEquipmentControl : MonoBehaviour
     /// <summary>物品从某挂载点卸下时触发（参数为原主槽），供外部音效/UI 订阅。</summary>
     public event Action<EEquipmentSlot> OnUnequipped;
 
-    /// <summary>组件启用时自订阅输入与动画事件；重置全部槽位占用状态为"空闲"。</summary>
+    /// <summary>组件启用时重置全部槽位占用状态为"空闲"并缓存默认控制器。</summary>
     private void Awake()
     {
         foreach (EEquipmentSlot slot in Enum.GetValues(typeof(EEquipmentSlot)))
             _slotTaken[slot] = false;
-        _player.InputService.OnHotbarTriggered += OnHotbarTriggered;
+        _overrideController = new AnimatorOverrideController(_player.Anim.runtimeAnimatorController);
+        _player.Anim.runtimeAnimatorController = _overrideController;
     }
 
-    /// <summary>组件销毁时反订阅，与 Awake 配对防止重 spawn 事件累积。</summary>
-    private void OnDestroy()
-    {
-        _player.InputService.OnHotbarTriggered -= OnHotbarTriggered;
-    }
+    #region 输入事件绑定（由 Player.OnNetworkSpawn/OnNetworkDespawn 在 IsOwner 可靠后转发调用）
+    /// <summary>订阅本地玩家热键栏输入事件（仅 owner 调用）。</summary>
+    public void BindInput() => _player.InputService.OnHotbarTriggered += OnHotbarTriggered;
+
+    /// <summary>反订阅热键栏输入事件（与 BindInput 配对，防重 spawn 累积）。</summary>
+    public void UnbindInput() => _player.InputService.OnHotbarTriggered -= OnHotbarTriggered;
+    #endregion
+
     #region 装备切换编排（自订阅）
     /// <summary>热键栏回调：本地玩家切换指定槽位装备（拔刀/收刀表现）。仅做状态决策（翻转占用表）并播动画，真实挂载在 OnToggleFrame 帧事件提交。</summary>
     private void OnHotbarTriggered(EEquipmentSlot slot_)
@@ -59,7 +65,6 @@ public class PlayerEquipmentControl : MonoBehaviour
         Toggle(slot_);
         PendingItem = item;
         PendingSlot = slot_;
-        _player.StateControl.IsBusy = true;
         _player.Anim.SetTrigger("Equip1HandWeaponTrigger");
     }
     #endregion
@@ -88,6 +93,10 @@ public class PlayerEquipmentControl : MonoBehaviour
         }
         item_.IsEquipped = true;
         item_.RegisterOwner(_player);
+        //获取武器动画clip映射表
+        var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+        item_.WeaponData.OverrideController.GetOverrides(overrides);
+        _overrideController.ApplyOverrides(overrides);
         OnEquipped?.Invoke(mainSlot, item_);
     }
 
@@ -113,6 +122,7 @@ public class PlayerEquipmentControl : MonoBehaviour
         }
         item_.IsEquipped = false;
         UnregisterFromSlot(equipSlots, item_);
+        _overrideController.ApplyOverrides(new List<KeyValuePair<AnimationClip, AnimationClip>>());
         var mainSlot = equipSlots.Length > 0 ? equipSlots[0].Slot : EEquipmentSlot.RightHand;
         OnUnequipped?.Invoke(mainSlot);
     }
@@ -120,6 +130,7 @@ public class PlayerEquipmentControl : MonoBehaviour
     /// <summary>卸下并销毁全部槽位物品。</summary>
     public void UnequipAll()
     {
+        _overrideController.ApplyOverrides(new List<KeyValuePair<AnimationClip, AnimationClip>>());
         foreach (EEquipmentSlot slot in Enum.GetValues(typeof(EEquipmentSlot)))
             if (_slotTaken.TryGetValue(slot, out var taken) && taken)
                 _slotTaken[slot] = false;

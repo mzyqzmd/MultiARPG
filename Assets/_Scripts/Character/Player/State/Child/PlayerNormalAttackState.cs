@@ -1,19 +1,17 @@
-using Animancer;
 using UnityEngine;
 
 /// <summary>
-/// 轻击动作态：按当前武器 SO_Weapon.WeaponAnimations 字典动态播放连击段（Normal_0/1/2...），
-/// 段数由字典中存在的 key 数量决定，无需为每把武器新建状态类。
-/// 连击衔接由每段 clip 末尾动画事件（OnComboWindowOpen / OnAttackEnd）驱动：
-/// 窗口内再次收到轻击请求且存在下一段则播下一段，否则退出回移动态。
-/// 动画经 HybridAnimancerComponent 播放覆盖控制器，播完淡回 Locomotion（由 MovementState 接管）。
+/// 轻击动作态：进入置 NormalAttackState bool 触发控制器进入轻击子状态机，播第一段（Normal_01）。
+/// 连段（Normal_01→Normal_02→Normal_03...）由 AC_Player 控制器状态机 + 每段 clip 的动画事件（OnComboWindowOpen/Close）驱动：
+/// 窗口仅在 OnComboWindowOpen→Close 期间开启（StateControl.ComboWindowOpen），AnyTransition 才允许重入进下一段；
+/// 窗口外（前摇/后摇）的轻击请求被 StateControl.Update 丢弃，不计入连段。C# 不硬编码段数，加段仅在控制器加状态+连线。
+/// 动画经 AnimatorController 状态机驱动，由 ClientNetworkAnimator（owner 权威）原生跨端同步。
 /// </summary>
 public class PlayerNormalAttackState : PlayerActionState
 {
-    private int _comboIndex;
-    private SO_Weapon _weapon;
-    private AnimancerState _currentState;
-    private bool _comboWindowOpen;
+    private const string NormalAttackAnimSpeedParam = "NormalAttackSpeed";
+    private const string NormalAttackStateTag = "NormalAttack";
+    private const string NormalComboTrigger = "NormalCombo";
 
     public PlayerNormalAttackState(StateMachine<PlayerActionState> stateMachine_,
         Player player_, CharacterController characterController_) :
@@ -23,86 +21,34 @@ public class PlayerNormalAttackState : PlayerActionState
 
     public override void Enter()
     {
-        _comboIndex = 0;
-        _comboWindowOpen = false;
-        _weapon = _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand)?.ItemData as SO_Weapon;
+        base.Enter();
         _player.StateControl.IsBusy = true;
         _player.StateControl.ConsumeNormalAttack();
         _player.StatsControl.SpendStamina(_player.StateControl.NormalAttackStaminaCost);
-        PlaySegment();
-    }
-
-    public override void Exit()
-    {
-        _player.StateControl.ConsumeNormalAttack();
-        _player.StateControl.IsBusy = false;
-        _comboWindowOpen = false;
+        _player.Anim.SetBool("NormalAttackState", true);
     }
 
     public override void Update()
     {
         base.Update();
-        // 窗口内提前连段：收到新轻击请求且存在下一段则立即播下一段（不等 clip 自然结束）
-        if (_comboWindowOpen && _player.StateControl.NormalAttackRequested && HasNextSegment())
+        if (!_player.IsOwner) return;
+        var stateInfo = _player.Anim.GetCurrentAnimatorStateInfo(0);
+        if (stateInfo.IsTag(NormalAttackStateTag))
+            _player.Anim.SetFloat(NormalAttackAnimSpeedParam, stateInfo.length / _player.StatsControl.NormalAttackDuration);
+        // 连段：窗口期内检测到轻击请求 → 置 NormalCombo trigger 驱动 Animator 内部过渡 01→02；消费请求避免重复触发
+        if (_player.StateControl.NormalAttackRequested && _player.StateControl.ComboWindowOpen)
         {
-            _comboIndex++;
             _player.StateControl.ConsumeNormalAttack();
-            PlaySegment();
+            _player.Anim.SetTrigger(NormalComboTrigger);
         }
     }
 
-    /// <summary>动画事件 OnComboWindowOpen：开启可连段窗口。</summary>
-    public void OpenComboWindow() => _comboWindowOpen = true;
-
-    /// <summary>动画事件 OnAttackEnd：关闭窗口，由 OnClipEnd 决定退出与否。</summary>
-    public void CloseComboWindow() => _comboWindowOpen = false;
-
-    private bool HasNextSegment()
+    public override void Exit()
     {
-        if (_weapon == null) return false;
-        var key = $"Normal_{_comboIndex + 1}";
-        return _weapon.WeaponAnimations.ContainsKey(key);
-    }
-
-    private void PlaySegment()
-    {
-        if (_weapon == null || !TryGetClip($"Normal_{_comboIndex}", out var clip))
-        {
-            ChangeToMovement();
-            return;
-        }
-        _comboWindowOpen = false;
-        _currentState = _player.Animancer.Play(clip);
-        if (_currentState.Events(this, out var events))
-            events.OnEnd = OnClipEnd;
-    }
-
-    private void OnClipEnd()
-    {
-        // clip 自然结束：窗口内收到新请求且存在下一段则连段，否则退出回移动态
-        if (_player.StateControl.NormalAttackRequested && HasNextSegment())
-        {
-            _comboIndex++;
-            _player.StateControl.ConsumeNormalAttack();
-            PlaySegment();
-        }
-        else
-        {
-            ChangeToMovement();
-        }
-    }
-
-    private void ChangeToMovement()
-    {
-        // Hybrid 模式：用 PlayController 让控制器恢复输出（取代 Stop——Stop 会令 Hybrid 失去输出导致角色停在原 pose），
-        // 带 FadeDuration 平滑淡回 Locomotion，避免硬切错位。
-        _player.Animancer.PlayController();
-        _stateMachine.ChangeState(_player.StateControl.MovementState);
-    }
-
-    private bool TryGetClip(string key_, out ClipTransition clip_)
-    {
-        clip_ = default;
-        return _weapon != null && _weapon.WeaponAnimations.TryGetValue(key_, out clip_);
+        base.Exit();
+        _player.Anim.ResetTrigger(NormalComboTrigger);
+        _player.Anim.SetBool("NormalAttackState", false);
+        _player.StateControl.ConsumeNormalAttack();
+        _player.StateControl.IsBusy = false;
     }
 }
