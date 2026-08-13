@@ -7,7 +7,7 @@
 ![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-000000?logo=unity)
 ![Netcode](https://img.shields.io/badge/Netcode%20for%20GameObjects-1.12.2-2196F3)
 ![URP](https://img.shields.io/badge/URP-14.0.12-4CAF50)
-![C#](https://img.shields.io/badge/C%23-116%20files%20%2F%207.4k%20lines-239120)
+![C#](https://img.shields.io/badge/C%23-116%20files%20%2F%207.3k%20lines-239120)
 ![架构评分](https://img.shields.io/badge/Architecture-81%2F100%20%28B%29-21a0c0)
 
 ---
@@ -74,7 +74,7 @@
 
 ```
 Assets/
-├── _Scripts/                        源码（116 文件 / 7415 行）
+├── _Scripts/                        源码（116 文件 / 7320 行）
 │   ├── BasicSystems/                基础设施服务（39 文件 / 3675 行）
 │   │   ├── Input/                   Input System 封装 + 设备类型识别
 │   │   ├── UI/                      MVP 界面层（Core / MainMenu / InGame / General）
@@ -84,7 +84,7 @@ Assets/
 │   │   ├── VFX/                     特效服务 + 控制器 + SO 特效库
 │   │   └── Scene/                   场景切换服务（含黑幕过渡编排）
 │   │
-│   ├── Character/                   角色领域（38 文件 / 2434 行）
+│   ├── Character/                   角色领域（38 文件 / 2344 行）
 │   │   ├── Core/                    Character 基类 + 通用属性控制
 │   │   ├── Player/
 │   │   │   ├── Animation/           动画事件薄转发器
@@ -177,14 +177,14 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | 模块 | 文件数 | 行数 |
 |------|-------:|-----:|
 | BasicSystems | 39 | 3675 |
-| Character | 38 | 2335 |
+| Character | 38 | 2344 |
 | Core | 13 | 546 |
 | GameSystems | 22 | 532 |
 | Utility | 3 | 199 |
 | World | 1 | 29 |
-| **合计** | **116** | **7316** |
+| **合计** | **116** | **7320** |
 
-> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 5920 行。
+> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 5924 行。
 
 ## 当前进度
 
@@ -194,13 +194,13 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | 🚧 进行中 | 战斗手感打磨（**连段 / 蓄力流程已下沉至 Animator Controller + 动画 Clip 事件驱动，攻击态薄化为胶水**；蓄力重击倍率 / 连段窗口）；**`SO_Weapon` 动画覆盖控制器（`OverrideController`）已接通**（装备时切换武器专属动画）；敌人 AI（当前仅训练木桩）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，连段现由 Animator Controller 本地驱动，待以更稳妥方案重新设计） |
 | 📋 规划中 | 死亡 / 血量数值的跨端同步补齐；`NetworkHub` 按域拆分（战斗中继 / 存档）；关卡内容与示例场景 |
 
-**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)）综合评分 **81 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」75/94。当前为项目**连续两版维持无编译阻断状态，并在干净基线上借 `SO_Weapon` 数据驱动增益推至历史最高分 81**。
+**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)，2026-08-13 22:13 终态重跑版）综合评分 **81 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」75.5/94。当前为项目**连续两版维持无编译阻断状态，并在干净基线上借 `SO_Weapon` 数据驱动增益 + P3-13 拼写修复推至历史最高分 81**。
 
 ## 已知限制
 
 - **数值同步缺口**：`NetworkVariable` 移除后，死亡与血量的**数值**尚未补充替代同步方案，远端目前仅能通过动画层感知状态变化。
 - **`NetworkHub` 职责偏宽**：战斗中继与存档同步两个域同驻一个类（约 242 行），已规划拆分；Provider / 事件接缝已就位，拆分为零行为变化的纯重构。
-- **原型残留**：`Player` 中仍保留少量 Inspector 测试字段（如 `_defaultWeapon`）与 `TestButton` 调试入口（承载了"返回主菜单"真实功能），正式数据链路完善后清理。
+- **原型残留**：`Player` 中仍保留少量 Inspector 测试字段（如 `_defaultWeapon`，作者确认是有意保留的测试脚手架，待拾取系统落地后替换为数据库驱动）与 `TestButton` 调试入口（承载了"返回主菜单"真实功能），正式数据链路完善后清理。
 - **内容量有限**：项目定位为架构验证与技术展示，玩法内容仍处早期。
 
 ## 架构文档

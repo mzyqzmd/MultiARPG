@@ -3,8 +3,7 @@
 /// <summary>
 /// 轻剑（Rapier）接触伤害：仅攻击者本机结算命中（Owner.IsOwner 守卫），经 Host 中转把伤害发给目标 owner。
 /// 已装备状态下碰撞体碰到 Damageable 目标即构造 DamageInfo 并发起 RequestDamageServerRpc（冷却 _meleeCooldown 防连触）；
-/// 走路意外蹭到敌人也会掉血（用户明确要求）。未装备的孤儿武器走独立接触路径（无冷却），保持场景陷阱/掉落物行为。
-/// 不读取任何 Player 攻击标志，状态类也不碰本武器字段。
+/// 走路意外蹭到敌人也会掉血（用户明确要求）。
 /// </summary>
 public class Weapon_Rapier : BaseItem
 {

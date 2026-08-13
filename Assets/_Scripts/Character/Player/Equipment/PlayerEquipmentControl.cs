@@ -11,7 +11,7 @@ public class PlayerEquipmentControl : MonoBehaviour
     [Header("玩家引用")]
     [SerializeField] private Player _player;
     [Header("默认武器(测试用的)")]
-    [SerializeField] private BaseItem _defaultWeapon;
+    [SerializeField] private BaseItem _defaultWeapon;//就是测试用的,到时候武器要拾取
     [Header("装备挂载点")]
     [SerializeField] private Transform _leftHand;
     [SerializeField] private Transform _rightHand;
