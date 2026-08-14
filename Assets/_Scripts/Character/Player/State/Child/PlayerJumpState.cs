@@ -70,7 +70,7 @@ public class PlayerJumpState : PlayerActionState
         if (input != Vector2.zero)
         {
             moveDir = GetMoveDirection(input);
-            Move(moveDir * _player.StatsControl.NormalMoveSpeed +
+            Move(moveDir * _player.StatsControl.GetMoveSpeed(false) +
                 _verticalMotionControl.VerticalVelocity);
         }
         else

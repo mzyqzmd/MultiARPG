@@ -40,7 +40,7 @@ public class PlayerFallState : PlayerActionState
         if (input != Vector2.zero)
         {
             Vector3 moveDir = GetMoveDirection(input);
-            Move(moveDir * _player.StatsControl.NormalMoveSpeed + _verticalMotionControl.VerticalVelocity);
+            Move(moveDir * _player.StatsControl.GetMoveSpeed(false) + _verticalMotionControl.VerticalVelocity);
             RotateTowards(moveDir, _player.StateControl.IsInCombat);
         }
         else

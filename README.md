@@ -7,8 +7,8 @@
 ![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-000000?logo=unity)
 ![Netcode](https://img.shields.io/badge/Netcode%20for%20GameObjects-1.12.2-2196F3)
 ![URP](https://img.shields.io/badge/URP-14.0.12-4CAF50)
-![C#](https://img.shields.io/badge/C%23-116%20files%20%2F%207.3k%20lines-239120)
-![架构评分](https://img.shields.io/badge/Architecture-81%2F100%20%28B%29-21a0c0)
+![C#](https://img.shields.io/badge/C%23-134%20files%20%2F%207.8k%20lines-239120)
+![架构评分](https://img.shields.io/badge/Architecture-80%2F100%20%28B%29-21a0c0)
 
 ---
 
@@ -16,9 +16,9 @@
 
 | 特性 | 说明 |
 |------|------|
-| **单一网络表面** | 全项目 **8 个 RPC 全部收口在 `NetworkHub`**（4 ServerRpc + 4 ClientRpc），`NetworkVariable` 使用量为 **0**；仅 **7 个文件** `using Unity.Netcode` |
-| **领域 NGO-free** | Stats / Effect / Item / Save 组装 / Input / Audio / UI / FSM 全部不引用网络库，可单机独立运行与推演 |
-| **组合根 + 服务容器** | `GameRoot` 按显式依赖顺序构建并注册 **11 个服务**，构造注入而非静态单例；场景卸载时逆序注销 |
+| **单一网络表面** | 全项目 **8 个 RPC 全部收口在 `NetworkHub`**（4 ServerRpc + 4 ClientRpc），`NetworkVariable` 使用量为 **0**；仅 **9 个文件** `using Unity.Netcode`（含新增 AI 的 `Zombie` 与 `AINpcService`，详见已知限制） |
+| **领域 NGO-free（大体）** | Stats / Effect / Item / Save 组装 / Input / Audio / UI / FSM / `AINpcAnimatorBridge` 全部不引用网络库；仅新增的 `Zombie` 敌人域类破例直引 NGO（经 `NetworkHub` 外观复用伤害链路） |
+| **组合根 + 服务容器** | `GameRoot` 按显式依赖顺序构建并注册 **12 个服务**（含 v15 新增的 `AINpcService`），构造注入而非静态单例；场景卸载时逆序注销 |
 | **分层状态机** | 父层管姿态（Free / Combat），子层管动作（Move / Jump / Fall / Dodge / Attack / Hit / Dead），带优先级抢断的 `AnyTransition` |
 | **数据驱动** | 角色属性、效果、物品、音频、UI、VFX 全部由 `SO_*` 数据库按 key 查表，配置与运行时状态分离；`SO_Weapon` 蓄力倍率、武器动画字典、**武器动画覆盖控制器（`OverrideController`）均已接通运行时** |
 | **零 GC 事件总线** | `EventBus` 仅承载 3 个游戏级信号，参数为只读 `struct`，避免退化为「事件版服务定位器」 |
@@ -36,7 +36,7 @@
 
 **第三方资产**（详见 [许可与第三方资产](#许可与第三方资产)）
 
-- DOTween（Demigiant）· Odin Inspector（Sirenix）· **Animancer（Kybernetix，动画状态机驱动）** · ParrelSync（本地双开联调）· Hot Reload（本地 UPM 包）
+- DOTween（Demigiant）· Odin Inspector（Sirenix）· **Animancer（Kybernetix，动画状态机驱动）** · **NodeCanvas（ParadoxNotion，AI 行为树 / 可视化行为编排，新增 AI 子系统依赖）** · ParrelSync（本地双开联调）· Hot Reload（本地 UPM 包）
 
 ## 架构总览
 
@@ -74,7 +74,7 @@
 
 ```
 Assets/
-├── _Scripts/                        源码（116 文件 / 7320 行）
+├── _Scripts/                        源码（134 文件 / 7836 行）
 │   ├── BasicSystems/                基础设施服务（39 文件 / 3675 行）
 │   │   ├── Input/                   Input System 封装 + 设备类型识别
 │   │   ├── UI/                      MVP 界面层（Core / MainMenu / InGame / General）
@@ -84,25 +84,29 @@ Assets/
 │   │   ├── VFX/                     特效服务 + 控制器 + SO 特效库
 │   │   └── Scene/                   场景切换服务（含黑幕过渡编排）
 │   │
-│   ├── Character/                   角色领域（38 文件 / 2344 行）
+│   ├── Character/                   角色领域（33 文件 / 2210 行，FakeMan 已迁出）
 │   │   ├── Core/                    Character 基类 + 通用属性控制
-│   │   ├── Player/
-│   │   │   ├── Animation/           动画事件薄转发器
-│   │   │   ├── Camera/              锁定目标系统（含 ILockableTarget）
-│   │   │   ├── Equipment/           装备挂载权威（含武器动画覆盖控制器切换）
-│   │   │   ├── State/               分层状态机（Parent 姿态 / Child 动作 + SubCapabilities 协作类）
-│   │   │   ├── Stats/               玩家属性计算中心
-│   │   │   └── Save/                纯本地存档组装 / 还原
-│   │   └── FakeMan/                 训练木桩（复用 Character / FSM / Stats 范式）
+│   │   └── Player/
+│   │       ├── Animation/           动画事件薄转发器
+│   │       ├── Camera/              锁定目标系统（含 ILockableTarget）
+│   │       ├── Equipment/           装备挂载权威（含武器动画覆盖控制器切换）
+│   │       ├── State/               分层状态机（Parent 姿态 / Child 动作 + SubCapabilities 协作类）
+│   │       ├── Stats/               玩家属性计算中心
+│   │       └── Save/                纯本地存档组装 / 还原
 │   │
-│   ├── Core/                        零业务基础设施（13 文件 / 546 行）
-│   │   ├── GameRoot.cs              组合根：服务装配与生命周期
+│   ├── AI/                          ⭐ 非玩家智能体（23 文件 / 627 行，NodeCanvas 行为树驱动）
+│   │   ├── Core/                    AINPC（继承 Character）· AINpcService（第 12 个 IService）· AIVision · AINpcAnimatorBridge
+│   │   ├── Enemy/NormalZombie/      僵尸敌人（Zombie + 12 个行为树节点 + SO_ZombieStats）
+│   │   └── NPC/FakeMan/             训练木桩（由 Character/FakeMan 迁入，复用 FSM / Stats 范式）
+│   │
+│   ├── Core/                        零业务基础设施（13 文件 / 565 行）
+│   │   ├── GameRoot.cs              组合根：服务装配与生命周期（现注册 12 个服务）
 │   │   ├── FSM/                     泛型状态机 + 优先级迁移
 │   │   ├── Services/                服务容器
 │   │   ├── EventBus/                零 GC 事件总线
 │   │   └── ObjectPool/              Mono 对象池
 │   │
-│   ├── GameSystems/                 游戏系统（22 文件 / 532 行，SO_Weapon 新增动画覆盖控制器）
+│   ├── GameSystems/                 游戏系统（22 文件 / 531 行）
 │   │   ├── Effect/                  效果系统（Core / Concrete / DamageInfo）
 │   │   ├── Item/                    物品与武器（BaseItem · Weapon_Rapier · SO_Weapon 蓄力倍率）
 │   │   └── Stats/                   属性修饰器（ModifiableStat · StatModifier）
@@ -177,29 +181,32 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | 模块 | 文件数 | 行数 |
 |------|-------:|-----:|
 | BasicSystems | 39 | 3675 |
-| Character | 38 | 2344 |
-| Core | 13 | 546 |
-| GameSystems | 22 | 532 |
+| Character | 33 | 2210 |
+| **AI（新增）** | **23** | **627** |
+| Core | 13 | 565 |
+| GameSystems | 22 | 531 |
 | Utility | 3 | 199 |
 | World | 1 | 29 |
-| **合计** | **116** | **7320** |
+| **合计** | **134** | **7836** |
 
-> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 5924 行。
+> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 6440 行。AI 模块（23 文件 / 627 行）为 2026-08-14 新增的 NodeCanvas 行为树驱动子系统。
 
 ## 当前进度
 
 | 状态 | 内容 |
 |------|------|
-| ✅ 已具备 | SO 数据驱动体系；组合根与服务容器；分层状态机；零 GC 事件总线；集中式网络 Hub；客户端权威变换/动画同步；Host 单一数据源存档；MVP 事件驱动 UI；锁定目标系统；效果与属性修饰器；VFX / 音频服务；对象池与计时器；**代码状态干净可编译（无编译 / 打包阻断）** |
-| 🚧 进行中 | 战斗手感打磨（**连段 / 蓄力流程已下沉至 Animator Controller + 动画 Clip 事件驱动，攻击态薄化为胶水**；蓄力重击倍率 / 连段窗口）；**`SO_Weapon` 动画覆盖控制器（`OverrideController`）已接通**（装备时切换武器专属动画）；敌人 AI（当前仅训练木桩）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，连段现由 Animator Controller 本地驱动，待以更稳妥方案重新设计） |
-| 📋 规划中 | 死亡 / 血量数值的跨端同步补齐；`NetworkHub` 按域拆分（战斗中继 / 存档）；关卡内容与示例场景 |
+| ✅ 已具备 | SO 数据驱动体系；组合根与服务容器（现 12 个服务）；分层状态机；零 GC 事件总线；集中式网络 Hub；客户端权威变换/动画同步；Host 单一数据源存档；MVP 事件驱动 UI；锁定目标系统；效果与属性修饰器；VFX / 音频服务；对象池与计时器；**⭐ AI 子系统（NodeCanvas 行为树驱动，含僵尸敌人与 NPC 框架）**；**代码状态干净可编译（无编译 / 打包阻断，连续三版）** |
+| 🚧 进行中 | 战斗手感打磨（**连段 / 蓄力流程已下沉至 Animator Controller + 动画 Clip 事件驱动，攻击态薄化为胶水**；蓄力重击倍率 / 连段窗口）；**`SO_Weapon` 动画覆盖控制器（`OverrideController`）已接通**（装备时切换武器专属动画）；**AI 敌人扩展**（僵尸已实现行为树 + NavMesh + 手部碰撞体命中走 NetworkHub 中转；更多敌人类型与 BT 节点复用待扩展）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，连段现由 Animator Controller 本地驱动，待以更稳妥方案重新设计） |
+| 📋 规划中 | 死亡 / 血量数值的跨端同步补齐（现同样适用于新增 NPC）；`NetworkHub` 按域拆分（战斗中继 / 存档）；NPC 位移客户端同步（核实预制体 `NetworkTransform`）；`Zombie` 域类去 NGO 直引、收敛 `AINpcService` 网络入口；关卡内容与示例场景 |
 
-**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)，2026-08-13 22:13 终态重跑版）综合评分 **81 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」75.5/94。当前为项目**连续两版维持无编译阻断状态，并在干净基线上借 `SO_Weapon` 数据驱动增益 + P3-13 拼写修复推至历史最高分 81**。
+**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)，2026-08-14 v15 终态重跑版）综合评分 **80 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」74.0/94。本版因新增完整 AI 子系统（23 文件 / 627 行）使数据驱动维度创新高（11.0），但 `Zombie` 域类直引 NGO、`AINpcService` 绕过网络外观直连 `NetworkManager`、`FindObjectsByType` 三笔新债使总分较 v14 的 81 微降 1 分，仍处 B 档且连续三版无编译阻断。
 
 ## 已知限制
 
-- **数值同步缺口**：`NetworkVariable` 移除后，死亡与血量的**数值**尚未补充替代同步方案，远端目前仅能通过动画层感知状态变化。
+- **数值同步缺口**：`NetworkVariable` 移除后，死亡与血量的**数值**尚未补充替代同步方案，远端目前仅能通过动画层感知状态变化；**该缺口现同样适用于新增的僵尸 / NPC**（其死亡 / 血量也只本地判定）。
+- **NPC 位移同步待确认**：敌人 AI 行为树与 NavMesh 寻路仅 Host 端运行；若 NPC 预制体未挂 `NetworkTransform`，客户端将仅见动画、不见敌人实际移动。需核对预制体并决策是否补充网络变换同步。
 - **`NetworkHub` 职责偏宽**：战斗中继与存档同步两个域同驻一个类（约 242 行），已规划拆分；Provider / 事件接缝已就位，拆分为零行为变化的纯重构。
+- **AI 域网络约定偏离（v15 新增）**：`Zombie` 敌人域类直引 `using Unity.Netcode`（自 v6 网络重构以来首例域类破例），`AINpcService` 直连 `NetworkManager.Singleton` 绕过 `NetworkService` 外观（引入第二个 NGO 入口），且用 `Object.FindObjectsByType` 收集场景 NPC（打破"零隐式查找"记录）。三者均为小债，已列入改进路线（P2-8 / P2-9 / P3-14）。
 - **原型残留**：`Player` 中仍保留少量 Inspector 测试字段（如 `_defaultWeapon`，作者确认是有意保留的测试脚手架，待拾取系统落地后替换为数据库驱动）与 `TestButton` 调试入口（承载了"返回主菜单"真实功能），正式数据链路完善后清理。
 - **内容量有限**：项目定位为架构验证与技术展示，玩法内容仍处早期。
 
@@ -213,6 +220,7 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 
 - **Odin Inspector**（Sirenix）— 商业授权
 - **Animancer**（Kybernetix）— 商业授权，用于动画状态机驱动（HybridAnimancerComponent / ClipTransition）
+- **NodeCanvas**（ParadoxNotion）— 商业授权，用于 AI 行为树与可视化行为编排（`BehaviourTreeOwner` 与 `ActionTask`/`ConditionTask` 任务节点）
 - **DOTween**（Demigiant）— 免费版 / Pro 版
 - **Hot Reload**（Singularity Group）— 商业授权，位于 `Packages/com.singularitygroup.hotreload`
 - **ParrelSync** — MIT，位于 `Assets/Plugins/ParrelSync`

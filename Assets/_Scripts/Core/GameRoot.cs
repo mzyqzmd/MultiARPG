@@ -28,6 +28,7 @@ public class GameRoot : MonoBehaviour
     private GameSaveService _saveService;
     private EffectService _effectService;
     private ItemService _itemService;
+    private AINpcService _aiNpcService;
 
     private void Awake()
     {
@@ -53,6 +54,7 @@ public class GameRoot : MonoBehaviour
         RegisterPlayerCameraService();
         RegisterEffectService();
         RegisterItemService();
+        RegisterAINpcService();
     }
 
     private void OnDestroy()
@@ -69,6 +71,7 @@ public class GameRoot : MonoBehaviour
         UnregisterUIService();
         UnregisterSaveService();
         UnregisterSettingsService();
+        UnregisterAINpcService();
         Services.Clear();
         EventBus<ReturningToMainMenuEvent>.Clear();
         EventBus<LocalPlayerBoundEvent>.Clear();
@@ -236,6 +239,22 @@ public class GameRoot : MonoBehaviour
         Services.Unregister<ItemService>();
     }
     #endregion
+
+    #region 注册/注销 AI NPC 调度服务
+    private void RegisterAINpcService()
+    {
+        _aiNpcService = new AINpcService();
+        Services.Register(_aiNpcService);
+    }
+
+    private void UnregisterAINpcService()
+    {
+        Services.Unregister<AINpcService>();
+    }
+    #endregion
+
+    private void Update() =>
+        _aiNpcService?.Tick();
 
     private void OnApplicationFocus(bool focus) =>
         _sceneControlService?.OnApplicationFocusChanged(focus);
