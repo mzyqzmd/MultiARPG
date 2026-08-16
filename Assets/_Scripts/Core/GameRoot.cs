@@ -74,8 +74,6 @@ public class GameRoot : MonoBehaviour
         UnregisterAINpcService();
         Services.Clear();
         EventBus<ReturningToMainMenuEvent>.Clear();
-        EventBus<LocalPlayerBoundEvent>.Clear();
-        EventBus<LocalPlayerUnboundEvent>.Clear();
     }
 
     #region 注册/注销全局设置服务
@@ -115,23 +113,12 @@ public class GameRoot : MonoBehaviour
     {
         _uiService = new UIService(transform, _uiDatabase);
         Services.Register(_uiService);
-        EventBus<LocalPlayerBoundEvent>.Subscribe(OnLocalPlayerBound);
-        EventBus<LocalPlayerUnboundEvent>.Subscribe(OnLocalPlayerUnbound);
     }
 
     private void UnregisterUIService()
     {
-        EventBus<LocalPlayerBoundEvent>.Unsubscribe(OnLocalPlayerBound);
-        EventBus<LocalPlayerUnboundEvent>.Unsubscribe(OnLocalPlayerUnbound);
         Services.Unregister<UIService>();
     }
-
-    private void OnLocalPlayerBound(LocalPlayerBoundEvent e_) =>
-        _uiService.SpawnUiView<UI_InGameUI>("InGameUI", EUILayerCanvas.Hud).
-            Initialize(e_.Player);
-
-    private void OnLocalPlayerUnbound(LocalPlayerUnboundEvent _) =>
-        _uiService.ClearAllLayerView();
     #endregion
 
     #region 注册/注销网络服务
@@ -254,7 +241,7 @@ public class GameRoot : MonoBehaviour
     #endregion
 
     private void Update() =>
-        _aiNpcService?.Tick();
+        _aiNpcService.Tick();
 
     private void OnApplicationFocus(bool focus) =>
         _sceneControlService?.OnApplicationFocusChanged(focus);

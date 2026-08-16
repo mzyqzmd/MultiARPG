@@ -4,22 +4,22 @@ using UnityEngine;
 public class FakeManHitState : IState
 {
     private readonly StateMachine<IState> _fsm;
-    private readonly SO_FakeManStats _soFakeManStats;
+    private readonly FakeManStatsControl _fakeManStatsControl;
     private readonly FakeMan _fakeMan;
     private readonly Animator _anim;
     private float _stateDuration;
     public FakeManHitState(StateMachine<IState> fsm_, FakeMan fakeMan_,
-        SO_FakeManStats soFakeManStats_, Animator anim_)
+        FakeManStatsControl fakeManStatsControl_, Animator anim_)
     {
         _fsm = fsm_;
         _fakeMan = fakeMan_;
-        _soFakeManStats = soFakeManStats_;
+        _fakeManStatsControl = fakeManStatsControl_;
         _anim = anim_;
     }
 
     public void Enter()
     {
-        _stateDuration = _soFakeManStats.HitDuration;
+        _stateDuration = _fakeManStatsControl.HitDuration;
         _anim.SetFloat("HitDirection", _fakeMan.PendingHitDirection);
         _anim.SetBool("HitState", true);
     }

@@ -1,27 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FakeMan : Character
 {
     [SerializeField] private CapsuleCollider _capsuleCollider;
-    [SerializeField] private SO_FakeManStats _soFakeManStats;
 
-    public float PendingHitDirection { get; private set; }
+    private FakeManStatsControl FakeManStatsControl => _statsControl as FakeManStatsControl;
 
-    private FakeManStatsControl _fakeManStatsControl;
-    private StateMachine<IState> _fsm;
     public FakeManIdleState IdleState { get; private set; }
     public FakeManHitState HitState { get; private set; }
+    public float PendingHitDirection { get; private set; }
+
+    private StateMachine<IState> _fsm;
 
     protected override void Awake()
     {
         base.Awake();
-        _fakeManStatsControl = GetComponent<FakeManStatsControl>();
-        _statsControl = _fakeManStatsControl;
         _fsm = new StateMachine<IState>();
         IdleState = new FakeManIdleState(_anim);
-        HitState = new FakeManHitState(_fsm, this, _soFakeManStats, _anim);
+        HitState = new FakeManHitState(_fsm, this, FakeManStatsControl, _anim);
         _fsm.Initialize(IdleState);
     }
 

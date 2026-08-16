@@ -7,7 +7,7 @@ public class Player : Character
     [SerializeField] private CinemachineFreeLook _freeLookCamera;
 
     [Header("玩家依赖组件")]
-    [SerializeField] private PlayerAnimationControl _animEventControl;
+    [SerializeField] private PlayerAnimControl _animEventControl;
     [SerializeField] private PlayerLockOnTarget _lockOnTarget;
     [SerializeField] private PlayerEquipmentControl _equipmentControl;
     [SerializeField] private PlayerSaveControl _saveControl;// 玩家存档控制（纯本地数据组装/还原）
@@ -22,7 +22,7 @@ public class Player : Character
 
     //组件
     public new PlayerStatsControl StatsControl => _statsControl as PlayerStatsControl;
-    public PlayerAnimationControl AnimationEventControl => _animEventControl;
+    public PlayerAnimControl AnimationEventControl => _animEventControl;
     public PlayerLockOnTarget LockOnTarget => _lockOnTarget;
     public PlayerEquipmentControl EquipmentControl => _equipmentControl;
     public PlayerSaveControl SaveControl => _saveControl;

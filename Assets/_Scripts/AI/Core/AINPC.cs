@@ -6,59 +6,128 @@ using UnityEngine.AI;
 /// AI NPC 抽象基类（继承 Character）：复用车角色数值/受击/锁定体系，新增寻路、行为树、视觉、动画桥接与激活管理。
 /// 行为树/NavMesh/动画仅在 Host 端驱动；客户端经默认 NetworkAnimator(server 权威) 同步动画。
 /// </summary>
+[RequireComponent(typeof(BehaviourTreeOwner))]
 public abstract class AINPC : Character
 {
-    [Header("AI 配置")]
+
+    [Header("依赖配置")]
     [SerializeField] protected NavMeshAgent _navAgent;
-    [SerializeField] protected AINpcAnimatorBridge _animBridge;
     [SerializeField] protected BehaviourTreeOwner _btOwner;
-    [SerializeField] protected AIVision _vision;
-    [SerializeField] private float _activationRadius = 20f;
+    [Header("玩家靠近时激活范围")]
+    [SerializeField] protected float _activationRadius = 20f;
+    [Header("视觉参数")]
+    [SerializeField] protected Transform _lookStartPoint;
+    [SerializeField] protected float _viewDistance = 12f;
+    [SerializeField] protected float _viewAngle = 110f;
+    [SerializeField] protected LayerMask _obstacleMask;
 
     public NavMeshAgent NavAgent => _navAgent;
-    public AINpcAnimatorBridge AnimBridge => _animBridge;
-    public AIVision Vision => _vision;
+
     public float ActivationRadius => _activationRadius;
     public Transform TargetPlayer { get; set; }
 
-    private bool _active;
+    protected AINpcService _aiNPCService;
 
-    #region 行为树语义入口（由 BTNodes 调用，子类可重写）
-    /// <summary>执行一次攻击：默认空，由子类（如 NormalZombie）算方向后交 AnimBridge.TriggerAttack。</summary>
-    public virtual void PerformAttack() { }
+    protected bool _active;
 
-    /// <summary>死亡收尾：停行为树 + 标记死亡动画 + 失活 Agent。</summary>
-    public virtual void Die()
+    protected override void Awake()
     {
-        if (IsServer && _btOwner.isRunning) _btOwner.StopBehaviour();
-        _navAgent.ResetPath();
-        _animBridge.SetDead();
+        base.Awake();
+        _aiNPCService = Services.Get<AINpcService>();
+    }
+
+    #region 生命周期（向 AINpcService 自注册/反注册）
+    /// <summary>网络生成时向调度服务自报存在；失活态初始由服务统一判定。</summary>
+    public override void OnNetworkSpawn()
+    {
+        _aiNPCService.RegisterNpc(this);
+    }
+
+    /// <summary>网络销毁时从调度服务移除，避免注册表残留。</summary>
+    public override void OnNetworkDespawn()
+    {
+        _aiNPCService.UnregisterNpc(this);
     }
     #endregion
 
-    #region 移动速度（子类按走/跑配置重写）
-    /// <summary>切换行走/奔跑速度：基类空实现，子类按配置重写并设置 NavAgent.speed。</summary>
-    public virtual void ApplyMoveSpeed(bool running_) { }
-    #endregion
-
-    #region 激活管理（AINpcService 调用）
-    /// <summary>按玩家距离激活/失活：激活时启行为树与 Agent；失活时停树并回待机。</summary>
-    public virtual void SetActive(bool active_)
+    public bool CanSeeTarget(Transform target_)
     {
-        if (active_ == _active) return;
-        _active = active_;
-        if (active_)
+        if (target_ == null) return false;
+        var toTarget = target_.position - _lookStartPoint.position;
+        float dist = toTarget.magnitude;
+        if (dist > _viewDistance) return false;
+
+        var dir = toTarget / dist;
+        float angle = Vector3.Angle(_lookStartPoint.forward, dir);
+        if (angle > _viewAngle * 0.5f) return false;
+
+        if (_obstacleMask != 0 &&
+            Physics.Linecast(_lookStartPoint.position, target_.position, _obstacleMask))
+            return false;
+
+        return true;
+    }
+    /// <summary>死亡：行为树语义入口</summary>
+    public abstract void Die();
+
+    /// <summary>按玩家距离激活/失活：激活管理（AINpcService 调用）</summary>
+    public abstract void SetActive(bool active_);
+
+    #region 视线范围可视化
+    /// <summary>编辑器 Gizmo：绘制视锥（含可视半角内/外渐变色）与玩家激活范围球。</summary>
+    protected virtual void OnDrawGizmos()
+    {
+        Transform origin = _lookStartPoint != null ? _lookStartPoint : transform;
+        Vector3 pos = origin.position;
+        Vector3 fwd = origin.forward;
+
+        // 视锥：以可视半角为边界，扇区用半透明面 + 中心轴 + 两边界射线表达
+        float halfAngle = _viewAngle * 0.5f;
+        Quaternion leftRot = Quaternion.AngleAxis(-halfAngle, Vector3.up);
+        Quaternion rightRot = Quaternion.AngleAxis(halfAngle, Vector3.up);
+        Vector3 leftDir = leftRot * fwd;
+        Vector3 rightDir = rightRot * fwd;
+
+        // 扇形网格（扇区面）
+        Gizmos.color = new Color(0f, 1f, 0f, 0.12f);
+        int segments = 32;
+        Vector3 prev = pos;
+        for (int i = 1; i <= segments; i++)
         {
-            _navAgent.enabled = true;
-            _animBridge.SetIdle();
-            if (IsServer) _btOwner.StartBehaviour();
+            float t = (float)i / segments;
+            float ang = Mathf.Lerp(-halfAngle, halfAngle, t);
+            Vector3 dir = Quaternion.AngleAxis(ang, Vector3.up) * fwd;
+            Vector3 cur = pos + dir * _viewDistance;
+            Gizmos.DrawLine(prev, cur);
+            prev = cur;
         }
-        else
+        Gizmos.DrawLine(pos, pos + leftDir * _viewDistance);
+        Gizmos.DrawLine(pos, pos + rightDir * _viewDistance);
+
+        // 中心视轴（实线，亮绿）
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(pos, pos + fwd * _viewDistance);
+        // 两边界（暗绿虚化效果用半透明）
+        Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
+        Gizmos.DrawLine(pos, pos + leftDir * _viewDistance);
+        Gizmos.DrawLine(pos, pos + rightDir * _viewDistance);
+
+        // 视距端点弧（用细线圆近似，仅表意）
+        Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+        Vector3 last = pos + leftDir * _viewDistance;
+        for (int i = 1; i <= segments; i++)
         {
-            if (IsServer && _btOwner.isRunning) _btOwner.StopBehaviour();
-            _navAgent.ResetPath();
-            _animBridge.SetIdle();
+            float t = (float)i / segments;
+            float ang = Mathf.Lerp(-halfAngle, halfAngle, t);
+            Vector3 dir = Quaternion.AngleAxis(ang, Vector3.up) * fwd;
+            Vector3 cur = pos + dir * _viewDistance;
+            Gizmos.DrawLine(last, cur);
+            last = cur;
         }
+
+        // 玩家激活范围（仅描线边框）
+        Gizmos.color = new Color(1f, 1f, 0f, 0.4f);
+        Gizmos.DrawWireSphere(transform.position, _activationRadius);
     }
     #endregion
 }

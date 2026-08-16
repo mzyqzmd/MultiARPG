@@ -38,13 +38,13 @@ public class UIService : IService
     public void BindLocalPlayer(Player player_)
     {
         LocalPlayer = player_;
-        EventBus<LocalPlayerBoundEvent>.InvokeEvent(new LocalPlayerBoundEvent(player_));
+        SpawnUiView<UI_InGameUI>("InGameUI", EUILayerCanvas.Hud).Initialize(player_);
     }
 
     public void UnbindLocalPlayer()
     {
         LocalPlayer = null;
-        EventBus<LocalPlayerUnboundEvent>.InvokeEvent(new LocalPlayerUnboundEvent());
+        ClearAllLayerView();
     }
     #endregion
 

@@ -1144,7 +1144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1352763015
+  GlobalObjectIdHash: 2203555635
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1167,9 +1167,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _anim: {fileID: 8218321089088230472}
   _lockCenter: {fileID: 8485407142908136627}
-  _statsComponent: {fileID: 5622392678959515049}
+  _statsControl: {fileID: 5622392678959515049}
   _capsuleCollider: {fileID: 8347076792502815480}
-  _soFakeManStats: {fileID: 11400000, guid: bf90d378646ed4b4eaea6b373c1286cf, type: 2}
+  _soFakeManStats: {fileID: 0}
 --- !u!95 &8218321089088230472
 Animator:
   serializedVersion: 5
