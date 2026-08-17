@@ -1,5 +1,6 @@
 using NodeCanvas.Tasks.Conditions;
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,55 +13,37 @@ public class Zombie : AINPC
     [Header("基础配置")]
     [SerializeField] protected ZombieAnimControl _animControl;
     [Header("攻击配置")]
-    [SerializeField] private Collider _leftHandHit;
-    [SerializeField] private Collider _rightHandHit;
+    [SerializeField] private ZombieHandHit _leftHandHit;
+    [SerializeField] private ZombieHandHit _rightHandHit;
 
     public ZombieAnimControl AnimationControl => _animControl;
     public ZombieStatsControl ZombieStatsControl => _statsControl as ZombieStatsControl;
 
-    /// <summary>攻击动画结束通知（由 DisableHandHit 末帧链路触发，供行为树节点收口）。</summary>
-    public Action OnAttackEnded;
-
     protected override void Awake()
     {
         base.Awake();
-        _leftHandHit.enabled = false;
-        _rightHandHit.enabled = false;
+        _leftHandHit.Disable();
+        _rightHandHit.Disable();
         _navAgent.speed = ZombieStatsControl.GetMoveSpeed(false);
         _navAgent.angularSpeed = ZombieStatsControl.RotationSpeed;
         _navAgent.stoppingDistance = 1f;
     }
 
     #region 攻击窗口
-    /// <summary>攻击窗口开启（动画帧事件调用）：启用手部碰撞体。</summary>
+    /// <summary>攻击窗口开启（行为树节点调用）：启用手部碰撞体。</summary>
     public void EnableHandHit()
     {
-        _leftHandHit.enabled = true;
-        _rightHandHit.enabled = true;
+        _leftHandHit.Enable();
+        _rightHandHit.Enable();
     }
 
-    /// <summary>攻击窗口关闭（动画帧事件调用）：禁用手部碰撞体并交还 Agent 位移控制。</summary>
+    /// <summary>攻击窗口关闭（行为树/安全网调用）：禁用手部碰撞体。</summary>
     public void DisableHandHit()
     {
-        _leftHandHit.enabled = false;
-        _rightHandHit.enabled = false;
-    }
-
-    private void OnTriggerEnter(Collider other_)
-    {
-        if (!IsServer) return;
-        if (NetworkHub.Instance == null) return;
-        var target = other_.GetComponent<Character>();
-        if (target == null || target == this) return;
-        var source = StatsControl as IEffectSource;
-        var effectTarget = target.StatsControl as IEffectTarget;
-        var damage = new DamageInfo(ZombieStatsControl.AttackDamage, 0, 0, 0, 0,
-            other_.ClosestPoint(transform.position), source, effectTarget);
-        NetworkHub.Instance.RequestDamageServerRpc(NetworkObjectId, target.OwnerClientId, damage);
+        _leftHandHit.Disable();
+        _rightHandHit.Disable();
     }
     #endregion
-
-
 
     #region 死亡
     public override void Die()
@@ -68,22 +51,23 @@ public class Zombie : AINPC
         if (IsServer && _btOwner.isRunning) _btOwner.StopBehaviour();
         _navAgent.ResetPath();
         _animControl.SetDead();
-    } 
+        if (IsServer) StartCoroutine(DestroyAfterDelay());
+    }
+
+    /// <summary>Host 端计时：死亡动画播完后经 NetworkObject.Despawn 同步销毁所有客户端实例。</summary>
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(4f);
+        if (NetworkObject.IsSpawned)
+            NetworkObject.Despawn(true);
+    }
     #endregion
 
     #region 受击反馈
     public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
     {
-        _animControl.SetHit(ComputeHitDirection(contactPoint_));
+        _animControl.SetHit(contactPoint_);
         base.OnHitReceived(damage_, contactPoint_);
-    }
-    /// <summary>计算受击方向：接触点相对本地坐标系的方位（0前/1后/2右/3左）。</summary>
-    private int ComputeHitDirection(Vector3 contactPoint_)
-    {
-        Vector3 local = transform.InverseTransformDirection((contactPoint_ - transform.position).normalized);
-        if (local.z >= Mathf.Abs(local.x) && local.z >= 0) return 0; // 前
-        if (local.z < 0) return 1;                                  // 后
-        return local.x >= 0 ? 2 : 3;                                // 右/左
     }
     #endregion
 
@@ -104,6 +88,6 @@ public class Zombie : AINPC
             _navAgent.ResetPath();
             _animControl.SetIdle();
         }
-    } 
+    }
     #endregion
 }

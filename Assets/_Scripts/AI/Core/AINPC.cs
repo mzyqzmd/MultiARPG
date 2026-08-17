@@ -9,17 +9,19 @@ using UnityEngine.AI;
 [RequireComponent(typeof(BehaviourTreeOwner))]
 public abstract class AINPC : Character
 {
-
     [Header("依赖配置")]
     [SerializeField] protected NavMeshAgent _navAgent;
     [SerializeField] protected BehaviourTreeOwner _btOwner;
     [Header("玩家靠近时激活范围")]
     [SerializeField] protected float _activationRadius = 20f;
-    [Header("视觉参数")]
+    [Header("视觉参数（起点前后共用，遮挡层共用，角度前后互补）")]
     [SerializeField] protected Transform _lookStartPoint;
-    [SerializeField] protected float _viewDistance = 12f;
+    [SerializeField] protected float _frontViewDistance = 12f;
+    [SerializeField] protected float _backViewDistance = 6f;
     [SerializeField] protected float _viewAngle = 110f;
     [SerializeField] protected LayerMask _obstacleMask;
+    [Header("残留记忆：丢失视野后仍视为可见的秒数")]
+    [SerializeField] protected float _memoryDuration = 3f;
 
     public NavMeshAgent NavAgent => _navAgent;
 
@@ -29,6 +31,7 @@ public abstract class AINPC : Character
     protected AINpcService _aiNPCService;
 
     protected bool _active;
+    private float _lastSeenTime = -Mathf.Infinity;
 
     protected override void Awake()
     {
@@ -50,16 +53,26 @@ public abstract class AINPC : Character
     }
     #endregion
 
+    #region 视觉判定（前后向合并 + 残留记忆）
+    /// <summary>目标是否可见（前或后任一实时可见，或 3 秒内曾见过）。</summary>
     public bool CanSeeTarget(Transform target_)
     {
         if (target_ == null) return false;
+        bool seenNow = CheckVisible(target_, _lookStartPoint.forward, _frontViewDistance, _viewAngle)
+                    || CheckVisible(target_, -_lookStartPoint.forward, _backViewDistance, 360f - _viewAngle);
+        if (seenNow) _lastSeenTime = Time.time;
+        return seenNow || (Time.time - _lastSeenTime <= _memoryDuration);
+    }
+    /// <summary>目标是否在指定方向扇区内且无遮挡。</summary>
+    private bool CheckVisible(Transform target_, Vector3 dir_, float dist_, float angle_)
+    {
         var toTarget = target_.position - _lookStartPoint.position;
         float dist = toTarget.magnitude;
-        if (dist > _viewDistance) return false;
+        if (dist > dist_) return false;
 
         var dir = toTarget / dist;
-        float angle = Vector3.Angle(_lookStartPoint.forward, dir);
-        if (angle > _viewAngle * 0.5f) return false;
+        float angle = Vector3.Angle(dir_, dir);
+        if (angle > angle_ * 0.5f) return false;
 
         if (_obstacleMask != 0 &&
             Physics.Linecast(_lookStartPoint.position, target_.position, _obstacleMask))
@@ -67,6 +80,7 @@ public abstract class AINPC : Character
 
         return true;
     }
+    #endregion
     /// <summary>死亡：行为树语义入口</summary>
     public abstract void Die();
 
@@ -74,60 +88,15 @@ public abstract class AINPC : Character
     public abstract void SetActive(bool active_);
 
     #region 视线范围可视化
-    /// <summary>编辑器 Gizmo：绘制视锥（含可视半角内/外渐变色）与玩家激活范围球。</summary>
+    /// <summary>编辑器 Gizmo：绘制前（绿）/后（蓝）双视锥与玩家激活范围球（经 GizmoDrawer 静态工具）。</summary>
     protected virtual void OnDrawGizmos()
     {
         Transform origin = _lookStartPoint != null ? _lookStartPoint : transform;
-        Vector3 pos = origin.position;
-        Vector3 fwd = origin.forward;
-
-        // 视锥：以可视半角为边界，扇区用半透明面 + 中心轴 + 两边界射线表达
-        float halfAngle = _viewAngle * 0.5f;
-        Quaternion leftRot = Quaternion.AngleAxis(-halfAngle, Vector3.up);
-        Quaternion rightRot = Quaternion.AngleAxis(halfAngle, Vector3.up);
-        Vector3 leftDir = leftRot * fwd;
-        Vector3 rightDir = rightRot * fwd;
-
-        // 扇形网格（扇区面）
-        Gizmos.color = new Color(0f, 1f, 0f, 0.12f);
-        int segments = 32;
-        Vector3 prev = pos;
-        for (int i = 1; i <= segments; i++)
-        {
-            float t = (float)i / segments;
-            float ang = Mathf.Lerp(-halfAngle, halfAngle, t);
-            Vector3 dir = Quaternion.AngleAxis(ang, Vector3.up) * fwd;
-            Vector3 cur = pos + dir * _viewDistance;
-            Gizmos.DrawLine(prev, cur);
-            prev = cur;
-        }
-        Gizmos.DrawLine(pos, pos + leftDir * _viewDistance);
-        Gizmos.DrawLine(pos, pos + rightDir * _viewDistance);
-
-        // 中心视轴（实线，亮绿）
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(pos, pos + fwd * _viewDistance);
-        // 两边界（暗绿虚化效果用半透明）
-        Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
-        Gizmos.DrawLine(pos, pos + leftDir * _viewDistance);
-        Gizmos.DrawLine(pos, pos + rightDir * _viewDistance);
-
-        // 视距端点弧（用细线圆近似，仅表意）
-        Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
-        Vector3 last = pos + leftDir * _viewDistance;
-        for (int i = 1; i <= segments; i++)
-        {
-            float t = (float)i / segments;
-            float ang = Mathf.Lerp(-halfAngle, halfAngle, t);
-            Vector3 dir = Quaternion.AngleAxis(ang, Vector3.up) * fwd;
-            Vector3 cur = pos + dir * _viewDistance;
-            Gizmos.DrawLine(last, cur);
-            last = cur;
-        }
+        GizmoDrawer.DrawVisionCone(origin.position, origin.forward, _frontViewDistance, _viewAngle * 0.5f, Color.green);
+        GizmoDrawer.DrawVisionCone(origin.position, -origin.forward, _backViewDistance, (360f - _viewAngle) * 0.5f, Color.red);
 
         // 玩家激活范围（仅描线边框）
-        Gizmos.color = new Color(1f, 1f, 0f, 0.4f);
-        Gizmos.DrawWireSphere(transform.position, _activationRadius);
+        GizmoDrawer.DrawWireSphere(transform.position, _activationRadius, new Color(1f, 1f, 0f, 0.4f));
     }
     #endregion
 }

@@ -23,8 +23,9 @@ public class PlayerHitState : PlayerActionState
         // 受击硬直时长由配置（SO_CharacterStats.HitDuration）驱动，可被硬直延长类效果经 EStatType.HitDuration 修正
         _stateDuration = _player.StatsControl.HitDuration;
         _player.Anim.SetBool("HitState", true);
-        // 按受击方向选动画：0=前 1=后 2=左 3=右（多方向状态机由编辑器后续搭建，此处仅预留参数）
-        _player.Anim.SetFloat("HitDirection", _player.StateControl.PendingHitDirection);
+        // 按受击连续方向(X=右/Y=前)驱动 2D BlendTree 混合受击朝向动画（clip 坐标由编辑器摆放）
+        _player.Anim.SetFloat("HitDirectionX", _player.StateControl.PendingHitX);
+        _player.Anim.SetFloat("HitDirectionY", _player.StateControl.PendingHitY);
         // 已缓存 clip 长度则立即设定倍速（用当前 HitDuration 实时算，确保硬直延长效果生效）
         if (_hitClipLength > 0f)
             _player.Anim.SetFloat(HitAnimSpeedParam, _hitClipLength / _player.StatsControl.HitDuration);

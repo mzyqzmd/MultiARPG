@@ -6,34 +6,52 @@ using UnityEngine;
 [Name("僵尸：攻击")]
 public class ZombieAttack : ActionTask<Zombie>
 {
+    private float _elapsed;
+    private bool _hitOpened;
+
     protected override void OnExecute()
     {
-        int dir = ComputeAttackDirection();
+        _elapsed = 0f;
+        _hitOpened = false;
+        Vector2 dirXY = ComputeAttackDirectionXY();
         int variant = Random.Range(0, 3);
-        agent.AnimationControl.TriggerAttack(dir, variant);
-        agent.OnAttackEnded += FinishAttack;
+        agent.AnimationControl.TriggerAttack(dirXY, variant);
+    }
+
+    protected override void OnUpdate()
+    {
+        _elapsed += Time.deltaTime;
+        float windup = agent.ZombieStatsControl.AttackWindup;
+        float window = agent.ZombieStatsControl.AttackWindow;
+        float duration = agent.ZombieStatsControl.AttackDuration;
+
+        // 前摇结束开启判定碰撞体（仅一次）
+        if (!_hitOpened && _elapsed >= windup)
+        {
+            _hitOpened = true;
+            agent.EnableHandHit();
+        }
+        // 判定窗口结束关闭碰撞体
+        if (_hitOpened && _elapsed >= windup + window)
+            agent.DisableHandHit();
+
+        // 攻击总时长结束收口
+        if (_elapsed >= duration)
+            EndAction(true);
     }
 
     protected override void OnStop(bool resumed_)
     {
-        agent.OnAttackEnded -= FinishAttack;
+        // 防御节点被 BT 中断：强制复位攻击态所有副作用
+        agent.AnimationControl.ForceEndAttack();
     }
 
-    /// <summary>攻击动画结束事件回调：反订阅并收口行为树节点。</summary>
-    private void FinishAttack()
+    /// <summary>计算攻击方向：玩家相对僵尸本地坐标系的连续坐标（X=右、Y=前，范围约[-1,1]），供 Cartesian Blend Tree 方位/斜向混合。</summary>
+    private Vector2 ComputeAttackDirectionXY()
     {
-        agent.OnAttackEnded -= FinishAttack;
-        EndAction(true);
-    }
-
-    /// <summary>计算攻击方向：玩家相对僵尸本地坐标系的方位（0前/1后/2右/3左）。</summary>
-    private int ComputeAttackDirection()
-    {
-        if (agent.TargetPlayer == null) return 0;
+        if (agent.TargetPlayer == null) return new Vector2(0f, 1f);
         Vector3 local = agent.transform.InverseTransformDirection(
-            (agent.TargetPlayer.position - agent.transform.position).normalized);
-        if (local.z >= Mathf.Abs(local.x) && local.z >= 0) return 0; // 前
-        if (local.z < 0) return 1;                                  // 后
-        return local.x >= 0 ? 2 : 3;                               // 右/左
+            agent.TargetPlayer.position - agent.transform.position);
+        return new Vector2(local.x, local.z).normalized;
     }
 }

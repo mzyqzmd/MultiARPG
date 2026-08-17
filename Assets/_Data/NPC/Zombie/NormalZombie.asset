@@ -17,5 +17,8 @@ MonoBehaviour:
   _maxHealth: 30
   _hitDuration: 0.4
   _runSpeed: 4
-  _attackDamage: 10
-  _attackRange: 1.8
+  _attackDamage: 3
+  _attackRange: 1.2
+  _attackWindup: 0.15
+  _attackWindow: 0.9
+  _attackDuration: 2.1

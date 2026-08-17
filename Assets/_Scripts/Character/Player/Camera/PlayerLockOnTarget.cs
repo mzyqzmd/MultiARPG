@@ -168,19 +168,11 @@ public class PlayerLockOnTarget : MonoBehaviour
     {
         var center = CheckOrigin.position;
         // 检测球范围
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(center, _lockRadius);
+        GizmoDrawer.DrawWireSphere(center, _lockRadius, Color.yellow);
         // 相机前方 180° 扇形边界（以 camera.forward 为基准）
         var cam = _player.PlayerCameraService?.PlayerCamera;
         if (cam != null)
-        {
-            var forward = cam.transform.forward;
-            Gizmos.color = Color.cyan;
-            var left = Quaternion.AngleAxis(-_frontFovHalfAngle, Vector3.up) * forward;
-            var right = Quaternion.AngleAxis(_frontFovHalfAngle, Vector3.up) * forward;
-            Gizmos.DrawLine(center, center + left * _lockRadius);
-            Gizmos.DrawLine(center, center + right * _lockRadius);
-        }
+            GizmoDrawer.DrawFovBoundary(center, cam.transform.forward, _frontFovHalfAngle, _lockRadius, Color.cyan);
         // 当前目标连线
         if (_currentTarget != null && _currentTarget.LockCenter != null)
         {

@@ -7,7 +7,7 @@
 ![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-000000?logo=unity)
 ![Netcode](https://img.shields.io/badge/Netcode%20for%20GameObjects-1.12.2-2196F3)
 ![URP](https://img.shields.io/badge/URP-14.0.12-4CAF50)
-![C#](https://img.shields.io/badge/C%23-134%20files%20%2F%207.8k%20lines-239120)
+![C#](https://img.shields.io/badge/C%23-132%20files%20%2F%208.0k%20lines-239120)
 ![架构评分](https://img.shields.io/badge/Architecture-80%2F100%20%28B%29-21a0c0)
 
 ---
@@ -16,8 +16,8 @@
 
 | 特性 | 说明 |
 |------|------|
-| **单一网络表面** | 全项目 **8 个 RPC 全部收口在 `NetworkHub`**（4 ServerRpc + 4 ClientRpc），`NetworkVariable` 使用量为 **0**；仅 **9 个文件** `using Unity.Netcode`（含新增 AI 的 `Zombie` 与 `AINpcService`，详见已知限制） |
-| **领域 NGO-free（大体）** | Stats / Effect / Item / Save 组装 / Input / Audio / UI / FSM / `AINpcAnimatorBridge` 全部不引用网络库；仅新增的 `Zombie` 敌人域类破例直引 NGO（经 `NetworkHub` 外观复用伤害链路） |
+| **单一网络表面** | 全项目 **8 个 RPC 全部收口在 `NetworkHub`**（4 ServerRpc + 4 ClientRpc），`NetworkVariable` 使用量为 **0**；仅 **10 个文件** `using Unity.Netcode`（含 AI 的 `Zombie` 与 `ZombieHandHit` 域类、`AINpcService` 服务，详见已知限制） |
+| **领域 NGO-free（大体）** | Stats / Effect / Item / Save 组装 / Input / Audio / UI / FSM / `ZombieAnimControl` 全部不引用网络库；仅 `Zombie` 与 `ZombieHandHit` 两个敌人域类破例直引 NGO（均经 `NetworkHub` 外观复用伤害链路） |
 | **组合根 + 服务容器** | `GameRoot` 按显式依赖顺序构建并注册 **12 个服务**（含 v15 新增的 `AINpcService`），构造注入而非静态单例；场景卸载时逆序注销 |
 | **分层状态机** | 父层管姿态（Free / Combat），子层管动作（Move / Jump / Fall / Dodge / Attack / Hit / Dead），带优先级抢断的 `AnyTransition` |
 | **数据驱动** | 角色属性、效果、物品、音频、UI、VFX 全部由 `SO_*` 数据库按 key 查表，配置与运行时状态分离；`SO_Weapon` 蓄力倍率、武器动画字典、**武器动画覆盖控制器（`OverrideController`）均已接通运行时** |
@@ -49,9 +49,9 @@
 │  领域层    Character / Player 能力组件 · 分层 FSM ·        │
 │            Effect · Item · Stats        ← 全部 NGO-free   │
 ├──────────────────────────────────────────────────────────┤
-│  服务层    11 × IService（Input / UI / Audio / VFX /       │
+│  服务层    12 × IService（Input / UI / Audio / VFX /       │
 │            Scene / Save / Settings / Effect / Item /       │
-│            Camera / Network）                              │
+│            Camera / Network / AINpc）                      │
 ├──────────────────────────────────────────────────────────┤
 │  数据层    SO_* 配置资产（Assets/_Data，按 key 查表）      │
 ├──────────────────────────────────────────────────────────┤
@@ -74,7 +74,7 @@
 
 ```
 Assets/
-├── _Scripts/                        源码（134 文件 / 7836 行）
+├── _Scripts/                        源码（132 文件 / 8045 行）
 │   ├── BasicSystems/                基础设施服务（39 文件 / 3675 行）
 │   │   ├── Input/                   Input System 封装 + 设备类型识别
 │   │   ├── UI/                      MVP 界面层（Core / MainMenu / InGame / General）
@@ -84,7 +84,7 @@ Assets/
 │   │   ├── VFX/                     特效服务 + 控制器 + SO 特效库
 │   │   └── Scene/                   场景切换服务（含黑幕过渡编排）
 │   │
-│   ├── Character/                   角色领域（33 文件 / 2210 行，FakeMan 已迁出）
+│   ├── Character/                   角色领域（33 文件 / 2208 行，FakeMan 已迁出）
 │   │   ├── Core/                    Character 基类 + 通用属性控制
 │   │   └── Player/
 │   │       ├── Animation/           动画事件薄转发器
@@ -94,12 +94,12 @@ Assets/
 │   │       ├── Stats/               玩家属性计算中心
 │   │       └── Save/                纯本地存档组装 / 还原
 │   │
-│   ├── AI/                          ⭐ 非玩家智能体（23 文件 / 627 行，NodeCanvas 行为树驱动）
-│   │   ├── Core/                    AINPC（继承 Character）· AINpcService（第 12 个 IService）· AIVision · AINpcAnimatorBridge
-│   │   ├── Enemy/NormalZombie/      僵尸敌人（Zombie + 12 个行为树节点 + SO_ZombieStats）
+│   ├── AI/                          ⭐ 非玩家智能体（22 文件 / 778 行，NodeCanvas 行为树驱动，v16 重构）
+│   │   ├── Core/                    AINPC（继承 Character）· AINpcService（第 12 个 IService，⭐显式 RegisterNpc 替代 FindObjectsByType）
+│   │   ├── Enemy/NormalZombie/      僵尸敌人（Zombie + ZombieAnimControl + ZombieHandHit + 10 个行为树节点 + SO_ZombieStats，死亡跨端 Despawn）
 │   │   └── NPC/FakeMan/             训练木桩（由 Character/FakeMan 迁入，复用 FSM / Stats 范式）
 │   │
-│   ├── Core/                        零业务基础设施（13 文件 / 565 行）
+│   ├── Core/                        零业务基础设施（11 文件 / 544 行）
 │   │   ├── GameRoot.cs              组合根：服务装配与生命周期（现注册 12 个服务）
 │   │   ├── FSM/                     泛型状态机 + 优先级迁移
 │   │   ├── Services/                服务容器
@@ -111,7 +111,7 @@ Assets/
 │   │   ├── Item/                    物品与武器（BaseItem · Weapon_Rapier · SO_Weapon 蓄力倍率）
 │   │   └── Stats/                   属性修饰器（ModifiableStat · StatModifier）
 │   │
-│   ├── Utility/                     工具（TickService · EventTimer · ButtonScaler）
+│   ├── Utility/                     工具（TickService · EventTimer · ButtonScaler · GizmoDrawer）
 │   └── World/                       世界交互物（Checkpoint）
 │
 ├── _Data/                           SO 配置资产（Character / Effects / Items / Audio / UI）
@@ -181,32 +181,32 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | 模块 | 文件数 | 行数 |
 |------|-------:|-----:|
 | BasicSystems | 39 | 3675 |
-| Character | 33 | 2210 |
-| **AI（新增）** | **23** | **627** |
-| Core | 13 | 565 |
+| Character | 33 | 2208 |
+| **AI** | **22** | **778** |
+| Core | 11 | 544 |
 | GameSystems | 22 | 531 |
-| Utility | 3 | 199 |
+| Utility | 4 | 280 |
 | World | 1 | 29 |
-| **合计** | **134** | **7836** |
+| **合计** | **132** | **8045** |
 
-> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 6440 行。AI 模块（23 文件 / 627 行）为 2026-08-14 新增的 NodeCanvas 行为树驱动子系统。
+> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 6649 行。AI 模块（22 文件 / 778 行）为 NodeCanvas 行为树驱动子系统，2026-08-17 经 v16 重构（去 `FindObjectsByType`、拆 `ZombieAnimControl`·`ZombieHandHit`、僵尸死亡跨端 `Despawn`）。
 
 ## 当前进度
 
 | 状态 | 内容 |
 |------|------|
-| ✅ 已具备 | SO 数据驱动体系；组合根与服务容器（现 12 个服务）；分层状态机；零 GC 事件总线；集中式网络 Hub；客户端权威变换/动画同步；Host 单一数据源存档；MVP 事件驱动 UI；锁定目标系统；效果与属性修饰器；VFX / 音频服务；对象池与计时器；**⭐ AI 子系统（NodeCanvas 行为树驱动，含僵尸敌人与 NPC 框架）**；**代码状态干净可编译（无编译 / 打包阻断，连续三版）** |
-| 🚧 进行中 | 战斗手感打磨（**连段 / 蓄力流程已下沉至 Animator Controller + 动画 Clip 事件驱动，攻击态薄化为胶水**；蓄力重击倍率 / 连段窗口）；**`SO_Weapon` 动画覆盖控制器（`OverrideController`）已接通**（装备时切换武器专属动画）；**AI 敌人扩展**（僵尸已实现行为树 + NavMesh + 手部碰撞体命中走 NetworkHub 中转；更多敌人类型与 BT 节点复用待扩展）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，连段现由 Animator Controller 本地驱动，待以更稳妥方案重新设计） |
-| 📋 规划中 | 死亡 / 血量数值的跨端同步补齐（现同样适用于新增 NPC）；`NetworkHub` 按域拆分（战斗中继 / 存档）；NPC 位移客户端同步（核实预制体 `NetworkTransform`）；`Zombie` 域类去 NGO 直引、收敛 `AINpcService` 网络入口；关卡内容与示例场景 |
+| ✅ 已具备 | SO 数据驱动体系；组合根与服务容器（12 个服务）；分层状态机；零 GC 事件总线；集中式网络 Hub；客户端权威变换/动画同步；Host 单一数据源存档；MVP 事件驱动 UI；锁定目标系统；效果与属性修饰器；VFX / 音频服务；对象池与计时器；**⭐ AI 子系统（NodeCanvas 行为树驱动，含僵尸敌人与 NPC 框架）**；**⭐ v16 AI 内聚重构**：`AINpcService` 去除 `FindObjectsByType`（NPC 显式注册）、僵尸手部命中与动画编排拆为单职责类、僵尸死亡跨端 `Despawn`；**代码状态干净可编译（无编译 / 打包阻断，连续四版）** |
+| 🚧 进行中 | 战斗手感打磨（**连段 / 蓄力流程已下沉至 Animator Controller + 动画 Clip 事件驱动，攻击态薄化为胶水**；蓄力重击倍率 / 连段窗口）；**`SO_Weapon` 动画覆盖控制器（`OverrideController`）已接通**（装备时切换武器专属动画）；**AI 敌人扩展**（僵尸已实现行为树 + NavMesh + 手部碰撞体命中走 NetworkHub 中转、死亡跨端 `Despawn`；更多敌人类型与 BT 节点复用待扩展）；**技能 / 连招系统重建**（v13 移除了 v12 的实验性实现，连段现由 Animator Controller 本地驱动，待以更稳妥方案重新设计） |
+| 📋 规划中 | 死亡 / 血量数值的跨端同步补齐（僵尸死亡已 Despawn，但血量数值仍仅本地）；`NetworkHub` 按域拆分（战斗中继 / 存档）；NPC 位移客户端同步（核实预制体 `NetworkTransform`）；`Zombie`/`ZombieHandHit` 域类去 NGO 直引、收敛 `AINpcService` 网络入口（P2-8 / P2-9）；关卡内容与示例场景 |
 
-**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)，2026-08-14 v15 终态重跑版）综合评分 **80 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」74.0/94。本版因新增完整 AI 子系统（23 文件 / 627 行）使数据驱动维度创新高（11.0），但 `Zombie` 域类直引 NGO、`AINpcService` 绕过网络外观直连 `NetworkManager`、`FindObjectsByType` 三笔新债使总分较 v14 的 81 微降 1 分，仍处 B 档且连续三版无编译阻断。
+**架构评分**：最新一次逐文件复审（见 [`架构分析报告.md`](架构分析报告.md)，2026-08-17 v16）综合评分 **80 / 100（B 档）**——其中「构建健康度」维度满分（无编译阻断），「纯设计分」74.0/94。v16 为「AI 子系统内聚重构」迭代：在 v15 AI 骨架上修复了 P3-14（`AINpcService` 去除 `FindObjectsByType`、改为显式注册），并拆分 `ZombieAnimControl`/`ZombieHandHit` 单职责类、让僵尸死亡跨端 `Despawn`；但 `ZombieHandHit` 成为僵尸域第 2 个直引 NGO 的文件（NGO 触点 9→10），卫生 +0.5 与分层 −0.5 对冲，总分稳在 80（B 档，连续四版无编译阻断）。
 
 ## 已知限制
 
-- **数值同步缺口**：`NetworkVariable` 移除后，死亡与血量的**数值**尚未补充替代同步方案，远端目前仅能通过动画层感知状态变化；**该缺口现同样适用于新增的僵尸 / NPC**（其死亡 / 血量也只本地判定）。
+- **数值同步缺口**：`NetworkVariable` 移除后，血量的**数值**尚未补充替代同步方案，远端目前仅能通过动画层感知状态变化；僵尸死亡已新增 `NetworkObject.Despawn` 跨端销毁（远端能感知实体消失），但**血量数值仍仅本地判定**、玩家 / `FakeMan` 死亡仍仅本地动画。
 - **NPC 位移同步待确认**：敌人 AI 行为树与 NavMesh 寻路仅 Host 端运行；若 NPC 预制体未挂 `NetworkTransform`，客户端将仅见动画、不见敌人实际移动。需核对预制体并决策是否补充网络变换同步。
 - **`NetworkHub` 职责偏宽**：战斗中继与存档同步两个域同驻一个类（约 242 行），已规划拆分；Provider / 事件接缝已就位，拆分为零行为变化的纯重构。
-- **AI 域网络约定偏离（v15 新增）**：`Zombie` 敌人域类直引 `using Unity.Netcode`（自 v6 网络重构以来首例域类破例），`AINpcService` 直连 `NetworkManager.Singleton` 绕过 `NetworkService` 外观（引入第二个 NGO 入口），且用 `Object.FindObjectsByType` 收集场景 NPC（打破"零隐式查找"记录）。三者均为小债，已列入改进路线（P2-8 / P2-9 / P3-14）。
+- **AI 域网络约定偏离**：`Zombie` 与 `ZombieHandHit` 两个敌人域类直引 `using Unity.Netcode`（自 v6 网络重构以来首例域类破例，均路由伤害经 `NetworkHub` 外观），`AINpcService` 直连 `NetworkManager.Singleton` 绕过 `NetworkService` 外观（引入第二个 NGO 入口）。三者均为小债，已列入改进路线（P2-8 / P2-9）。**✅ 已修复**：v16 中 `AINpcService` 已去除 `FindObjectsByType` 隐式查找，改为 NPC 显式 `RegisterNpc`/`UnregisterNpc`（恢复"零隐式查找"记录）。
 - **原型残留**：`Player` 中仍保留少量 Inspector 测试字段（如 `_defaultWeapon`，作者确认是有意保留的测试脚手架，待拾取系统落地后替换为数据库驱动）与 `TestButton` 调试入口（承载了"返回主菜单"真实功能），正式数据链路完善后清理。
 - **内容量有限**：项目定位为架构验证与技术展示，玩法内容仍处早期。
 

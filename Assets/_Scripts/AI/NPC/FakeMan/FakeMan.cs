@@ -8,7 +8,8 @@ public class FakeMan : Character
 
     public FakeManIdleState IdleState { get; private set; }
     public FakeManHitState HitState { get; private set; }
-    public float PendingHitDirection { get; private set; }
+    public float PendingHitX { get; private set; }
+    public float PendingHitY { get; private set; }
 
     private StateMachine<IState> _fsm;
 
@@ -34,10 +35,11 @@ public class FakeMan : Character
     }
     public void EnterHitState(Vector3 contactPoint_)
     {
-        var local = _capsuleCollider.transform.InverseTransformDirection(
-            (contactPoint_ - _capsuleCollider.transform.position).normalized);
-        PendingHitDirection = local.z >= Mathf.Abs(local.x) ? (local.z >= 0 ? 0 : 1)
-            : (local.x >= 0 ? 3 : 2);
+        Vector3 local = _capsuleCollider.transform.InverseTransformDirection(
+            contactPoint_ - _capsuleCollider.transform.position);
+        Vector2 localVector2 = new Vector2(local.x, local.z).normalized;
+        PendingHitX = localVector2.x;
+        PendingHitY = localVector2.y;
         _fsm.ChangeState(HitState);
         _anim.SetTrigger("Hit");
     }

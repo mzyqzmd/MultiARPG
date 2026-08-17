@@ -14,4 +14,7 @@ public class ZombieStatsControl : CharacterStatsControl
 
     public int AttackDamage => ZombieStats.AttackDamage;
     public float AttackRange => ZombieStats.AttackRange;
+    public float AttackWindup => ZombieStats.AttackWindup;
+    public float AttackWindow => ZombieStats.AttackWindow;
+    public float AttackDuration => ZombieStats.AttackDuration;
 }

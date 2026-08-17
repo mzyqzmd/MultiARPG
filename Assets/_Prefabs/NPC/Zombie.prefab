@@ -1193,6 +1193,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7680102750872201094}
+  - component: {fileID: 8545665865359373620}
   - component: {fileID: 8169969226991573934}
   - component: {fileID: 235476212857914215}
   m_Layer: 0
@@ -1222,6 +1223,21 @@ Transform:
   - {fileID: 3301417702607861324}
   m_Father: {fileID: 2272840640813143515}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8545665865359373620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5516274260484703957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75e57487eb3bd7b48b19f845ae341179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _owner: {fileID: 4716315921890470647}
+  _collider: {fileID: 8169969226991573934}
+  _attackInterval: 2
 --- !u!135 &8169969226991573934
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1749,16 +1765,18 @@ MonoBehaviour:
   _statsControl: {fileID: 1400673928333156962}
   _navAgent: {fileID: 503398360127940229}
   _btOwner: {fileID: 1824140246035827087}
-  _activationRadius: 20
+  _activationRadius: 50
   _lookStartPoint: {fileID: 6471150532567525933}
-  _viewDistance: 18
-  _viewAngle: 270
+  _frontViewDistance: 15
+  _backViewDistance: 10
+  _viewAngle: 200
   _obstacleMask:
     serializedVersion: 2
     m_Bits: 128
+  _memoryDuration: 5
   _animControl: {fileID: 1486005614586335501}
-  _leftHandHit: {fileID: 8819895963742250885}
-  _rightHandHit: {fileID: 8169969226991573934}
+  _leftHandHit: {fileID: 6102091557676172102}
+  _rightHandHit: {fileID: 8545665865359373620}
 --- !u!114 &1400673928333156962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1819,7 +1837,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 229373857
+    DestinationState: 1080829965
+    TransitionDuration: 0
+    TriggerNameHash: 1080829965
+    TransitionIndex: 0
   m_Animator: {fileID: 2686795666855292245}
 --- !u!114 &8144752591174057828
 MonoBehaviour:
@@ -2045,6 +2070,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8780820936501505839}
+  - component: {fileID: 6102091557676172102}
   - component: {fileID: 8819895963742250885}
   - component: {fileID: 1643044813645091884}
   m_Layer: 0
@@ -2074,6 +2100,21 @@ Transform:
   - {fileID: 2642050847420364944}
   m_Father: {fileID: 5442271644599964846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6102091557676172102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7457183780752170155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75e57487eb3bd7b48b19f845ae341179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _owner: {fileID: 4716315921890470647}
+  _collider: {fileID: 8819895963742250885}
+  _attackInterval: 2
 --- !u!135 &8819895963742250885
 SphereCollider:
   m_ObjectHideFlags: 0

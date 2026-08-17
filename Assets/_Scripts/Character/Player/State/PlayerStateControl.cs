@@ -67,8 +67,10 @@ public class PlayerStateControl : MonoBehaviour
 
     /// <summary>轻击连段窗口是否开启：仅窗口期内允许 AnyTransition 重入进下一段；窗口外按键不计入连段。</summary>
     public bool ComboWindowOpen { get; private set; }
-    /// <summary>待消费受击方向(EnterHitState 写入、PlayerHitState.Enter 读取，用于选方向动画)。</summary>
-    public int PendingHitDirection { get; private set; }
+    /// <summary>待消费受击方向(EnterHitState 写入、PlayerHitState.Enter 读取，用于 2D BlendTree 混合受击朝向；X=右/Y=前，范围[-1,1])。</summary>
+    public float PendingHitX { get; private set; }
+    /// <summary>待消费受击方向 Y 分量(前正后负)。</summary>
+    public float PendingHitY { get; private set; }
     /// <summary>战斗姿态锁定标志：true=进入战斗(八向strafe)，false=自由。后续绑定输入/锁定目标。</summary>
     public bool CombatLocked { get; set; }
 
@@ -190,13 +192,16 @@ public class PlayerStateControl : MonoBehaviour
     public void ReturnToMovementState() => _stateAnimEventControl.ReturnToMovementState();
     #endregion
 
-    /// <summary>受击入口：按接触点相对玩家本地空间算出前/后/左/右方向并缓存，置标志后切入受击态（不向状态传参，方向经 PendingHitDirection 在 Enter 时消费）。</summary>
+    #region 受击入口
+    /// <summary>受击入口：按接触点相对玩家本地空间算出连续方向(X=右/Y=前,范围[-1,1])并缓存，置标志后切入受击态（不向状态传参，方向经 PendingHitX/Y 在 Enter 时消费驱动 2D BlendTree）。</summary>
     public void EnterHitState(Vector3 contactPoint_)
     {
-        var local = _characterController.transform.InverseTransformDirection(
-            (contactPoint_ - _characterController.transform.position).normalized);
-        PendingHitDirection = local.z >= Mathf.Abs(local.x) ? (local.z >= 0 ? 0 : 1)
-            : (local.x >= 0 ? 3 : 2);
+        Vector3 local = _characterController.transform.InverseTransformDirection(
+            contactPoint_ - _characterController.transform.position);
+        Vector2 localVector2 = new Vector2(local.x, local.z).normalized;
+        PendingHitX = localVector2.x;
+        PendingHitY = localVector2.y;
         _hitRequested = true;
-    }
+    } 
+    #endregion
 }

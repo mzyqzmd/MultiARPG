@@ -20,7 +20,8 @@ public class FakeManHitState : IState
     public void Enter()
     {
         _stateDuration = _fakeManStatsControl.HitDuration;
-        _anim.SetFloat("HitDirection", _fakeMan.PendingHitDirection);
+        _anim.SetFloat("HitDirectionX", _fakeMan.PendingHitX);
+        _anim.SetFloat("HitDirectionY", _fakeMan.PendingHitY);
         _anim.SetBool("HitState", true);
     }
 
