@@ -60,7 +60,7 @@ public class PlayerEquipmentControl : MonoBehaviour
     {
         BaseItem item = _defaultWeapon;//NOTE:临时测试用
         if (item == null) return; // 未提供则不切换
-        var mainSlot = item.ItemData.EquipTargetSlots[0].Slot;
+        var mainSlot = item.GetItemData<SO_BaseItem>().EquipTargetSlots[0].Slot;
         if (slot_ != mainSlot) return; // 热键槽位与武器主装备槽不符则不响应
         Toggle(slot_);
         PendingItem = item;
@@ -78,7 +78,7 @@ public class PlayerEquipmentControl : MonoBehaviour
     /// 触发 OnEquipped（主槽取数组首个槽位）。</summary>
     public void Equip(BaseItem item_)
     {
-        var slots = item_.ItemData.EquipTargetSlots;
+        var slots = item_.GetItemData<SO_BaseItem>().EquipTargetSlots;
         var mainSlot = slots.Length > 0 ? slots[0].Slot : EEquipmentSlot.RightHand;
         foreach (var e in slots)
         {
@@ -95,7 +95,7 @@ public class PlayerEquipmentControl : MonoBehaviour
         item_.RegisterOwner(_player);
         //获取武器动画clip映射表
         var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
-        item_.WeaponData.OverrideController.GetOverrides(overrides);
+        item_.GetItemData<SO_Weapon>().OverrideController.GetOverrides(overrides);
         _overrideController.ApplyOverrides(overrides);
         OnEquipped?.Invoke(mainSlot, item_);
     }
@@ -105,12 +105,12 @@ public class PlayerEquipmentControl : MonoBehaviour
     public void Unequip(BaseItem item_)
     {
         if (item_ == null) return;
-        var equipSlots = item_.ItemData.EquipTargetSlots;
+        var equipSlots = item_.GetItemData<SO_BaseItem>().EquipTargetSlots;
         foreach (var e in equipSlots)
             if (e.IsOccupying)
                 _slotTaken[e.Slot] = false;
 
-        var unequipSlots = item_.ItemData.UnequipTargetSlots;
+        var unequipSlots = item_.GetItemData<SO_BaseItem>().UnequipTargetSlots;
         foreach (var e in unequipSlots)
         {
             var t = GetSlotTransform(e.Slot);

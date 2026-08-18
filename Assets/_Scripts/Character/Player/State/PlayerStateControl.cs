@@ -190,6 +190,13 @@ public class PlayerStateControl : MonoBehaviour
     /// <summary>动画事件驱动的蓄力结算：按 tier 写倍率到右手武器并扣耐力。tier>=2=满蓄(LongChargeMulti)，否则短蓄(ShortChargeMulti)。不在此切状态——倍率写完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
     public void EndHeavyChargeByTier(int tier_) => _stateAnimEventControl.EndHeavyChargeByTier(tier_);
     public void ReturnToMovementState() => _stateAnimEventControl.ReturnToMovementState();
+
+    /// <summary>攻击命中窗口开启（动画事件 OnAttackColliderOpen 驱动）：启用右手武器碰撞体，仅窗口期内可命中目标。</summary>
+    public void EnableWeaponCollider() =>
+        _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand).EnableCollider();
+    /// <summary>攻击命中窗口关闭（动画事件 OnAttackColliderClose 驱动）：禁用右手武器碰撞体，避免非攻击期误伤。</summary>
+    public void DisableWeaponCollider() =>
+        _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand).DisableCollider();
     #endregion
 
     #region 受击入口

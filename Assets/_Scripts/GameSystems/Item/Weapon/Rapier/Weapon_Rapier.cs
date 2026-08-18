@@ -3,7 +3,7 @@
 /// <summary>
 /// 轻剑（Rapier）接触伤害：仅攻击者本机结算命中（Owner.IsOwner 守卫），经 Host 中转把伤害发给目标 owner。
 /// 已装备状态下碰撞体碰到 Damageable 目标即构造 DamageInfo 并发起 RequestDamageServerRpc（冷却 _meleeCooldown 防连触）；
-/// 走路意外蹭到敌人也会掉血（用户明确要求）。
+/// 碰撞体仅在攻击命中窗口期由动画事件启用，窗口外触碰不结算（避免走路蹭到目标误伤）。
 /// </summary>
 public class Weapon_Rapier : BaseItem
 {
@@ -29,6 +29,8 @@ public class Weapon_Rapier : BaseItem
     private void OnTriggerEnter(Collider other)
     {
         if (!IsEquipped) return;
+        //攻击命中窗口外（碰撞体未启用）触碰直接跳过结算，避免走路蹭到目标误伤。
+        if (!_triggerCollider.enabled) return;
         //仅攻击者本机结算命中：消除多端重复结算（远端副本不触发，IsEquipped 是否同步无关紧要）。
         if (Owner == null || !Owner.IsOwner) return;
 

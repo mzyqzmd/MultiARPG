@@ -75,7 +75,7 @@ public class UI_WeaponQuickPanel : UI_BaseView
     {
         var image = GetSlotImage(slot_);
         if (image == null) return;
-        image.sprite = item_.ItemData.ItemSprite ? item_.ItemData.ItemSprite : _emptyIcon;
+        image.sprite = item_.GetItemData<SO_BaseItem>().ItemSprite ? item_.GetItemData<SO_BaseItem>().ItemSprite : _emptyIcon;
         image.color = equipped_ ? Color.white : Color.gray;
     }
 

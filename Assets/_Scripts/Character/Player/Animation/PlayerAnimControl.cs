@@ -17,12 +17,22 @@ public class PlayerAnimControl : MonoBehaviour
             _player.EquipmentControl.Unequip(_player.EquipmentControl.PendingItem);
         _player.EquipmentControl.PendingItem = null;
     }
+
     #region 轻击连击窗口
     /// <summary>Animation Clip 事件：轻击连击窗口开启，转发至状态机当前轻击态。</summary>
     public void OnComboWindowOpen() => _player.StateControl.OpenComboWindow();
     /// <summary>Animation Clip 事件：轻击段结束（窗口关闭），转发至状态机当前轻击态。</summary>
     public void OnComboWindowClose() => _player.StateControl.CloseComboWindow();
-    #endregion 
+    #endregion
+
+    #region 攻击碰撞体窗口
+    /// <summary>Animation Clip 事件：攻击命中窗口开启，启用右手武器碰撞体。</summary>
+    public void OnAttackColliderOpen() => _player.StateControl.EnableWeaponCollider();
+    /// <summary>Animation Clip 事件：攻击命中窗口关闭，禁用右手武器碰撞体。</summary>
+    public void OnAttackColliderClose() => _player.StateControl.DisableWeaponCollider();
+    #endregion
+
+    /// <summary>Animation Clip 事件：返回移动状态，转发至状态机当前移动态。</summary>
     public void ReturnToMovementState() => _player.StateControl.ReturnToMovementState();
     /// <summary>Animation Clip 事件：蓄力分级帧，转发 OnHeavyChargeTierResolved（tier: 1=短蓄 2=满蓄）。</summary>
     public void OnHeavyChargeTier(int tier_) => _player.StateControl.EndHeavyChargeByTier(tier_);

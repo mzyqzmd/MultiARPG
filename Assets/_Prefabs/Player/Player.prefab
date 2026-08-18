@@ -2069,7 +2069,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 584404837969333627}
   _checkStartPoint: {fileID: 6750485316512293947}
-  _freeLookCamera: {fileID: 6174310483427124090}
   _lockRadius: 20
   _blockingLayers:
     serializedVersion: 2
@@ -3525,7 +3524,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _owner
       value: 
-      objectReference: {fileID: 584404837969333627}
+      objectReference: {fileID: 0}
     - target: {fileID: 8364483458913367027, guid: cfb918ea2c500804bad4ffafb8e8fbcc,
         type: 3}
       propertyPath: m_Name

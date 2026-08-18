@@ -14,10 +14,10 @@ public class PlayerStateAnimEventControl
     /// <summary>动画事件驱动的蓄力结算：按 tier 写倍率到右手武器并扣耐力。tier>=2=满蓄(LongChargeMulti)，否则短蓄(ShortChargeMulti)。不在此切状态——倍率写完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
     public void EndHeavyChargeByTier(int tier_)
     {
-        if (_player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) is Weapon_Rapier rapier && rapier.WeaponData != null)
+        if (_player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) is Weapon_Rapier rapier && rapier.GetItemData<SO_Weapon>() != null)
         {
             _player.StatsControl.SpendStamina(_player.StateControl.HeavyAttackStaminaCost);
-            rapier.CurrentMultiplier = tier_ >= 2 ? rapier.WeaponData.LongChargeMulti : rapier.WeaponData.ShortChargeMulti;
+            rapier.CurrentMultiplier = tier_ >= 2 ? rapier.GetItemData<SO_Weapon>().LongChargeMulti : rapier.GetItemData<SO_Weapon>().ShortChargeMulti;
             Debug.Log($"Rapier HeavyAttackMultiplier:{rapier.CurrentMultiplier}");
         }
         _player.StateControl.ConsumeHeavyAttack();
