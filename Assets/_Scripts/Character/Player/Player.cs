@@ -20,6 +20,8 @@ public class Player : Character
     private GameSaveService _saveService;
     private SceneControlService _sceneControlService;
 
+    public CinemachineFreeLook FreeLookCamera => _freeLookCamera;
+
     //组件
     public new PlayerStatsControl StatsControl => _statsControl as PlayerStatsControl;
     public PlayerAnimControl AnimationEventControl => _animEventControl;

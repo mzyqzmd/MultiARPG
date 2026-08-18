@@ -16,10 +16,8 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 11400000, guid: a9f32c03e7425df478f909c89a0464b0, type: 2}
-    - {fileID: 11400000, guid: 8b6791b0e9dbeb441b16a4a63115beef, type: 2}
-    - {fileID: 11400000, guid: d118443d157953a42969054aa6221867, type: 2}
     - {fileID: 11400000, guid: 4dbbb785c8d85b74c82205a7d7ba7917, type: 2}
+    - {fileID: 11400000, guid: d600bbdcc4165cd42b19f40cf63c5cd4, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -38,13 +36,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 4
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: StatModifierEffect
+      Data: RapierDamage
     - Name: $v
       Entry: 10
       Data: 0
@@ -56,34 +54,10 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HealEffect
+      Data: ZombieHitStun
     - Name: $v
       Entry: 10
       Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: DamageEffect
-    - Name: $v
-      Entry: 10
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: RapierDamage
-    - Name: $v
-      Entry: 10
-      Data: 3
     - Name: 
       Entry: 8
       Data: 

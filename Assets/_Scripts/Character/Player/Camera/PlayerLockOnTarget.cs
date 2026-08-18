@@ -1,14 +1,13 @@
-using Cinemachine;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 
 /// <summary>
 /// 玩家锁定目标组件（MonoBehaviour，挂 Player.prefab）。
 /// 职责：检测半径内且视线无遮挡、并实现 ILockableTarget 的对象并锁定；
-/// 锁定期间不接管相机视角（Look 输入保持可用，玩家可自由旋转观察）；仅将目标写入 PlayerCameraService.CurrentLockTarget，
-/// 由状态层把玩家身体朝向目标。再触发时切到下一个候选；目标销毁/超距/被墙遮挡时自动解除。
+/// 锁定期间接管 FreeLook 相机 X 轴（水平旋转），以"正对锁定目标"为 0 点 clamp 在 ±90° 窗口内（不自动回正、不跳变），
+/// 防止视角绕到目标背后；同时把目标写入 PlayerCameraService.CurrentLockTarget，由状态层把玩家身体朝向目标。
+/// 再触发时切到下一个候选；目标销毁/超距/被墙遮挡时自动解除，并恢复相机 X 轴原 360° 回环。
 /// 仅经 OnLockStateChanged(bool) 通知外部设战斗姿态，零反向依赖状态机。
 /// </summary>
 public class PlayerLockOnTarget : MonoBehaviour
@@ -74,7 +73,7 @@ public class PlayerLockOnTarget : MonoBehaviour
         }
     }
 
-    /// <summary>锁定到指定目标：标记锁定 + 通知状态机 + 写入相机服务（供玩家朝向目标）；不接管相机视角，Look 输入保持可用。</summary>
+    /// <summary>锁定到指定目标：标记锁定 + 接管相机 X 轴 clamp + 通知状态机 + 写入相机服务（供玩家朝向目标）。</summary>
     private void LockTo(ILockableTarget target_)
     {
         _currentTarget = target_;
@@ -85,7 +84,7 @@ public class PlayerLockOnTarget : MonoBehaviour
         OnLockStateChanged?.Invoke(true);
     }
 
-    /// <summary>解除锁定：清标记 + 通知 + 清空相机服务目标引用。</summary>
+    /// <summary>解除锁定：清标记 + 恢复相机 X 轴 + 通知 + 清空相机服务目标引用。</summary>
     private void Unlock()
     {
         _currentTarget = null;
@@ -99,7 +98,7 @@ public class PlayerLockOnTarget : MonoBehaviour
     /// <summary>外部强制解锁入口（动作破锁用）：复用 Unlock 全部逻辑（清目标 + FreeLook 过渡相机）。</summary>
     public void ForceUnlock() => Unlock();
     #endregion
-
+   
     #region 目标检测
     /// <summary>在 OverlapSphere 候选里按"距离最近且视线无遮挡且≠排除项"选目标；无则返回 null。
     /// excludeQueue_ 非空时，额外排除队列内全部目标（优先锁定队列外的新目标）。</summary>

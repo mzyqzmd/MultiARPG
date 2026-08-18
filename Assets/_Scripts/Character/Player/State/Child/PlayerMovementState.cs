@@ -66,8 +66,16 @@ public class PlayerMovementState : PlayerActionState
         Vector2 move = _player.InputService.MoveInputVector2 * scale;
         if (combat_)
         {
-            _player.Anim.SetFloat("RightInput", move.x, 0.1f, Time.deltaTime);
-            _player.Anim.SetFloat("ForwardInput", move.y, 0.1f, Time.deltaTime);
+            // 锁敌：以"玩家→目标"为前向基准，将输入世界方向投影到目标坐标系，得到连续动画分量（非硬取反）
+            var lockTarget = _player.PlayerCameraService.CurrentLockTarget;
+            Vector3 forward = (lockTarget.LockCenter.position - _characterController.transform.position);
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            Vector3 inputWorld = _player.PlayerCameraService.MoveForward * move.y +
+                _player.PlayerCameraService.MoveRight * move.x;
+            _player.Anim.SetFloat("ForwardInput", Vector3.Dot(inputWorld, forward), 0.1f, Time.deltaTime);
+            _player.Anim.SetFloat("RightInput", Vector3.Dot(inputWorld, right), 0.1f, Time.deltaTime);
         }
         else
         {

@@ -18,18 +18,33 @@ public class ZombieAnimControl : MonoBehaviour
     private const string HitTrigger = "Hit";
     private const string HitDirectionX = "HitDirectionX";
     private const string HitDirectionY = "HitDirectionY";
+    /// <summary>受击动画 Speed Multiplier 参数名：须在 AC_Zombie.controller 的 Hit 状态上绑定（m_SpeedParameter:HitAnimSpeed），使受击动画恰好在 HitDuration（可被效果修正）内播完。</summary>
+    private const string HitAnimSpeedParam = "HitAnimSpeed";
+    /// <summary>免疫判定阈值：HitDuration 小于等于此值视为「受击打断免疫」（被 ZombieHitStun 效果压到 0），跳过打断与受击动画仍扣血。</summary>
+    private const float HitStunImmuneThreshold = 0.001f;
     private const string DeadState = "DeadState";
 
     private float _currentSpeed;
     private float _targetSpeed;
     private bool _attacking;
-
-
+    private bool _hitAnimSpeedReady;
+    private float _hitClipLength;
+    /// <summary>每帧推进：免疫期无需处理；非免疫期首次 Hit 动画命中后取真实 clip 长度并设倍速（blend tree 下 stateInfo.length 为归一化值，须用 clipInfo 取真实秒长）。</summary>
     private void Update()
     {
-        // 仅 Host 端由 BT 写 MoveSpeed；客户端 MoveSpeed 由 NetworkAnimator 同步值驱动，本地不写以防双端抢写。
-        if (!_zombie.IsServer || _attacking) return;
-        _currentSpeed = Mathf.Lerp(_currentSpeed, _targetSpeed, Time.deltaTime * 5f);
+        if (!_zombie.IsServer) return;
+        if (_zombie.ZombieStatsControl.HitDuration > HitStunImmuneThreshold &&
+            !_hitAnimSpeedReady && _zombie.Anim.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
+        {
+            var clips = _zombie.Anim.GetCurrentAnimatorClipInfo(0);
+            if (clips.Length > 0)
+            {
+                _hitClipLength = clips[0].clip.length;
+                _zombie.Anim.SetFloat(HitAnimSpeedParam, _hitClipLength / _zombie.ZombieStatsControl.HitDuration);
+                _hitAnimSpeedReady = true;
+            }
+        }
+        _currentSpeed = Mathf.Lerp(_currentSpeed, _targetSpeed, 0.5f);
         _zombie.Anim.SetFloat(MoveSpeed, _currentSpeed);
     }
 
@@ -79,14 +94,19 @@ public class ZombieAnimControl : MonoBehaviour
         _zombie.Anim.SetFloat(MoveSpeed, 1f);
         _zombie.DisableHandHit();
         _zombie.Anim.applyRootMotion = false;
-        _zombie.NavAgent.Warp(_zombie.transform.position);
+        // Warp 需 agent 已在有效 NavMesh 上，否则在失活/未烘焙场景抛错；仅复位位置标记位即可。
+        if (_zombie.NavAgent.isOnNavMesh)
+            _zombie.NavAgent.Warp(_zombie.transform.position);
         _zombie.NavAgent.updatePosition = true;
         _zombie.NavAgent.updateRotation = true;
     }
 
-    /// <summary>受击表现：按接触点相对本地坐标的连续方向(X=右/Y=前,范围[-1,1])置 HitDirectionX/Y 双 float 并触发 Hit Blend Tree（不交 Root Motion，NavMesh 仍驱动）；入口先复位攻击态防打断卡死。</summary>
+    /// <summary>受击表现：免疫期（HitDuration 被效果压到 0）跳过打断与受击动画，仅由 base 扣血；正常期按接触点方向置 HitDirectionX/Y 双 float 触发 Hit Blend Tree，并按「clip 真实长度 / HitDuration」动态设受击动画倍速，使硬直时长与配置一致。</summary>
     public void SetHit(Vector3 contactPoint_)
     {
+        // 免疫期：不打断攻击、不播受击动画（base.OnHitReceived 仍扣血）。
+        if (_zombie.ZombieStatsControl.HitDuration <= HitStunImmuneThreshold) return;
+
         ForceEndAttack();
         Vector3 local = _zombie.transform.InverseTransformDirection(
             contactPoint_ - _zombie.transform.position).normalized;
@@ -94,6 +114,9 @@ public class ZombieAnimControl : MonoBehaviour
         _zombie.Anim.SetFloat(HitDirectionX, localVector2.x);
         _zombie.Anim.SetFloat(HitDirectionY, localVector2.y);
         _zombie.Anim.SetTrigger(HitTrigger);
+        // 已缓存 clip 长度则立即按当前 HitDuration 设倍速（确保硬直缩短/延长效果实时生效）
+        if (_hitClipLength > 0f)
+            _zombie.Anim.SetFloat(HitAnimSpeedParam, _hitClipLength / _zombie.ZombieStatsControl.HitDuration);
     }
 
     /// <summary>进入死亡：标记 Dead 动画并停 Agent；入口先复位攻击态防打断卡死。</summary>

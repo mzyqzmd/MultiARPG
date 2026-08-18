@@ -19,6 +19,11 @@ public class Zombie : AINPC
     public ZombieAnimControl AnimationControl => _animControl;
     public ZombieStatsControl ZombieStatsControl => _statsControl as ZombieStatsControl;
 
+    /// <summary>受击打断免疫效果 id：累计受击达阈值时施加，将 HitDuration 压到 0（Timed 窗口内不打断攻击、不播受击）。资产须在 SO_EffectDatabase 注册。</summary>
+    private const string HitStunEffectId = "ZombieHitStun";
+    /// <summary>受击计数：达 ZombieStatsControl.HitStunThreshold 时施加免疫效果并清零。</summary>
+    private int _hitCount;
+
     protected override void Awake()
     {
         base.Awake();
@@ -66,6 +71,13 @@ public class Zombie : AINPC
     #region 受击反馈
     public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
     {
+        // 计数达阈值则施加受击打断免疫效果（HitDuration 压 0，Timed 窗口到期自动回滚），并清零计数。
+        if (++_hitCount >= ZombieStatsControl.HitStunThreshold)
+        {
+            _hitCount = 0;
+            var hitStunEffect = EffectService.GetEffect(HitStunEffectId);
+            if (hitStunEffect != null) ZombieStatsControl.ApplyEffect(hitStunEffect, ZombieStatsControl);
+        }
         _animControl.SetHit(contactPoint_);
         base.OnHitReceived(damage_, contactPoint_);
     }
