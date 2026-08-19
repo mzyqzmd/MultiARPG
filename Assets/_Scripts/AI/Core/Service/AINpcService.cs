@@ -37,7 +37,7 @@ public class AINpcService : IService
         if (_timer < PollInterval) return;
         _timer = 0f;
 
-        var players = CollectPlayerTransforms();
+        var players = PlayerTransforms;
         foreach (var npc in _npcs)
         {
             if (npc == null) continue;
@@ -45,44 +45,38 @@ public class AINpcService : IService
         }
     }
 
-    /// <summary>枚举全部在线玩家的 Transform（仅 Host 可见，自动随上下线更新）。</summary>
-    private List<Transform> CollectPlayerTransforms()
+    /// <summary>全部在线玩家的 Transform 列表（仅 Host 有效，自动随上下线更新）；行为树节点经此取玩家，避免各自依赖 NetworkManager。</summary>
+    public List<Transform> PlayerTransforms
     {
-        var result = new List<Transform>();
-        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        get
         {
-            if (client == null || client.PlayerObject == null) continue;
-            var transform_ = client.PlayerObject.transform;
-            if (transform_ != null) result.Add(transform_);
+            if (!NetworkManager.Singleton.IsServer) return new List<Transform>();
+            var result = new List<Transform>();
+            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            {
+                if (client == null || client.PlayerObject == null) continue;
+                var transform_ = client.PlayerObject.transform;
+                if (transform_ != null) result.Add(transform_);
+            }
+            return result;
         }
-        return result;
     }
 
-    /// <summary>任一玩家在 ActivationRadius 内即激活并记最近玩家为 TargetPlayer；全超出则失活。</summary>
+    /// <summary>任一玩家在 ActivationRadius 内即激活；全超出则失活。目标选取交由行为树，此处不写 TargetPlayer。</summary>
     private void EvaluateActivation(AINPC npc_, List<Transform> players_)
     {
-        Transform nearest = null;
-        float nearestSqr = float.MaxValue;
         float radiusSqr = npc_.ActivationRadius * npc_.ActivationRadius;
-
         foreach (var player in players_)
         {
             if (player == null) continue;
             float sqr = (player.position - npc_.transform.position).sqrMagnitude;
             if (sqr <= radiusSqr)
             {
-                npc_.TargetPlayer = player;
                 npc_.SetActive(true);
                 return;
             }
-            if (sqr < nearestSqr)
-            {
-                nearestSqr = sqr;
-                nearest = player;
-            }
         }
 
-        npc_.TargetPlayer = nearest;
         npc_.SetActive(false);
     }
     #endregion

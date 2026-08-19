@@ -33,6 +33,10 @@ public class PlayerStateControl : MonoBehaviour
     #endregion
 
     #region 玩家状态(_builder获取处实例)
+    /// <summary>父层(姿态)状态机当前态：Free/Combat。供按当前姿态放行/限制动作。</summary>
+    public PlayerStanceState CurrentStanceState => _builder.Fsm.CurrentState;
+    /// <summary>子层(动作)状态机当前态：Movement/Dodge/Jump/Fall/Dead/NormalAttack/HeavyAttack/Hit。供按当前动作放行/限制动作(如 Dodge 抢断 Hit)。</summary>
+    public PlayerActionState CurrentActionState => _builder.ChildFsm.CurrentState;
     public PlayerMovementState MovementState => _builder.MovementState;
     public PlayerDodgeState DodgeState => _builder.DodgeState;
     public PlayerJumpState JumpState => _builder.JumpState;
@@ -97,11 +101,9 @@ public class PlayerStateControl : MonoBehaviour
         if (IsBusy || _player.StatsControl.IsDead)
         {
             _jumpRequested = false;
-            _dodgeRequested = false;
-            // 连段窗口未开启时清空轻击请求：窗口期外（含攻击前摇/后摇）的按键不计入连段，
-            // 避免窗口关闭后残留请求等到下次窗口开启又误连；窗口开启期间保留供 AnyTransition 消费。
-            if (!ComboWindowOpen)
-                _normalAttackRequested = false;
+            // Hit 受击态下保留 Dodge 请求：允许同帧 Fsm.Update 内 Dodge 守卫抢断 Hit；非 Hit 态仍照常清
+            if (CurrentActionState != HitState) _dodgeRequested = false;
+            if (!ComboWindowOpen) _normalAttackRequested = false;
             _heavyAttackRequested = false;
             _hitRequested = false;
         }
@@ -192,11 +194,19 @@ public class PlayerStateControl : MonoBehaviour
     public void ReturnToMovementState() => _stateAnimEventControl.ReturnToMovementState();
 
     /// <summary>攻击命中窗口开启（动画事件 OnAttackColliderOpen 驱动）：启用右手武器碰撞体，仅窗口期内可命中目标。</summary>
-    public void EnableWeaponCollider() =>
-        _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand).EnableCollider();
+    public void EnableWeaponCollider()
+    {
+        var item = _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand);
+        if (item == null) return;
+        item.EnableCollider();
+    }
     /// <summary>攻击命中窗口关闭（动画事件 OnAttackColliderClose 驱动）：禁用右手武器碰撞体，避免非攻击期误伤。</summary>
-    public void DisableWeaponCollider() =>
-        _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand).DisableCollider();
+    public void DisableWeaponCollider()
+    {
+        var item = _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand);
+        if (item == null) return;
+        item.DisableCollider();
+    }
     #endregion
 
     #region 受击入口
@@ -209,6 +219,6 @@ public class PlayerStateControl : MonoBehaviour
         PendingHitX = localVector2.x;
         PendingHitY = localVector2.y;
         _hitRequested = true;
-    } 
+    }
     #endregion
 }

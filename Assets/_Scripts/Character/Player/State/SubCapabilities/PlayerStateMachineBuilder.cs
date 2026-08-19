@@ -73,8 +73,9 @@ public class PlayerStateMachineBuilder
             () => _stateControl.HitRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead, ETransitionPriority.High);
         // 闪避/跳跃为 High 优先级任意态抢断；进行中不可再次进入(互斥)；死亡态下禁止触发
         // 注册顺序 Dodge 先于 Jump，使 Dodge 优先级略高
+        // Dodge 守卫放宽：Hit 受击态下允许抢断脱身(CurrentActionState==HitState)，其余态仍受 IsBusy 互斥保护
         ChildFsm.AddAnyTransition(DodgeState,
-            () => _stateControl.DodgeRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead, ETransitionPriority.High);
+            () => _stateControl.DodgeRequested && (!_stateControl.IsBusy || _stateControl.CurrentActionState == _stateControl.HitState) && !_player.StatsControl.IsDead, ETransitionPriority.High);
         ChildFsm.AddAnyTransition(JumpState,
             () => _stateControl.JumpRequested && !_stateControl.IsBusy && _verticalMotion.CanJump && !_player.StatsControl.IsDead,
             ETransitionPriority.High);
