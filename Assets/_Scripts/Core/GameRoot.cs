@@ -12,7 +12,6 @@ public class GameRoot : MonoBehaviour
     [SerializeField] private SO_VFXDatabase _vfxDatabase;
     [SerializeField] private SO_UIDatabase _uiDatabase;
     [SerializeField] private SO_EffectDatabase _effectDatabase;
-    [SerializeField] private SO_ItemDatabase _itemDatabase;
     [Header("网络中转站预制体")]
     [SerializeField] private NetworkHub _networkHubPrefab;
 
@@ -27,7 +26,6 @@ public class GameRoot : MonoBehaviour
     private UIService _uiService;
     private GameSaveService _saveService;
     private EffectService _effectService;
-    private ItemService _itemService;
     private AINpcService _aiNpcService;
 
     private void Awake()
@@ -53,14 +51,12 @@ public class GameRoot : MonoBehaviour
         RegisterSceneControlService();
         RegisterPlayerCameraService();
         RegisterEffectService();
-        RegisterItemService();
         RegisterAINpcService();
     }
 
     private void OnDestroy()
     {
         _alive = false;
-        UnregisterItemService();
         UnregisterEffectService();
         UnregisterPlayerCameraService();
         UnregisterSceneControlService();
@@ -211,19 +207,6 @@ public class GameRoot : MonoBehaviour
     private void UnregisterEffectService()
     {
         Services.Unregister<EffectService>();
-    }
-    #endregion
-
-    #region 注册/注销物品服务
-    private void RegisterItemService()
-    {
-        _itemService = new ItemService(_itemDatabase);
-        Services.Register(_itemService);
-    }
-
-    private void UnregisterItemService()
-    {
-        Services.Unregister<ItemService>();
     }
     #endregion
 

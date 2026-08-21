@@ -82,7 +82,8 @@ public class PlayerStatsControl : CharacterStatsControl
         if (wasExerting && _currentStamina <= 0)
         {
             OnExhausted?.Invoke();
-            _player.AudioService.PlayAudio("Player", "ExhaustedBreath", transform.position);
+            _player.AudioService.PlayAudio(_player.PlayerPresentation.ExhaustedAudioGroup,
+               _player.PlayerPresentation.ExhaustedAudioKey, transform.position);
         }
     }
 

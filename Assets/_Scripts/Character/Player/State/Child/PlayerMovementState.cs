@@ -19,6 +19,8 @@ public class PlayerMovementState : PlayerActionState
     public override void Enter()
     {
         base.Enter();
+        _player.AudioService.PlayAudio(_player.PlayerPresentation.IdleAudioGroup,
+        _player.PlayerPresentation.IdleAudioKey, _player.transform.position);
         _player.Anim.SetBool("MovementState", true);
     }
 
@@ -45,6 +47,8 @@ public class PlayerMovementState : PlayerActionState
     {
         base.Exit();
         _player.Anim.SetBool("MovementState", false);
+        _player.AudioService.StopAudio(_player.PlayerPresentation.IdleAudioGroup,
+        _player.PlayerPresentation.IdleAudioKey);
     }
 
     // 读输入驱动移动：战斗态 strafe 面向相机，自由态面向移动方向

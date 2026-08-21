@@ -12,10 +12,6 @@ public class PlayerNormalAttackState : PlayerActionState
     private const string NormalAttackAnimSpeedParam = "NormalAttackSpeed";
     private const string NormalAttackStateTag = "NormalAttack";
     private const string NormalComboTrigger = "NormalCombo";
-    // 超时兜底系数：覆盖连段总时长，仅当动画事件 ReturnToMovementState 彻底丢失(卡死)时才兜底强切，不会提前打断正常连段
-    private const float FallbackDurationMultiplier = 2.5f;
-
-    private bool _returnedToMovement;
 
     public PlayerNormalAttackState(StateMachine<PlayerActionState> stateMachine_,
         Player player_, CharacterController characterController_) :
@@ -30,8 +26,7 @@ public class PlayerNormalAttackState : PlayerActionState
         _player.StateControl.ConsumeNormalAttack();
         _player.StatsControl.SpendStamina(_player.StateControl.NormalAttackStaminaCost);
         _player.Anim.SetBool("NormalAttackState", true);
-        _stateDuration = _player.StatsControl.NormalAttackDuration * FallbackDurationMultiplier;
-        _returnedToMovement = false;
+        _stateDuration = _player.StatsControl.NormalAttackDuration;
     }
 
     public override void Update()
@@ -49,11 +44,8 @@ public class PlayerNormalAttackState : PlayerActionState
         }
         // 超时兜底：动画事件 ReturnToMovementState 可能因 clip 未播到末帧而丢失(连段狂按重入/退出过渡卡末帧)，
         // 导致 Exit 不执行、IsBusy 永久锁死。计时到点且尚未返回时强切 MovementState，与动画事件形成双保险。
-        if (_stateDuration <= 0f && !_returnedToMovement)
-        {
-            _returnedToMovement = true;
+        if (_stateDuration <= 0f)
             _player.StateControl.ReturnToMovementState();
-        }
     }
 
     public override void Exit()

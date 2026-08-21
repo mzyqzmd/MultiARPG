@@ -1,9 +1,9 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class FakeMan : Character
 {
-    [SerializeField] private CapsuleCollider _capsuleCollider;
-
+    public SO_FakeManPresentation FakeManPresentation => _presentation as SO_FakeManPresentation;
     private FakeManStatsControl FakeManStatsControl => _statsControl as FakeManStatsControl;
 
     public FakeManIdleState IdleState { get; private set; }
@@ -35,8 +35,8 @@ public class FakeMan : Character
     }
     public void EnterHitState(Vector3 contactPoint_)
     {
-        Vector3 local = _capsuleCollider.transform.InverseTransformDirection(
-            contactPoint_ - _capsuleCollider.transform.position);
+        Vector3 local = transform.InverseTransformDirection(
+            contactPoint_ - transform.position);
         Vector2 localVector2 = new Vector2(local.x, local.z).normalized;
         PendingHitX = localVector2.x;
         PendingHitY = localVector2.y;

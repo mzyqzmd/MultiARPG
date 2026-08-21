@@ -40,7 +40,8 @@ public class PlayerDodgeState : PlayerActionState
         _player.StatsControl.SpendStamina(_player.StateControl.DodgeStaminaCost);
 
         // 音效
-        _player.AudioService.PlayAudio("Player", "DodgeSFX", _characterController.transform.position);
+        _player.AudioService.PlayAudio(_player.PlayerPresentation.DeathAudioGroup,
+            _player.PlayerPresentation.DodgeAudioKey, _characterController.transform.position);
 
         //动画
         _player.Anim.SetBool("DodgeState", true);

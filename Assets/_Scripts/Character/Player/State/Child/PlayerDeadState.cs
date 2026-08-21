@@ -13,6 +13,8 @@ public class PlayerDeadState : PlayerActionState
     {
         base.Enter();
         _player.InputService.DisableAllMode();
+        _player.AudioService.PlayAudio(_player.PlayerPresentation.DeathAudioGroup,
+        _player.PlayerPresentation.DeathAudioKey, _player.transform.position);
         _player.UIService.SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay).
             Initialize("寄!", Color.red, 1.5f, false);
         _player.Anim.SetBool("DeadState", true);

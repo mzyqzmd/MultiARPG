@@ -18,6 +18,8 @@ public class Zombie : AINPC
 
     public ZombieAnimControl AnimationControl => _animControl;
     public ZombieStatsControl ZombieStatsControl => _statsControl as ZombieStatsControl;
+    /// <summary>僵尸表现配置：含受击（基类）+ 死亡/攻击（子类扩展）音效 key，供 ZombieAnimControl 动画事件取用。</summary>
+    public SO_ZombiePresentation ZombiePresentation => _presentation as SO_ZombiePresentation;
 
     /// <summary>受击打断免疫效果 id：累计受击达阈值时施加，将 HitDuration 压到 0（Timed 窗口内不打断攻击、不播受击）。资产须在 SO_EffectDatabase 注册。</summary>
     private const string HitStunEffectId = "ZombieHitStun";
@@ -75,11 +77,12 @@ public class Zombie : AINPC
         if (++_hitCount >= ZombieStatsControl.HitStunThreshold)
         {
             _hitCount = 0;
-            var hitStunEffect = EffectService.GetEffect(HitStunEffectId);
-            if (hitStunEffect != null) ZombieStatsControl.ApplyEffect(hitStunEffect, ZombieStatsControl);
+            ZombieStatsControl.ApplyEffect(EffectService.GetEffect(HitStunEffectId), ZombieStatsControl);
         }
-        _animControl.SetHit(contactPoint_);
+        _animControl.ForceEndAttack();
         base.OnHitReceived(damage_, contactPoint_);
+        if (!_statsControl.IsDead)
+            _animControl.SetHit(contactPoint_);
     }
     #endregion
 

@@ -70,7 +70,7 @@ public class PlayerStateControl : MonoBehaviour
     #endregion
 
     /// <summary>轻击连段窗口是否开启：仅窗口期内允许 AnyTransition 重入进下一段；窗口外按键不计入连段。</summary>
-    public bool ComboWindowOpen { get; private set; }
+    public bool ComboWindowOpen { get; set; }
     /// <summary>待消费受击方向(EnterHitState 写入、PlayerHitState.Enter 读取，用于 2D BlendTree 混合受击朝向；X=右/Y=前，范围[-1,1])。</summary>
     public float PendingHitX { get; private set; }
     /// <summary>待消费受击方向 Y 分量(前正后负)。</summary>
@@ -182,31 +182,16 @@ public class PlayerStateControl : MonoBehaviour
 
     #region 动画事件转发
     /// <summary>轻击连段窗口开启（动画事件 OnComboWindowOpen 驱动）：置标志，AnyTransition 此刻起允许消费轻击请求连段。</summary>
-    public void OpenComboWindow() => ComboWindowOpen = true;
+    public void OpenComboWindow() => _stateAnimEventControl.OpenComboWindow();
     /// <summary>轻击段结束（窗口关闭，动画事件 OnComboWindowClose 驱动）：关标志并清残留请求，避免窗口外误连。</summary>
-    public void CloseComboWindow()
-    {
-        ComboWindowOpen = false;
-        _normalAttackRequested = false;
-    }
+    public void CloseComboWindow()=>_stateAnimEventControl.CloseComboWindow();
     /// <summary>动画事件驱动的蓄力结算：按 tier 写倍率到右手武器并扣耐力。tier>=2=满蓄(LongChargeMulti)，否则短蓄(ShortChargeMulti)。不在此切状态——倍率写完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
     public void EndHeavyChargeByTier(int tier_) => _stateAnimEventControl.EndHeavyChargeByTier(tier_);
     public void ReturnToMovementState() => _stateAnimEventControl.ReturnToMovementState();
-
     /// <summary>攻击命中窗口开启（动画事件 OnAttackColliderOpen 驱动）：启用右手武器碰撞体，仅窗口期内可命中目标。</summary>
-    public void EnableWeaponCollider()
-    {
-        var item = _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand);
-        if (item == null) return;
-        item.EnableCollider();
-    }
+    public void EnableWeaponCollider()=>_stateAnimEventControl.EnableWeaponCollider();
     /// <summary>攻击命中窗口关闭（动画事件 OnAttackColliderClose 驱动）：禁用右手武器碰撞体，避免非攻击期误伤。</summary>
-    public void DisableWeaponCollider()
-    {
-        var item = _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand);
-        if (item == null) return;
-        item.DisableCollider();
-    }
+    public void DisableWeaponCollider()=>_stateAnimEventControl.DisableWeaponCollider();
     #endregion
 
     #region 受击入口

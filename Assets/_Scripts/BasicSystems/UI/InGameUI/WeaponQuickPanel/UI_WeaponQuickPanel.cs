@@ -19,8 +19,8 @@ public class UI_WeaponQuickPanel : UI_BaseView
     [SerializeField] private Image _leftHipPropImage;
     [SerializeField] private Image _rightHipPropImage;
 
-    /// <summary>每个槽位最后装备过的武器实例缓存，供收起时取图标置灰（实例已 IsEquipped=false 但仍在 _slotItems）。</summary>
-    private readonly Dictionary<EEquipmentSlot, BaseItem> _lastEquipped = new();
+    /// <summary>每个槽位最后装备过的物品实例缓存，供收起时取图标置灰（实例已 IsEquipped=false 但仍在 _slotItems）。</summary>
+    private readonly Dictionary<EEquipmentSlot, IEquippable> _lastEquipped = new();
     /// <summary>槽位枚举到对应 Image 的映射，避免重复分支。</summary>
     private readonly Dictionary<EEquipmentSlot, Image> _slotImages = new();
     /// <summary>订阅来源，OnDestroy 反订阅配对。</summary>
@@ -54,14 +54,14 @@ public class UI_WeaponQuickPanel : UI_BaseView
     #endregion
 
     #region 槽位刷新
-    /// <summary>装备回调：记录缓存并以正常色显示武器图标。</summary>
-    private void OnEquipped(EEquipmentSlot slot_, BaseItem item_)
+    /// <summary>装备回调：记录缓存并以正常色显示物品图标。</summary>
+    private void OnEquipped(EEquipmentSlot slot_, IEquippable item_)
     {
         _lastEquipped[slot_] = item_;
         RefreshSlot(slot_, item_, true);
     }
 
-    /// <summary>卸下回调：读缓存置灰同图标；若缓存缺失（彻底无武器）回退空图标。</summary>
+    /// <summary>卸下回调：读缓存置灰同图标；若缓存缺失（彻底无物品）回退空图标。</summary>
     private void OnUnequipped(EEquipmentSlot slot_)
     {
         if (_lastEquipped.TryGetValue(slot_, out var item) && item != null)
@@ -71,11 +71,11 @@ public class UI_WeaponQuickPanel : UI_BaseView
     }
 
     /// <summary>按装备状态刷新槽位：装备显示彩色图标，收起显示灰色同图标。</summary>
-    private void RefreshSlot(EEquipmentSlot slot_, BaseItem item_, bool equipped_)
+    private void RefreshSlot(EEquipmentSlot slot_, IEquippable item_, bool equipped_)
     {
         var image = GetSlotImage(slot_);
         if (image == null) return;
-        image.sprite = item_.GetItemData<SO_BaseItem>().ItemSprite ? item_.GetItemData<SO_BaseItem>().ItemSprite : _emptyIcon;
+        image.sprite = item_.ItemSprite ? item_.ItemSprite : _emptyIcon;
         image.color = equipped_ ? Color.white : Color.gray;
     }
 

@@ -24,11 +24,17 @@ public class ZombieAnimControl : MonoBehaviour
     private const float HitStunImmuneThreshold = 0.001f;
     private const string DeadState = "DeadState";
 
+    private AudioService _audioService;
     private float _currentSpeed;
     private float _targetSpeed;
     private bool _attacking;
     private bool _hitAnimSpeedReady;
     private float _hitClipLength;
+
+    private void Awake()
+    {
+        _audioService = Services.Get<AudioService>();
+    }
     /// <summary>每帧推进：免疫期无需处理；非免疫期首次 Hit 动画命中后取真实 clip 长度并设倍速（blend tree 下 stateInfo.length 为归一化值，须用 clipInfo 取真实秒长）。</summary>
     private void Update()
     {
@@ -106,8 +112,6 @@ public class ZombieAnimControl : MonoBehaviour
     {
         // 免疫期：不打断攻击、不播受击动画（base.OnHitReceived 仍扣血）。
         if (_zombie.ZombieStatsControl.HitDuration <= HitStunImmuneThreshold) return;
-
-        ForceEndAttack();
         Vector3 local = _zombie.transform.InverseTransformDirection(
             contactPoint_ - _zombie.transform.position).normalized;
         Vector2 localVector2 = new Vector2(local.x, local.z).normalized;
@@ -128,5 +132,23 @@ public class ZombieAnimControl : MonoBehaviour
         _zombie.Anim.SetFloat(MoveSpeed, 0f);
         _zombie.Anim.SetBool(DeadState, true);
     }
+    #endregion
+
+    #region 音效（动画事件调用，借 NetworkAnimator 同步跨端）
+    /// <summary>idle 循环音效：从僵尸表现配置取 idle key 本地播（动画事件驱动，各端播到该帧各自触发）。</summary>
+    public void PlayIdleAudio() =>
+        _audioService.PlayAudio(_zombie.ZombiePresentation.IdleAudioGroup,
+           _zombie.ZombiePresentation.IdleAudioKey, _zombie.transform.position);
+    public void StopIdleAudio()=>
+        _audioService.StopAudio(_zombie.ZombiePresentation.IdleAudioGroup,
+            _zombie.ZombiePresentation.IdleAudioKey);
+    /// <summary>死亡音效：从僵尸表现配置取 death key 本地播。</summary>
+    public void PlayDeathAudio() =>
+        _audioService.PlayAudio(_zombie.ZombiePresentation.DeathAudioGroup,
+            _zombie.ZombiePresentation.DeathAudioKey, _zombie.transform.position);
+    /// <summary>攻击音效：从僵尸表现配置取 attack key 本地播。</summary>
+    public void PlayAttackAudio() =>
+        _audioService.PlayAudio(_zombie.ZombiePresentation.AttackAudioGroup,
+            _zombie.ZombiePresentation.AttackAudioKey, _zombie.transform.position);
     #endregion
 }

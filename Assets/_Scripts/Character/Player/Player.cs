@@ -13,13 +13,13 @@ public class Player : Character
     [SerializeField] private PlayerSaveControl _saveControl;// 玩家存档控制（纯本地数据组装/还原）
     [SerializeField] private PlayerStateControl _stateControl;// 玩家状态控制（挂 Player.prefab 同对象，Inspector 拖入）
                                                               // 服务
-    private AudioService _audioService;
     private UIService _uiService;
     private InputService _inputService;                 // 输入
     private PlayerCameraService _playerCameraService;   // 相机
     private GameSaveService _saveService;
     private SceneControlService _sceneControlService;
 
+    public SO_PlayerPresentation PlayerPresentation => _presentation as SO_PlayerPresentation;
     public CinemachineFreeLook FreeLookCamera => _freeLookCamera;
 
     //组件
@@ -31,7 +31,6 @@ public class Player : Character
     public PlayerStateControl StateControl => _stateControl;
 
     //服务
-    public AudioService AudioService => _audioService;
     public UIService UIService => _uiService;
     public InputService InputService => _inputService;
     public PlayerCameraService PlayerCameraService => _playerCameraService;
@@ -44,7 +43,6 @@ public class Player : Character
     protected override void Awake()
     {
         base.Awake();
-        _audioService = Services.Get<AudioService>();
         _uiService = Services.Get<UIService>();
         _inputService = Services.Get<InputService>();
         _playerCameraService = Services.Get<PlayerCameraService>();

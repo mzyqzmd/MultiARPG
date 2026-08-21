@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>装备控制（MonoBehaviour，挂 Player.prefab）：本地挂载权威，管理五个挂载点，统一占用表 _slotTaken 记录槽位是否被占。
-/// 装备/卸下目标槽位直接读 SO_BaseItem 上的 EquipTargetSlots/UnequipTargetSlots（不缓存运行时副本）。
-/// Toggle 仅做槽位状态决策（即时翻转 _slotTaken），Equip/Unequip 在动画帧被调用时执行真实 Transform 挂载并触发事件。
+/// 装备/卸下目标槽位直接读 IEquippable 上的 EquipTargetSlots/UnequipTargetSlots（不缓存运行时副本）。
+/// 切换意图显式记录于 _pendingAction（不再把 _slotTaken 当信号位），Equip/Unequip 在动画帧被调用时执行真实 Transform 挂载并触发事件。
 /// 装备切换编排（热键订阅、动画帧提交、拔刀/收刀动画、IsBusy、重击 tier 桥接）由本组件经 [SerializeField] 自订阅，不依赖 Player 桥接。</summary>
 public class PlayerEquipmentControl : MonoBehaviour
 {
     [Header("玩家引用")]
     [SerializeField] private Player _player;
-    [Header("默认武器(测试用的)")]
-    [SerializeField] private BaseItem _defaultWeapon;//就是测试用的,到时候武器要拾取
     [Header("装备挂载点")]
     [SerializeField] private Transform _leftHand;
     [SerializeField] private Transform _rightHand;
@@ -20,19 +18,21 @@ public class PlayerEquipmentControl : MonoBehaviour
     [SerializeField] private Transform _back;
 
     /// <summary>当前切换流程中待提交挂载的物品。</summary>
-    public BaseItem PendingItem { get; set; }
+    public IEquippable PendingItem { get; set; }
     /// <summary>当前切换流程的目标槽位。</summary>
     public EEquipmentSlot PendingSlot { get; private set; }
+    /// <summary>当前切换流程的显式意图（拔刀/收刀），由动画帧提交时消费，不再依赖 _slotTaken 反推。</summary>
+    public EPendingEquipAction PendingAction { get; private set; }
     /// <summary>常驻覆盖控制器：以 AC_Player 为基类包一层壳，运行期引用恒定，仅 ApplyOverrides 改特定 clip 映射。</summary>
     private AnimatorOverrideController _overrideController;
 
     /// <summary>槽位占用表：真实槽位是否被占用（IsOccupying==false 的表现挂不写入，可无限叠加）。</summary>
     private readonly Dictionary<EEquipmentSlot, bool> _slotTaken = new();
     /// <summary>槽位实例缓存：每个真实占用槽当前挂接的物品实例列表（含表现挂），供 GetEquippedItem 查询。</summary>
-    private readonly Dictionary<EEquipmentSlot, List<BaseItem>> _slotItems = new();
+    private readonly Dictionary<EEquipmentSlot, List<IEquippable>> _slotItems = new();
 
     /// <summary>物品挂上某挂载点时触发（参数：主槽 + 被挂接实例），供外部音效/UI 订阅。</summary>
-    public event Action<EEquipmentSlot, BaseItem> OnEquipped;
+    public event Action<EEquipmentSlot, IEquippable> OnEquipped;
 
     /// <summary>物品从某挂载点卸下时触发（参数为原主槽），供外部音效/UI 订阅。</summary>
     public event Action<EEquipmentSlot> OnUnequipped;
@@ -49,20 +49,23 @@ public class PlayerEquipmentControl : MonoBehaviour
     #region 输入事件绑定（由 Player.OnNetworkSpawn/OnNetworkDespawn 在 IsOwner 可靠后转发调用）
     /// <summary>订阅本地玩家热键栏输入事件（仅 owner 调用）。</summary>
     public void BindInput() => _player.InputService.OnHotbarTriggered += OnHotbarTriggered;
-
     /// <summary>反订阅热键栏输入事件（与 BindInput 配对，防重 spawn 累积）。</summary>
     public void UnbindInput() => _player.InputService.OnHotbarTriggered -= OnHotbarTriggered;
-    #endregion
-
-    #region 装备切换编排（自订阅）
-    /// <summary>热键栏回调：本地玩家切换指定槽位装备（拔刀/收刀表现）。仅做状态决策（翻转占用表）并播动画，真实挂载在 OnToggleFrame 帧事件提交。</summary>
+    /// <summary>热键栏回调：本地玩家切换指定槽位装备（拔刀/收刀表现）。按槽内是否已装备该物判定意图并记录 _pendingAction，
+    /// 真实挂载在 OnToggleFrame 帧事件按意图提交。仅响应目标槽位与物品主装备槽匹配的热键。</summary>
     private void OnHotbarTriggered(EEquipmentSlot slot_)
     {
-        BaseItem item = _defaultWeapon;//NOTE:临时测试用
-        if (item == null) return; // 未提供则不切换
-        var mainSlot = item.GetItemData<SO_BaseItem>().EquipTargetSlots[0].Slot;
-        if (slot_ != mainSlot) return; // 热键槽位与武器主装备槽不符则不响应
-        Toggle(slot_);
+        IEquippable item = null;
+        foreach (var list in _slotItems.Values)
+            foreach (var candidate in list)
+            {
+                bool match = false;
+                foreach (var e in candidate.EquipTargetSlots) if (e.Slot == slot_) { match = true; break; }
+                if (match) { item = candidate; break; }
+            }
+        if (item == null) return; // 无对应武器则不切换
+        if (slot_ != item.EquipTargetSlots[0].Slot) return; // 热键槽位与武器主装备槽不符则不响应
+        PendingAction = IsSlotTaken(slot_) ? EPendingEquipAction.Unequip : EPendingEquipAction.Equip;
         PendingItem = item;
         PendingSlot = slot_;
         _player.Anim.SetTrigger("Equip1HandWeaponTrigger");
@@ -70,61 +73,63 @@ public class PlayerEquipmentControl : MonoBehaviour
     #endregion
 
     #region 切换与挂载
-    /// <summary>切换指定槽位装备状态：即时翻转 _slotTaken 占用表（避免动画途中重复触发误判）。
-    /// 真实 Transform 挂载由动画帧调 Equip/Unequip 提交，本方法不直接挂物体。</summary>
-    public void Toggle(EEquipmentSlot slot_) => _slotTaken[slot_] = !_slotTaken[slot_];
-
-    /// <summary>动画帧提交：物品按 EquipTargetSlots 挂载到各槽位（IsOccupying==true 才登记占用，false 仅表现挂），
-    /// 触发 OnEquipped（主槽取数组首个槽位）。</summary>
-    public void Equip(BaseItem item_)
+    /// <summary>动画帧提交（拔刀）：按 EquipTargetSlots 挂载到各槽位并标记已装备，武器额外应用动画 clip 覆盖。</summary>
+    public void Equip(IEquippable item_)
     {
-        var slots = item_.GetItemData<SO_BaseItem>().EquipTargetSlots;
-        var mainSlot = slots.Length > 0 ? slots[0].Slot : EEquipmentSlot.RightHand;
-        foreach (var e in slots)
-        {
-            if (e.IsOccupying) _slotTaken[e.Slot] = true;
-            RegisterToSlot(e.Slot, item_);
-            var t = GetSlotTransform(e.Slot);
-            if (t != null)
-            {
-                item_.transform.SetParent(t);
-                item_.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            }
-        }
+        if (item_ == null) return;
+        var mainSlot = item_.EquipTargetSlots.Length > 0 ? item_.EquipTargetSlots[0].Slot : EEquipmentSlot.RightHand;
+        MountInternal(item_, item_.EquipTargetSlots, true);
         item_.IsEquipped = true;
         item_.RegisterOwner(_player);
-        //获取武器动画clip映射表
-        var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
-        item_.GetItemData<SO_Weapon>().OverrideController.GetOverrides(overrides);
-        _overrideController.ApplyOverrides(overrides);
+        if (item_ is BaseWeapon weapon && weapon.WeaponData.OverrideController != null)
+        {
+            var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+            weapon.WeaponData.OverrideController.GetOverrides(overrides);
+            _overrideController.ApplyOverrides(overrides);
+        }
         OnEquipped?.Invoke(mainSlot, item_);
     }
 
-    /// <summary>动画帧提交：按 UnequipTargetSlots 把物品挂到目标槽位（含表现挂），
-    /// 清理 EquipTargetSlots 中真正占用项，触发 OnUnequipped。</summary>
-    public void Unequip(BaseItem item_)
+    /// <summary>动画帧提交（收刀）：按 UnequipTargetSlots 把物品挂到收起槽位，清理 EquipTargetSlots 占用项并还原动画 clip 映射。</summary>
+    public void Unequip(IEquippable item_)
     {
         if (item_ == null) return;
-        var equipSlots = item_.GetItemData<SO_BaseItem>().EquipTargetSlots;
+        var go = item_ as MonoBehaviour;
+        var equipSlots = item_.EquipTargetSlots;
         foreach (var e in equipSlots)
             if (e.IsOccupying)
                 _slotTaken[e.Slot] = false;
 
-        var unequipSlots = item_.GetItemData<SO_BaseItem>().UnequipTargetSlots;
-        foreach (var e in unequipSlots)
-        {
-            var t = GetSlotTransform(e.Slot);
-            if (t != null)
-            {
-                item_.transform.SetParent(t);
-                item_.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            }
-        }
+        var unequipSlots = item_.UnequipTargetSlots;
+        MountInternal(item_, unequipSlots, false);
         item_.IsEquipped = false;
-        UnregisterFromSlot(equipSlots, item_);
+        foreach (var e in equipSlots)
+            if (_slotItems.TryGetValue(e.Slot, out var list))
+                list.Remove(item_);
         _overrideController.ApplyOverrides(new List<KeyValuePair<AnimationClip, AnimationClip>>());
         var mainSlot = equipSlots.Length > 0 ? equipSlots[0].Slot : EEquipmentSlot.RightHand;
         OnUnequipped?.Invoke(mainSlot);
+    }
+
+    /// <summary>共有挂载循环：按给定槽集合把物品 SetParent + 归零局部变换，IsOccupying==true 的槽登记占用表与实例缓存。
+    /// isEquip_=true 时为正式装备（登记真实占用）；false 时为收起态表现挂（不登记占用、不顶掉手持武器映射）。</summary>
+    private void MountInternal(IEquippable item_, EquipSlot[] slots_, bool isEquip_)
+    {
+        var go = item_ as MonoBehaviour;
+        if (go == null) return;
+        foreach (var e in slots_)
+        {
+            if (isEquip_ && e.IsOccupying) _slotTaken[e.Slot] = true;
+            if (!_slotItems.TryGetValue(e.Slot, out var list))
+                _slotItems[e.Slot] = list = new List<IEquippable>();
+            if (!list.Contains(item_)) list.Add(item_);
+            var t = GetSlotTransform(e.Slot);
+            if (t != null)
+            {
+                go.transform.SetParent(t);
+                go.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            }
+        }
     }
 
     /// <summary>卸下并销毁全部槽位物品。</summary>
@@ -135,16 +140,44 @@ public class PlayerEquipmentControl : MonoBehaviour
             if (_slotTaken.TryGetValue(slot, out var taken) && taken)
                 _slotTaken[slot] = false;
         _slotItems.Clear();
-        foreach (var item in _back.GetComponentsInChildren<BaseItem>())
-            Destroy(item.gameObject);
-        foreach (var item in _leftHand.GetComponentsInChildren<BaseItem>())
-            Destroy(item.gameObject);
-        foreach (var item in _rightHand.GetComponentsInChildren<BaseItem>())
-            Destroy(item.gameObject);
-        foreach (var item in _leftHip.GetComponentsInChildren<BaseItem>())
-            Destroy(item.gameObject);
-        foreach (var item in _rightHip.GetComponentsInChildren<BaseItem>())
-            Destroy(item.gameObject);
+        foreach (var item in _back.GetComponentsInChildren<MonoBehaviour>())
+            if (item is IEquippable) Destroy(item.gameObject);
+        foreach (var item in _leftHand.GetComponentsInChildren<MonoBehaviour>())
+            if (item is IEquippable) Destroy(item.gameObject);
+        foreach (var item in _rightHand.GetComponentsInChildren<MonoBehaviour>())
+            if (item is IEquippable) Destroy(item.gameObject);
+        foreach (var item in _leftHip.GetComponentsInChildren<MonoBehaviour>())
+            if (item is IEquippable) Destroy(item.gameObject);
+        foreach (var item in _rightHip.GetComponentsInChildren<MonoBehaviour>())
+            if (item is IEquippable) Destroy(item.gameObject);
+    }
+    #endregion
+
+    #region 拾取（纯本地）
+    /// <summary>场景物品拾取（即时挂载，不走拔刀动画）：EquipTargetSlots 占用槽全空闲则直接装备；
+    /// 被占则挂到 UnequipTargetSlots（收起态，不登记占用、不改 IsEquipped、不应用动画覆盖，避免顶掉手持武器映射）；
+    /// 两者均无空间返回 false（不拾取，留待背包系统）。收起态仍触发 OnEquipped 供 UI 显示。</summary>
+    public bool TryPickup(IEquippable item_)
+    {
+        if (item_ == null) return false;
+        if (HasFreeSpace(item_.EquipTargetSlots)) { Equip(item_); return true; }
+        if (HasFreeSpace(item_.UnequipTargetSlots))
+        {
+            MountInternal(item_, item_.UnequipTargetSlots, false);
+            item_.RegisterOwner(_player);
+            var mainSlot = item_.UnequipTargetSlots.Length > 0 ? item_.UnequipTargetSlots[0].Slot : EEquipmentSlot.Back;
+            OnEquipped?.Invoke(mainSlot, item_);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>给定槽位集合是否可整体挂载：任一 IsOccupying==true 的槽已被占即视为无空间（表现挂不占槽、不阻断）。</summary>
+    private bool HasFreeSpace(EquipSlot[] slots_)
+    {
+        foreach (var e in slots_)
+            if (e.IsOccupying && IsSlotTaken(e.Slot)) return false;
+        return true;
     }
     #endregion
 
@@ -154,7 +187,7 @@ public class PlayerEquipmentControl : MonoBehaviour
         _slotTaken.TryGetValue(slot_, out var taken) && taken;
 
     /// <summary>取指定槽位当前已装备（IsEquipped==true）的物品实例；无则返回 null。</summary>
-    public BaseItem GetEquippedItem(EEquipmentSlot slot_)
+    public IEquippable GetEquippedItem(EEquipmentSlot slot_)
     {
         if (_slotItems.TryGetValue(slot_, out var list))
             foreach (var item in list)
@@ -172,21 +205,5 @@ public class PlayerEquipmentControl : MonoBehaviour
         EEquipmentSlot.Back => _back,
         _ => null
     };
-
-    /// <summary>把物品实例登记到指定槽位的缓存列表（列表按需创建）。</summary>
-    private void RegisterToSlot(EEquipmentSlot slot_, BaseItem item_)
-    {
-        if (!_slotItems.TryGetValue(slot_, out var list))
-            _slotItems[slot_] = list = new List<BaseItem>();
-        if (!list.Contains(item_)) list.Add(item_);
-    }
-
-    /// <summary>从各给定槽位的缓存列表移除物品实例（卸下/销毁时清理）。</summary>
-    private void UnregisterFromSlot(EquipSlot[] slots_, BaseItem item_)
-    {
-        foreach (var e in slots_)
-            if (_slotItems.TryGetValue(e.Slot, out var list))
-                list.Remove(item_);
-    }
     #endregion
 }

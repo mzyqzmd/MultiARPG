@@ -10,13 +10,20 @@ public class PlayerAnimControl : MonoBehaviour
 
     public void OnToggleFrameEvent()
     {
-        if (_player.EquipmentControl.PendingItem == null) return;
-        if (_player.EquipmentControl.IsSlotTaken(_player.EquipmentControl.PendingSlot))
-            _player.EquipmentControl.Equip(_player.EquipmentControl.PendingItem);
+        var equipment = _player.EquipmentControl;
+        if (equipment.PendingItem == null) return;
+        if (equipment.PendingAction == EPendingEquipAction.Equip)
+            equipment.Equip(equipment.PendingItem);
         else
-            _player.EquipmentControl.Unequip(_player.EquipmentControl.PendingItem);
-        _player.EquipmentControl.PendingItem = null;
+            equipment.Unequip(equipment.PendingItem);
+        equipment.PendingItem = null;
     }
+
+    #region 攻击音效
+    public void PlayeAttackAudio() => _player.AudioService.PlayAudio(
+        _player.PlayerPresentation.AttackAudioGroup,
+        _player.PlayerPresentation.AttackAudioKey, _player.transform.position);
+    #endregion
 
     #region 轻击连击窗口
     /// <summary>Animation Clip 事件：轻击连击窗口开启，转发至状态机当前轻击态。</summary>

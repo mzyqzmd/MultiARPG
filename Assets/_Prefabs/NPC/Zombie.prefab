@@ -1763,6 +1763,7 @@ MonoBehaviour:
   _anim: {fileID: 2686795666855292245}
   _lockCenter: {fileID: 8911135844919754380}
   _statsControl: {fileID: 1400673928333156962}
+  _presentation: {fileID: 11400000, guid: bd02cf4f1d7e64344a31b5df68ee8792, type: 2}
   _navAgent: {fileID: 503398360127940229}
   _btOwner: {fileID: 1824140246035827087}
   _activationRadius: 50
@@ -1842,7 +1843,7 @@ MonoBehaviour:
     Layer: 0
     OriginatingState: 229373857
     DestinationState: 1080829965
-    TransitionDuration: 0
+    TransitionDuration: 0.1
     TriggerNameHash: 1080829965
     TransitionIndex: 0
   m_Animator: {fileID: 2686795666855292245}

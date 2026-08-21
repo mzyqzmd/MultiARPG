@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -129,7 +130,7 @@ public class NetworkHub : NetworkBehaviour
         if (target.IsOwner)
         {
             target.OnHitReceived(damage_, damage_.contactPoint);
-            PlayHitReactionLocal(damage_.contactPoint);
+            PlayHitReactionLocal(target, damage_.contactPoint);
         }
         else
         {
@@ -146,37 +147,62 @@ public class NetworkHub : NetworkBehaviour
         {
             Send = new ClientRpcSendParams { TargetClientIds = spectators.ToArray() }
         };
-        PlayHitReactClientRpc(damage_.contactPoint, param);
+        PlayHitReactClientRpc(HitFeedbackKeys.From(target.Presentation), damage_.contactPoint, param);
     }
 
-    /// <summary>本地受击表现（飙血 VFX + 受伤音效 + 血溅音效）：各端基于同一 contactPoint 世界坐标本地播，
-    /// 视觉一致且无需跨端 RPC 额外同步（VFXService/AudioService 均为纯本地）。被击者自身、Host 自击分支、旁观端共用。</summary>
-    private void PlayHitReactionLocal(Vector3 contactPoint_)
+    /// <summary>受击表现 key 快照：旁观端不持有被击者对象，由 Host 侧从目标 Presentation 提取后经 RPC 携带，避免硬编码玩家默认 key。
+    /// 用 FixedString64Bytes 承载（NGO 1.12 不支持 string 序列化，见项目铁律）+ INetworkSerializeByMemcpy 强制按内存布局 memcpy（ILPP 自动通过）。</summary>
+    private struct HitFeedbackKeys : INetworkSerializeByMemcpy
     {
-        _vfxService.PlayVFX("FX_BloodSplatter", contactPoint_);
-        _audioService.PlayAudio("Player", "BloodSplatter", contactPoint_);
-        _audioService.PlayAudio("Player", "Hit", contactPoint_);
+        public FixedString32Bytes HitVfxKey;
+        public FixedString32Bytes HitSplatterGroup;
+        public FixedString32Bytes HitSplatterKey;
+        public FixedString32Bytes HitAudioGroup;
+        public FixedString32Bytes HitAudioKey;
+
+        public static HitFeedbackKeys From(SO_CharacterPresentation p_)
+        {
+            return new HitFeedbackKeys
+            {
+                HitVfxKey = p_.HitVFXKey,
+                HitSplatterGroup = p_.HitSplatterGroup,
+                HitSplatterKey = p_.HitSplatterKey,
+                HitAudioGroup = p_.HitAudioGroup,
+                HitAudioKey = p_.HitAudioKey
+            };
+        }
+    }
+
+    /// <summary>本地受击表现（飙血 VFX + 受伤音效 + 血溅音效）：按目标角色表现配置取 key，各端基于同一 contactPoint 世界坐标本地播，
+    /// 视觉一致且无需跨端 RPC 额外同步（VFXService/AudioService 均为纯本地）。被击者自身、Host 自击分支、旁观端共用。</summary>
+    private void PlayHitReactionLocal(Character target_, Vector3 contactPoint_)
+    {
+        var p = target_.Presentation;
+        _vfxService.PlayVFX(p.HitVFXKey, contactPoint_);
+        _audioService.PlayAudio(p.HitSplatterGroup, p.HitSplatterKey, contactPoint_);
+        _audioService.PlayAudio(p.HitAudioGroup, p.HitAudioKey, contactPoint_);
     }
 
     /// <summary>定向被击者 owner 客户端：让其本地进受击态 + 扣血 + 本地播受击表现（受击动画靠 ClientNetworkAnimator owner 权威同步出去）。</summary>
     [ClientRpc]
     private void NotifyHitClientRpc(ulong targetId_, DamageInfo damage_)
     {
-        if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) return;
-        if (!targetObj.TryGetComponent<Character>(out var target)) return;
+        Debug.Log($"[RapierHit] RPC 收到 targetId={targetId_} total={damage_.TotalDamage}");
+        if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) { Debug.Log($"[RapierHit] 断点7: SpawnedObjects 找不到 {targetId_}"); return; }
+        if (!targetObj.TryGetComponent<Character>(out var target)) { Debug.Log($"[RapierHit] 断点8: targetObj 同GO无 Character, obj={targetObj.name}"); return; }
         // 仅被击者自身的 owner 端响应（ClientRpc 已定向，但守卫一次以防误投）
         if (!target.IsOwner) return;
         target.OnHitReceived(damage_, damage_.contactPoint);
-        PlayHitReactionLocal(damage_.contactPoint);
+        PlayHitReactionLocal(target, damage_.contactPoint);
     }
 
-    /// <summary>受击表现广播：在 contactPoint 世界坐标播飙血 VFX + 受伤音效。发往指定客户端（默认全端，由调用方排除攻击者与被击者 owner）。</summary>
+    /// <summary>受击表现广播：按携带的被击者表现 key 在 contactPoint 世界坐标播飙血 VFX + 受伤音效。发往指定客户端（排除攻击者与被击者 owner），保证旁观端也精确区分僵尸/假人等表现差异。</summary>
     [ClientRpc]
-    private void PlayHitReactClientRpc(Vector3 contactPoint_, ClientRpcParams param_ = default)
+    private void PlayHitReactClientRpc(HitFeedbackKeys keys_, Vector3 contactPoint_, ClientRpcParams param_ = default)
     {
-        _vfxService.PlayVFX("FX_BloodSplatter", contactPoint_);
-        _audioService.PlayAudio("Player", "BloodSplatter", contactPoint_);
-        _audioService.PlayAudio("Player", "Hit", contactPoint_);
+        _vfxService.PlayVFX(keys_.HitVfxKey.ToString(), contactPoint_);
+        _audioService.PlayAudio(keys_.HitSplatterGroup.ToString(), keys_.HitSplatterKey.ToString(), contactPoint_);
+        _audioService.PlayAudio(keys_.HitAudioGroup.ToString(), keys_.HitAudioKey.ToString(), contactPoint_);
     }
     #endregion
 

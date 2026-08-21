@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e91fc6232cfe344786070d2fb351a54, type: 3}
+  m_Name: PlayerPresentation
+  m_EditorClassIdentifier: 
+  _hitVfxKey: FX_BloodSplatter
+  _hitSplatterGroup: General
+  _hitSplatterKey: BloodSplatter
+  _hitAudioGroup: Player
+  _hitAudioKey: Hit
+  _idleAudioGroup: Player
+  _idleAudioKey: Idle
+  _deathAudioGroup: Player
+  _deathAudioKey: Die
+  _attackAudioGroup: Player
+  _attackAudioKey: Attack
+  _dodgeAudioGroup: Player
+  _dodgeAudioKey: Dodge
+  _exhaustedAudioGroup: Player
+  _exhaustedAudioKey: Exhausted

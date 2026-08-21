@@ -14,10 +14,13 @@ public abstract class Character : NetworkBehaviour, ILockableTarget
     [SerializeField] protected Animator _anim;
     [SerializeField] protected Transform _lockCenter;
     [SerializeField] protected CharacterStatsControl _statsControl;
+    [Header("表现配置")]
+    [SerializeField] protected SO_CharacterPresentation _presentation;
 
     // 服务
     protected EffectService _effectService;
     protected VFXService _vfxService;
+    protected AudioService _audioService;
 
     public Animator Anim => _anim;
     // ILockableTarget
@@ -25,14 +28,18 @@ public abstract class Character : NetworkBehaviour, ILockableTarget
     public virtual bool CanBeLocked => _statsControl == null || !_statsControl.IsDead;
     public Transform LockCenter => _lockCenter;
     public CharacterStatsControl StatsControl => _statsControl;
+    /// <summary>角色表现配置：受击/待机等表现使用的 VFX 与音频 key，由子类 prefab 挂对应 SO_*Presentation 资产。</summary>
+    public SO_CharacterPresentation Presentation => _presentation;
 
     public EffectService EffectService => _effectService;
     public VFXService VFXService => _vfxService;
+    public AudioService AudioService => _audioService;
 
     protected virtual void Awake()
     {
         _effectService = Services.Get<EffectService>();
         _vfxService = Services.Get<VFXService>();
+        _audioService = Services.Get<AudioService>();
     }
     protected virtual void Update() { }
 
