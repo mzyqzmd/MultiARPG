@@ -4,7 +4,7 @@ using UnityEngine;
 /// 僵尸表现配置：继承基类（受击 VFX/受伤音/血溅音/idle 音），扩展死亡音与攻击音。
 /// 僵尸所有音效统一走 "Zombie" 音频组（由 Inspector 配置具体组名/音效名）。
 /// </summary>
-[CreateAssetMenu(fileName = "ZombiePresentation", menuName = "MultiARPG/Presentation/ZombiePresentation")]
+[CreateAssetMenu(fileName = "ZombiePresentation", menuName = "MultiARPG/Presentation/NPC/Enemy/ZombiePresentation")]
 public class SO_ZombiePresentation : SO_CharacterPresentation
 {
     [Header("idle 音")]

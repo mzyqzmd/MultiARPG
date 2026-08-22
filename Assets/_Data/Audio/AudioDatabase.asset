@@ -884,7 +884,7 @@ MonoBehaviour:
       Data: false
     - Name: _volume
       Entry: 4
-      Data: 1
+      Data: 0.15
     - Name: _volumeRandomMin
       Entry: 4
       Data: 0.1
@@ -945,7 +945,7 @@ MonoBehaviour:
       Data: false
     - Name: _volume
       Entry: 4
-      Data: 0.8
+      Data: 0.6
     - Name: _volumeRandomMin
       Entry: 4
       Data: 0.1

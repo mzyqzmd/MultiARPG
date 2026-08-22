@@ -1,0 +1,19 @@
+{
+    "name": "_MultiARPG.Gameplay",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6ed107413ddeb1e4d8426e410db1cb7c",
+        "GUID:0e7cfd103e4edff4684fbabf8ce76be5",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:4307f53044263cf4b835bd812fc161a4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

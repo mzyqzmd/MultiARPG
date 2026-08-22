@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Zombie", menuName = "MultiARPG/Stats/ZombieStats")]
+[CreateAssetMenu(fileName = "Zombie", menuName = "MultiARPG/Stats/NPC/Enemy/ZombieStats")]
 public class SO_ZombieStats : SO_CharacterStats
 {
     [Header("僵尸配置")]
