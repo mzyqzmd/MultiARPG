@@ -6,7 +6,7 @@ using System;
 /// 按值移除由 ModifiableStat.Remove 借助 List.Remove 的值类型默认逐字段比较完成（施加与移除来自同一效果资产，值必然一致）。
 /// </summary>
 [Serializable]
-public struct StatModifier
+public struct StatModifier : IEquatable<StatModifier>
 {
     public float additive;
     public float multiplier;
@@ -15,5 +15,13 @@ public struct StatModifier
     {
         additive = additive_;
         multiplier = multiplier_;
+    }
+
+    public readonly bool Equals(StatModifier other)
+    {
+        if (additive == other.additive &&
+            multiplier == other.multiplier)
+            return true;
+        return false;
     }
 }

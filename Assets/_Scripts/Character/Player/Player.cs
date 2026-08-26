@@ -154,12 +154,18 @@ public class Player : Character
     }
     #endregion
 
-    #region 受击入口（重写基类钩子：先播受击动画再 base 本地扣血）
-    /// <summary>受击钩子重写：进受击态（按 contactPoint 选方向动画）后交由基类统一本地扣血，死亡链路由基类 OnCurrentHealthChanged 自然触发。</summary>
-    public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
+    #region 受击/击晕入口（重写基类钩子：按攻击类型分流动画态，再 base 本地扣血）
+    /// <summary>受击钩子重写：isStun_=true（如 Boss 冲击波）进击晕态而非受击态，两者与受击动画严格分离；随后交由基类统一经 EffectControl 施加 effect 扣血。</summary>
+    public override void OnHitReceived(string effectId_, float multiplier_, Vector3 contactPoint_, bool isStun_)
     {
-        _stateControl.EnterHitState(contactPoint_);
-        base.OnHitReceived(damage_, contactPoint_);
+        if (isStun_) OnStunReceived();
+        else _stateControl.EnterHitState(contactPoint_);
+        base.OnHitReceived(effectId_, multiplier_, contactPoint_, isStun_);
     }
+    #endregion
+
+    #region 击晕入口
+    /// <summary>击晕入口：转发给状态控制，进入击晕态。</summary>
+    public void OnStunReceived() => _stateControl.EnterStunState();
     #endregion
 }

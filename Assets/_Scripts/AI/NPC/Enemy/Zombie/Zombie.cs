@@ -71,16 +71,16 @@ public class Zombie : AINPC
     #endregion
 
     #region 受击反馈
-    public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
+    public override void OnHitReceived(string effectId_, float multiplier_, Vector3 contactPoint_, bool isStun_ = false)
     {
         // 计数达阈值则施加受击打断免疫效果（HitDuration 压 0，Timed 窗口到期自动回滚），并清零计数。
         if (++_hitCount >= ZombieStatsControl.HitStunThreshold)
         {
             _hitCount = 0;
-            ZombieStatsControl.ApplyEffect(EffectService.GetEffect(HitStunEffectId), ZombieStatsControl);
+            //ZombieStatsControl.ApplyEffect(EffectService.GetEffect(HitStunEffectId), ZombieStatsControl);
         }
         _animControl.ForceEndAttack();
-        base.OnHitReceived(damage_, contactPoint_);
+        base.OnHitReceived(effectId_, multiplier_, contactPoint_, isStun_);
         if (!_statsControl.IsDead)
             _animControl.SetHit(contactPoint_);
     }

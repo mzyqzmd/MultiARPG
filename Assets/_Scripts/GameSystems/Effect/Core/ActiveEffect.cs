@@ -1,33 +1,63 @@
-/// <summary>运行时生效中的效果实例：包装一个 SO_BaseEffect，并由内嵌 EventTimer 本地驱动周期触发与到期。target_/source_ 在构造时经闭包捕获，EventTimer 零感知效果领域类型。</summary>
+using System;
+
+/// <summary>运行时生效中的效果实例：包装一个 SO_BaseEffect，并由内嵌 EventTimer 本地驱动周期触发与到期。target_/source_ 经 Reset 注入，EventTimer 零感知效果领域类型。自身与内嵌 timer 均来自对象池复用。</summary>
 public class ActiveEffect
 {
-    private readonly SO_BaseEffect _effect;
-    private readonly IEffectSource _source;
-    private readonly string _id;
-    private readonly IEffectTarget _target;
-    private readonly EffectControl _owner;
-    private readonly EventTimer _timer;
+    private readonly PlainObjectPool<EventTimer> _timerPool;
+    private BaseEffect _effect;
+    private IEffectTarget _target;
+    private IEffectSource _source;
+    private EventTimer _timer;
 
-    public SO_BaseEffect Effect => _effect;
-    public string Id => _id;
+    public event Action<ActiveEffect> OnEffectComplete;
 
-    public ActiveEffect(SO_BaseEffect effect_, IEffectTarget target_, IEffectSource source_, EffectControl owner_)
+    /// <summary>构造供对象池 CreateFunc 使用：仅持有 timer 池引用，具体参数经 Reset 注入。</summary>
+    public ActiveEffect(PlainObjectPool<EventTimer> timerPool_)
     {
-        _effect = effect_;
-        _id = effect_.Id;
-        _source = source_;
-        _target = target_;
-        _owner = owner_;
-        _timer = new EventTimer(_effect.Duration, _effect.TickInterval);
-        _timer.OnStart += () => _effect.Execute(_target, _source);
-        _timer.OnInterval += () => _effect.Execute(_target, _source);
-        _timer.OnComplete += () =>
-        {
-            _effect.OnRemove(_target, _source);
-            _owner.RemoveActive(this);
-        };
-        _timer.Start();
+        _timerPool = timerPool_;
     }
 
-    public void Stop() => _timer.Stop();
+    #region 初始化（池借取后调用）
+    public void Init(BaseEffect effect_, IEffectTarget target_, IEffectSource source_)
+    {
+        _effect = effect_;
+        _target = target_;
+        _source = source_;
+        _timer = _timerPool.Get();
+        _timer.Reset(_effect.Duration, _effect.TickInterval);
+        _timer.OnStart += OnTimerStart;
+        _timer.OnInterval += OnTimerInterval;
+        _timer.OnComplete += OnTimerComplete;
+        _timer.Start();
+    }
+    #endregion
+
+    #region 归还（效果结束后由 EffectControl 调用）
+    public void Release()
+    {
+        if (_timer != null)
+        {
+            _timer.Stop();
+            _timer.ClearEvents();
+            _timerPool.Release(_timer);
+            _timer = null;
+        }
+        _effect = null;
+        _target = null;
+        _source = null;
+        OnEffectComplete = null;
+    }
+    #endregion
+
+    #region 计时器回调
+    private void OnTimerStart() => _effect.Execute(_target, _source);
+    private void OnTimerInterval() => _effect.Execute(_target, _source);
+    private void OnTimerComplete()
+    {
+        //先 OnRemove 回滚效果（如倍率复位），再触发 OnEffectComplete 让 EffectControl 归还池实例。
+        //顺序不可颠倒：Release 会清空 _effect=null，若先 Invoke 再 OnRemove 会 NRE。
+        _effect.OnRemove(_target, _source);
+        OnEffectComplete?.Invoke(this);
+    }
+    #endregion
 }

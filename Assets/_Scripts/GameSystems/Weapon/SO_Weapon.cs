@@ -17,14 +17,10 @@ public class SO_Weapon : SerializedScriptableObject
     [SerializeField] private EquipSlot[] _equipTargetSlots = new[] { new EquipSlot(EEquipmentSlot.RightHand, true) };
     [Header("被卸下时需要挂载的槽位；IsOccupying=false 仅表现挂不占槽。")]
     [SerializeField] private EquipSlot[] _unequipTargetSlots = new[] { new EquipSlot(EEquipmentSlot.LeftHip, true) };
-    [Header("武器命中时触发的效果（通常为 SO_DamageEffect 伤害）。")]
-    [SerializeField] private List<SO_BaseEffect> _effects = new();
-
-    [Header("蓄力重击倍率")]
-    [Tooltip("短蓄力（达到短阈值但未满）时的伤害倍率，如 1.5 表示 150% 伤害。")]
-    [SerializeField] private float _shortChargeMulti = 1.5f;
-    [Tooltip("长蓄力（满蓄）时的伤害倍率，如 2.5 表示 250% 伤害。")]
-    [SerializeField] private float _longChargeMulti = 2.5f;
+    [Header("武器命中时触发的效果 id 列表（对应 SO_EffectDatabase 注册 key，如 weapon.rapier.damage）。")]
+    [SerializeField] private List<string> _effectIds = new();
+    [Header("蓄力倍率效果 id：对应 db 中 DamageMultiplierEffect（EffectType=Timed，配 Duration 与 _multiplier）。蓄力结算时按 tier 取对应 id 查表挂到攻击者自身，时间到自动复位倍率。")]
+    [SerializeField] private List<string> _chargeBuffEffectIds = new();
 
     [Header("武器动画")]
     [Tooltip("武器动画覆盖控制器：override 基础 AC_Player 中攻击/装备等状态的 clip，其余状态自动继承基础。装备时赋给玩家 Animator.runtimeAnimatorController，脱装备还原基础控制器。")]
@@ -38,12 +34,10 @@ public class SO_Weapon : SerializedScriptableObject
     public string ItemID => _weaponID;
     /// <summary>武器图标（快捷栏展示用）。</summary>
     public Sprite ItemSprite => _weaponSprite;
-    /// <summary>武器命中时触发的效果集合。</summary>
-    public IReadOnlyList<SO_BaseEffect> Effects => _effects;
-    /// <summary>短蓄力倍率。</summary>
-    public float ShortChargeMulti => _shortChargeMulti;
-    /// <summary>长蓄力倍率。</summary>
-    public float LongChargeMulti => _longChargeMulti;
+    /// <summary>武器命中时触发的效果 id 列表（对应 SO_EffectDatabase 注册 key）。</summary>
+    public List<string> EffectIds => _effectIds;
+    /// <summary>蓄力倍率效果 id 集合：索引 [0]=短蓄、[1]=满蓄。</summary>
+    public List<string> ChargeBuffEffectIds => _chargeBuffEffectIds;
     /// <summary>武器动画覆盖控制器。</summary>
     public AnimatorOverrideController OverrideController => _overrideController;
 

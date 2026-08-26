@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed27e40af3e7c245871d11057e8d3a3, type: 3}
   m_Name: FakeManStats
   m_EditorClassIdentifier: 
-  _normalMoveSpeed: 2
   _rotationSpeed: 500
-  _maxHealth: 100
+  _normalMoveSpeed: 2
+  _maxHealth: 99999
   _hitDuration: 0.4
+  _physicalArmor: 0
+  _magicalArmor: 0

@@ -18,10 +18,15 @@ public abstract class BaseItem : MonoBehaviour, IEquippable
     public EquipSlot[] UnequipTargetSlots => _itemData.UnequipTargetSlots;
     public void RegisterOwner(Player owner_) => _owner = owner_;
 
-    /// <summary>使用物品：遍历数据上的效果集合逐个结算（药壶治疗等）。武器不调用此方法。</summary>
+    /// <summary>使用物品：遍历数据上的效果 id 列表逐个查表并经 EffectControl 统一施加（Instant 快速路径/Timed 池化）。武器不调用此方法。</summary>
     public virtual void ApplyItem(IEffectTarget target_, IEffectSource source_)
     {
-        foreach (var effect in _itemData.Effects)
-            effect.Execute(target_, source_);
+        var effectService = Services.Get<EffectService>();
+        foreach (var effectId in _itemData.EffectIds)
+        {
+            var effect = effectService.GetEffect(effectId);
+            if (effect == null) continue;
+            target_.EffectControl.ApplyEffect(effect, target_, source_);
+        }
     }
 }

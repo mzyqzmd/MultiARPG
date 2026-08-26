@@ -32,9 +32,10 @@ public class PlayerStateMachineBuilder
     public PlayerNormalAttackState NormalAttackState { get; private set; }
     public PlayerHeavyAttackState HeavyAttackState { get; private set; }
     public PlayerHitState HitState { get; private set; }
+    public PlayerStunState StunState { get; private set; }
 
     #region 构建
-    /// <summary>构造两层状态机、8 个状态实例、父子关系绑定与全部 AnyTransition 注册。</summary>
+    /// <summary>构造两层状态机、9 个状态实例、父子关系绑定与全部 AnyTransition 注册。</summary>
     public void Build()
     {
         #region 父状态机初始化
@@ -55,6 +56,7 @@ public class PlayerStateMachineBuilder
         NormalAttackState = new PlayerNormalAttackState(ChildFsm, _player, _characterController);
         HeavyAttackState = new PlayerHeavyAttackState(ChildFsm, _player, _characterController);
         HitState = new PlayerHitState(ChildFsm, _player, _characterController);
+        StunState = new PlayerStunState(ChildFsm, _player, _characterController);
         ChildFsm.Initialize(MovementState);
         #endregion
 
@@ -65,9 +67,14 @@ public class PlayerStateMachineBuilder
         #endregion
 
         #region 子层状态机状态转换
-        // 子层：死亡为 High 优先级任意态抢断，注册先于 Dodge/Jump 使其先命中、可打断一切动作(含 mid-dodge 死亡)
+        // 子层：死亡为 High 优先级任意态抢断，注册先于 Dodge/Jump 使其先命中、可打断一切动作(含 mid-dodge 死亡)。
+        // 死亡对击晕态放行(击晕期间血量归零立即倒地)；其余受击/闪避/攻击等 IsBusy 动作的死亡时机保持不变。
         ChildFsm.AddAnyTransition(DeadState,
-            () => _player.StatsControl.IsDead && !_stateControl.IsBusy, ETransitionPriority.High);
+            () => _player.StatsControl.IsDead && (!_stateControl.IsBusy || _stateControl.CurrentActionState == _stateControl.StunState), ETransitionPriority.High);
+        // 击晕为 High 优先级任意态抢断；进行中不可再次进入(互斥)；死亡态下禁止触发。
+        // 不可被闪避抢断：Dodge 守卫仅对 Hit 态放行，击晕态 IsBusy=true 时 Dodge 不命中，天然满足「击晕期间无法冲刺脱身」。
+        ChildFsm.AddAnyTransition(StunState,
+            () => _stateControl.StunRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead, ETransitionPriority.High);
         // 受击为 High 优先级任意态抢断；进行中不可再次进入(互斥)；死亡态下禁止触发
         ChildFsm.AddAnyTransition(HitState,
             () => _stateControl.HitRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead, ETransitionPriority.High);

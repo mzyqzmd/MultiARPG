@@ -2980,7 +2980,6 @@ Transform:
   - {fileID: 3732410304060207401}
   - {fileID: 683518903}
   - {fileID: 69837425}
-  - {fileID: 265255354700747837}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &411595622 stripped
@@ -15842,12 +15841,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2102666886}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &265255354700747837 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4029593307186825984, guid: 594dbd6b218ed774193dee45709ef104,
-    type: 3}
-  m_PrefabInstance: {fileID: 5270375397861567819}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &268614145311012537 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7819784542959690887, guid: 594dbd6b218ed774193dee45709ef104,
@@ -16040,7 +16033,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 406955511}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2832537725940858303, guid: 594dbd6b218ed774193dee45709ef104,
         type: 3}
@@ -16259,3 +16252,4 @@ SceneRoots:
   - {fileID: 406955511}
   - {fileID: 1060919246}
   - {fileID: 8692617597908454678}
+  - {fileID: 5270375397861567819}

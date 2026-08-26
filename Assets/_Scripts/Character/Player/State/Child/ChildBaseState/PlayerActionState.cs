@@ -51,7 +51,7 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
         {
             targetRotation = Quaternion.LookRotation(moveDir_);
         }
-        float maxDegrees = _player.StatsControl.GetRotationDelta();
+        float maxDegrees = _player.StatsControl.RotationSpeed * Time.deltaTime;
         playerTransform.rotation = Quaternion.RotateTowards(playerTransform.rotation, targetRotation, maxDegrees);
     }
     #endregion

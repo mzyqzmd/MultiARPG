@@ -16,8 +16,8 @@ public abstract class SO_BaseItem : SerializedScriptableObject
     [SerializeField] protected EquipSlot[] _equipTargetSlots = new[] { new EquipSlot(EEquipmentSlot.RightHand, true) };
     [Header("被卸下时需要挂载的槽位；IsOccupying=false 仅表现挂不占槽。")]
     [SerializeField] protected EquipSlot[] _unequipTargetSlots = new[] { new EquipSlot(EEquipmentSlot.LeftHip, true) };
-    [Header("物品被使用时触发的效果（药壶治疗、陷阱伤害等）。")]
-    [SerializeField] protected List<SO_BaseEffect> _effects = new();
+    [Header("物品被使用时触发的效果 id 列表（对应 SO_EffectDatabase 注册 key，如 player.heal_small）。")]
+    [SerializeField] protected List<string> _effectIds = new();
 
     /// <summary>装备槽位配置（实例类据此实现 IEquippable）。</summary>
     public EquipSlot[] EquipTargetSlots => _equipTargetSlots;
@@ -27,8 +27,8 @@ public abstract class SO_BaseItem : SerializedScriptableObject
     public string ItemID => _itemID;
     /// <summary>物品图标（装备面板/快捷栏展示用）。</summary>
     public Sprite ItemSprite => _itemSprite;
-    /// <summary>被使用时触发的效果集合（药壶的治疗来源等）。</summary>
-    public IReadOnlyList<SO_BaseEffect> Effects => _effects;
+    /// <summary>被使用时触发的效果 id 列表（对应 SO_EffectDatabase 注册 key）。</summary>
+    public IReadOnlyList<string> EffectIds => _effectIds;
 
     protected void OnValidate() => _itemID = name;
 }

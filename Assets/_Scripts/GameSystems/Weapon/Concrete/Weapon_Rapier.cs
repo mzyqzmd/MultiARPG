@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 /// <summary>
 /// 轻剑（Rapier）接触伤害：仅攻击者本机结算命中（Owner.IsOwner 守卫），经 Host 中转把伤害发给目标 owner。
-/// 已装备状态下碰撞体碰到 Damageable 目标即构造 DamageInfo 并发起 RequestDamageServerRpc（冷却 _meleeCooldown 防连触）；
+/// 已装备状态下碰撞体碰到 Damageable 目标即读 effectId+攻击者 DamageMultiplier 经 Host 中转（冷却 _meleeCooldown 防连触）；
 /// 碰撞体仅在攻击命中窗口期由动画事件启用，窗口外触碰不结算（避免走路蹭到目标误伤）。
 /// </summary>
 public class Weapon_Rapier : BaseWeapon
@@ -43,18 +43,22 @@ public class Weapon_Rapier : BaseWeapon
             _damageableInterval = _meleeCooldown;
         }
 
-        //从武器 effect 集合聚合伤害并交给目标角色经 Host 中转（目标 owner 本地扣血 + 其他端播受击表现）；倍率来自当前蓄力等级。
-        var contactPoint = other_.ClosestPoint(transform.position);
-        var damage = DamageInfo.FromEffects(_weaponData.Effects, contactPoint, source, target, CurrentMultiplier);
         //攻击者本机命中瞬间立即本地播受击表现（按目标角色表现配置取 key，飙血 VFX + 受伤音效，零网络延迟）。
+        var contactPoint = other_.ClosestPoint(transform.position);
         var p = targetCharacter.Presentation;
         _vfxService.PlayVFX(p.HitVFXKey, contactPoint);
         _audioService.PlayAudio(p.HitSplatterGroup, p.HitSplatterKey, contactPoint);
         _audioService.PlayAudio(p.HitAudioGroup, p.HitAudioKey, contactPoint);
-        //经通用中转站 NetworkHub 发 Host：定位目标并扣血，受击表现广播给除攻击者外的其他端（本机已本地播，避免重复）。
-        NetworkHub.Instance.RequestDamageServerRpc(Owner.OwnerClientId, targetCharacter.NetworkObjectId, damage);
-        //命中即消费倍率，复位为 1 防止泄漏到后续轻击/下次攻击。
-        CurrentMultiplier = 1f;
+        //经通用中转站 NetworkHub 发 Host：传 effectId+multiplier（攻击者 DamageMultiplierEffect 蓄力时写入的倍率），
+        //由 Host 定位目标 owner 经 EffectControl.ApplyEffect 统一施加 effect（查表深拷贝→Execute→TakeDamage）。
+        float multiplier = source.DamageMultiplier;
+        string effectId = _weaponData.EffectIds.Count > 0 ? _weaponData.EffectIds[0] : null;
+        if (string.IsNullOrEmpty(effectId))
+        {
+            Debug.LogWarning("[Weapon_Rapier] 武器 _effectIds 未配置，扣血链路中止。请在 SO_Weapon 资产填入 effect id。");
+            return;
+        }
+        NetworkHub.Instance.RequestDamageServerRpc(Owner.OwnerClientId, targetCharacter.NetworkObjectId, effectId, multiplier, contactPoint, false);
     }
 }
 

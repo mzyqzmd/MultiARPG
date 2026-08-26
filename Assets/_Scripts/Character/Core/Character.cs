@@ -1,4 +1,4 @@
-﻿using Unity.Netcode;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -17,10 +17,9 @@ public abstract class Character : NetworkBehaviour, ILockableTarget
     [Header("表现配置")]
     [SerializeField] protected SO_CharacterPresentation _presentation;
 
-    // 服务
-    protected EffectService _effectService;
     protected VFXService _vfxService;
     protected AudioService _audioService;
+    protected EffectService _effectService;
 
     public Animator Anim => _anim;
     // ILockableTarget
@@ -31,38 +30,24 @@ public abstract class Character : NetworkBehaviour, ILockableTarget
     /// <summary>角色表现配置：受击/待机等表现使用的 VFX 与音频 key，由子类 prefab 挂对应 SO_*Presentation 资产。</summary>
     public SO_CharacterPresentation Presentation => _presentation;
 
-    public EffectService EffectService => _effectService;
     public VFXService VFXService => _vfxService;
     public AudioService AudioService => _audioService;
 
     protected virtual void Awake()
     {
-        _effectService = Services.Get<EffectService>();
         _vfxService = Services.Get<VFXService>();
         _audioService = Services.Get<AudioService>();
+        _effectService = Services.Get<EffectService>();
     }
     protected virtual void Update() { }
 
-    #region 受击入口（命中链路统一钩子：扣血 + 进受击态）
-    /// <summary>受击钩子：由 NetworkHub 在 Host 侧经目标 NetworkObjectId 定位后调用，统一驱动扣血（基类默认）与进受击态（子类重写先播动画再 base 扣血）。contactPoint 供受击态按位置选方向动画。</summary>
-    public virtual void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_) =>
-        _statsControl.TakeDamage(damage_);
-    #endregion
-
-    #region 效果施加入口
-    /// <summary>自身/环境效果本地施加入口：owner 端在本地应用（陷阱 / 环境伤害，无攻击者来源）。本地权威下不绕 server。</summary>
-    public void ApplyEffect(string effectId_)
+    /// <summary>受击钩子：由 NetworkHub 在 Host 侧经目标 NetworkObjectId 定位后调用，统一经 EffectControl 施加 effect（查表深拷贝 + TempEffectSource 包装 multiplier）。
+    /// 子类重写应先播受击动画/计数再 base 施加。contactPoint 供受击态按位置选方向动画。isStun_=true 表示击晕型攻击（由玩家子类拦截进击晕态，非受击态）。</summary>
+    public virtual void OnHitReceived(string effectId_, float multiplier_, Vector3 contactPoint_, bool isStun_ = false)
     {
-        if (!IsOwner) return;
         var effect = _effectService.GetEffect(effectId_);
-        if (effect != null) _statsControl.ApplyEffect(effect, null);
+        if (effect == null) return;
+        var source = new TempEffectSource(multiplier_);
+        _statsControl.EffectControl.ApplyEffect(effect, _statsControl, source);
     }
-
-    /// <summary>效果移除本地入口：owner 端按 id 移除已施加效果（与 ApplyEffect 对称）。</summary>
-    public void RemoveEffect(string effectId_)
-    {
-        if (!IsOwner) return;
-        _statsControl?.RemoveEffect(effectId_);
-    }
-    #endregion
 }

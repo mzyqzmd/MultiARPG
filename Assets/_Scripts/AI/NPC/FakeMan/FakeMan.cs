@@ -28,9 +28,10 @@ public class FakeMan : Character
         _fsm.Update();
     }
 
-    public override void OnHitReceived(DamageInfo damage_, Vector3 contactPoint_)
+    public override void OnHitReceived(string effectId_, float multiplier_, Vector3 contactPoint_, bool isStun_ = false)
     {
-        base.OnHitReceived(damage_, contactPoint_);
+        base.OnHitReceived(effectId_, multiplier_, contactPoint_, isStun_);
+        if (_statsControl.IsDead) _statsControl.ApplyDefaultHealth();
         EnterHitState(contactPoint_);
     }
     public void EnterHitState(Vector3 contactPoint_)

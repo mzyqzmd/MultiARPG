@@ -118,28 +118,28 @@ public class NetworkHub : NetworkBehaviour
     #endregion
 
     #region 战斗RPC（攻击者 owner 发起 → Host 定位目标 → 目标 owner 本地扣血 + 其他端播受击表现）
-    /// <summary>攻击者本机命中后发起：把伤害发给 Host（RequireOwnership=false 允许非目标 owner 调用），由 Host 按 targetId 找到目标 Character 经 OnHitReceived 钩子统一驱动扣血 + 进受击态；受击表现（飙血 VFX + 受伤音效）仅广播给除攻击者外的其他客户端（攻击者本机已在命中瞬间本地播放，避免往返延迟与重复）。</summary>
+    /// <summary>攻击者本机命中后发起：把 effectId+multiplier+isStun 发给 Host（RequireOwnership=false 允许非目标 owner 调用），由 Host 按 targetId 找到目标 Character 经 OnHitReceived 钩子统一驱动 EffectControl 施加；isStun=true 表示此为击晕型攻击（如 Boss 冲击波），目标玩家进击晕态而非受击态。受击表现（飙血 VFX + 受伤音效）仅广播给除攻击者外的其他客户端（攻击者本机已在命中瞬间本地播放，避免往返延迟与重复）。</summary>
     [ServerRpc(RequireOwnership = false)]
-    public void RequestDamageServerRpc(ulong attackerId_, ulong targetId_, DamageInfo damage_)
+    public void RequestDamageServerRpc(ulong attackerId_, ulong targetId_, string effectId_, float multiplier_, Vector3 contactPoint_, bool isStun_ = false)
     {
         if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) return;
         if (!targetObj.TryGetComponent<Character>(out var target)) return;
 
-        // 被击者 owner 端进受击态 + 扣血 + 本地播受击表现：
+        // 被击者 owner 端进受击/击晕态 + 施加 effect + 本地播受击表现：
         // 被击者即本进程（如 Host 拥有的假人）本机直接驱动；否则定向 ClientRpc 让其 owner 端响应。
         if (target.IsOwner)
         {
-            target.OnHitReceived(damage_, damage_.contactPoint);
-            PlayHitReactionLocal(target, damage_.contactPoint);
+            target.OnHitReceived(effectId_, multiplier_, contactPoint_, isStun_);
+            PlayHitReactionLocal(target, contactPoint_);
         }
         else
         {
-            NotifyHitClientRpc(targetId_, damage_);
+            NotifyHitClientRpc(targetId_, effectId_, multiplier_, contactPoint_, isStun_);
         }
 
         // 旁观端（排除攻击者与被击者 owner）统一播受击表现 VFX/音效：
         // 无论被击者归属 Host 还是远端 Client，其他端都应收得到，保证跨端表现对称。
-        var spectators = new System.Collections.Generic.List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
+        var spectators = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
         spectators.Remove(attackerId_);
         spectators.Remove(target.OwnerClientId);
         if (spectators.Count == 0) return;
@@ -147,7 +147,7 @@ public class NetworkHub : NetworkBehaviour
         {
             Send = new ClientRpcSendParams { TargetClientIds = spectators.ToArray() }
         };
-        PlayHitReactClientRpc(HitFeedbackKeys.From(target.Presentation), damage_.contactPoint, param);
+        PlayHitReactClientRpc(HitFeedbackKeys.From(target.Presentation), contactPoint_, param);
     }
 
     /// <summary>受击表现 key 快照：旁观端不持有被击者对象，由 Host 侧从目标 Presentation 提取后经 RPC 携带，避免硬编码玩家默认 key。
@@ -183,17 +183,16 @@ public class NetworkHub : NetworkBehaviour
         _audioService.PlayAudio(p.HitAudioGroup, p.HitAudioKey, contactPoint_);
     }
 
-    /// <summary>定向被击者 owner 客户端：让其本地进受击态 + 扣血 + 本地播受击表现（受击动画靠 ClientNetworkAnimator owner 权威同步出去）。</summary>
+    /// <summary>定向被击者 owner 客户端：让其本地进受击态 + 施加 effect + 本地播受击表现（受击动画靠 ClientNetworkAnimator owner 权威同步出去）。</summary>
     [ClientRpc]
-    private void NotifyHitClientRpc(ulong targetId_, DamageInfo damage_)
+    private void NotifyHitClientRpc(ulong targetId_, string effectId_, float multiplier_, Vector3 contactPoint_, bool isStun_ = false)
     {
-        Debug.Log($"[RapierHit] RPC 收到 targetId={targetId_} total={damage_.TotalDamage}");
         if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(targetId_, out var targetObj)) { Debug.Log($"[RapierHit] 断点7: SpawnedObjects 找不到 {targetId_}"); return; }
         if (!targetObj.TryGetComponent<Character>(out var target)) { Debug.Log($"[RapierHit] 断点8: targetObj 同GO无 Character, obj={targetObj.name}"); return; }
         // 仅被击者自身的 owner 端响应（ClientRpc 已定向，但守卫一次以防误投）
         if (!target.IsOwner) return;
-        target.OnHitReceived(damage_, damage_.contactPoint);
-        PlayHitReactionLocal(target, damage_.contactPoint);
+        target.OnHitReceived(effectId_, multiplier_, contactPoint_, isStun_);
+        PlayHitReactionLocal(target, contactPoint_);
     }
 
     /// <summary>受击表现广播：按携带的被击者表现 key 在 contactPoint 世界坐标播飙血 VFX + 受伤音效。发往指定客户端（排除攻击者与被击者 owner），保证旁观端也精确区分僵尸/假人等表现差异。</summary>

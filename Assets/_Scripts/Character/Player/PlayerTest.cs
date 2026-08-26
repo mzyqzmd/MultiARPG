@@ -27,7 +27,8 @@ public class PlayerTest : MonoBehaviour
         //ApplyEffect("StatModifierEffect");
         //ApplyEffect("DamageEffect");
         //_stateControl.CombatLocked = !_stateControl.CombatLocked;
-        Services.Get<SceneControlService>().ReturnToMainMenu();
+        //Services.Get<SceneControlService>().ReturnToMainMenu();
         //ApplyEffect("HealEffect");
+        _player.OnStunReceived();
     }
 }

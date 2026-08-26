@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BossZombieStatsControl : CharacterStatsControl
 {
@@ -10,10 +8,6 @@ public class BossZombieStatsControl : CharacterStatsControl
     public override float GetMoveSpeed(bool running_) =>
        running_ ? BossZombieStats.RunSpeed : BossZombieStats.NormalMoveSpeed;
 
-    public int AttackDamage => BossZombieStats.AttackDamage;
-    public int HitStunThreshold => BossZombieStats.HitStunThreshold;
-    public float AttackWindup => BossZombieStats.AttackWindup;
-    public float AttackWindow => BossZombieStats.AttackWindow;
     public float AttackDuration => BossZombieStats.AttackDuration;
 
     public float GetAttackRange(EBossZombieAttackAction action_) =>

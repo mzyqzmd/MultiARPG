@@ -9,15 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3cde19ca1f4dff4eba355be37af1638, type: 3}
+  m_Script: {fileID: 11500000, guid: 89ec44c56557845468332e2c0b0c4474, type: 3}
   m_Name: EffectDatabase
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 11400000, guid: 4dbbb785c8d85b74c82205a7d7ba7917, type: 2}
-    - {fileID: 11400000, guid: d600bbdcc4165cd42b19f40cf63c5cd4, type: 2}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -25,7 +23,7 @@ MonoBehaviour:
     SerializationNodes:
     - Name: _effects
       Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SO_BaseEffect,
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[BaseEffect,
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
@@ -36,16 +34,34 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 6
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: RapierDamage
+      Data: Papier_AttackDamage
     - Name: $v
-      Entry: 10
+      Entry: 7
+      Data: 2|DamageEffect, Assembly-CSharp
+    - Name: _effectType
+      Entry: 3
       Data: 0
+    - Name: _duration
+      Entry: 4
+      Data: 0
+    - Name: _tickInterval
+      Entry: 4
+      Data: 0
+    - Name: _physicalDamage
+      Entry: 3
+      Data: 15
+    - Name: _magicalDamage
+      Entry: 3
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -54,10 +70,142 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ZombieHitStun
+      Data: Papier_ShortCharge
     - Name: $v
-      Entry: 10
+      Entry: 7
+      Data: 3|DamageMultiplierEffect, Assembly-CSharp
+    - Name: _effectType
+      Entry: 3
       Data: 1
+    - Name: _duration
+      Entry: 4
+      Data: 1.15
+    - Name: _tickInterval
+      Entry: 4
+      Data: 0
+    - Name: _multiplier
+      Entry: 4
+      Data: 1.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Papier_LongCharge
+    - Name: $v
+      Entry: 7
+      Data: 4|DamageMultiplierEffect, Assembly-CSharp
+    - Name: _effectType
+      Entry: 3
+      Data: 1
+    - Name: _duration
+      Entry: 4
+      Data: 1.2
+    - Name: _tickInterval
+      Entry: 4
+      Data: 0
+    - Name: _multiplier
+      Entry: 4
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Zombie_AttackDamage
+    - Name: $v
+      Entry: 7
+      Data: 5|DamageEffect, Assembly-CSharp
+    - Name: _effectType
+      Entry: 3
+      Data: 0
+    - Name: _duration
+      Entry: 4
+      Data: 0
+    - Name: _tickInterval
+      Entry: 4
+      Data: 0
+    - Name: _physicalDamage
+      Entry: 3
+      Data: 5
+    - Name: _magicalDamage
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: BossZombie_P1AttackDamage
+    - Name: $v
+      Entry: 7
+      Data: 6|DamageEffect, Assembly-CSharp
+    - Name: _effectType
+      Entry: 3
+      Data: 0
+    - Name: _duration
+      Entry: 4
+      Data: 0
+    - Name: _tickInterval
+      Entry: 4
+      Data: 0
+    - Name: _physicalDamage
+      Entry: 3
+      Data: 20
+    - Name: _magicalDamage
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: BossZombie_ShockWaveDamage
+    - Name: $v
+      Entry: 7
+      Data: 7|DamageEffect, Assembly-CSharp
+    - Name: _effectType
+      Entry: 3
+      Data: 0
+    - Name: _duration
+      Entry: 4
+      Data: 0
+    - Name: _tickInterval
+      Entry: 4
+      Data: 0
+    - Name: _physicalDamage
+      Entry: 3
+      Data: 20
+    - Name: _magicalDamage
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 

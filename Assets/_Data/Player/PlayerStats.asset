@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cbc0168c56ad8046a6215b77f0be3ed, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: 
-  _normalMoveSpeed: 2
   _rotationSpeed: 600
+  _normalMoveSpeed: 2
   _maxHealth: 100
   _hitDuration: 0.8
+  _physicalArmor: 1
+  _magicalArmor: 1
   _runSpeed: 5
   _dodgeSpeed: 12
   _dodgeDuration: 0.6
@@ -25,6 +27,7 @@ MonoBehaviour:
   _normalAttackStaminaCost: 12
   _normalAttackDuration: 1
   _heavyAttackStaminaCost: 18
+  _stunDuration: 1.5
   _maxStamina: 100
   _dodgeStaminaCost: 20
   _staminaRegenRate: 20

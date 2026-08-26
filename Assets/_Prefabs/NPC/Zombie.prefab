@@ -1195,7 +1195,6 @@ GameObject:
   - component: {fileID: 7680102750872201094}
   - component: {fileID: 8545665865359373620}
   - component: {fileID: 8169969226991573934}
-  - component: {fileID: 235476212857914215}
   m_Layer: 0
   m_Name: hand_r
   m_TagString: Untagged
@@ -1238,6 +1237,7 @@ MonoBehaviour:
   _owner: {fileID: 4716315921890470647}
   _collider: {fileID: 8169969226991573934}
   _attackInterval: 2
+  _attackEffectId: Zombie_AttackDamage
 --- !u!135 &8169969226991573934
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1259,33 +1259,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.25
   m_Center: {x: 0.08, y: 0, z: 0}
---- !u!54 &235476212857914215
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5516274260484703957}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &5580038284667371365
 GameObject:
   m_ObjectHideFlags: 0
@@ -1702,6 +1675,7 @@ GameObject:
   - component: {fileID: 6302240863034523449}
   - component: {fileID: 503398360127940229}
   - component: {fileID: 6058693046429894389}
+  - component: {fileID: 4091281663795453123}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -1968,6 +1942,33 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!54 &4091281663795453123
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491145347372013065}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7021942387853676684
 GameObject:
   m_ObjectHideFlags: 0
@@ -2073,7 +2074,6 @@ GameObject:
   - component: {fileID: 8780820936501505839}
   - component: {fileID: 6102091557676172102}
   - component: {fileID: 8819895963742250885}
-  - component: {fileID: 1643044813645091884}
   m_Layer: 0
   m_Name: hand_l
   m_TagString: Untagged
@@ -2116,6 +2116,7 @@ MonoBehaviour:
   _owner: {fileID: 4716315921890470647}
   _collider: {fileID: 8819895963742250885}
   _attackInterval: 2
+  _attackEffectId: Zombie_AttackDamage
 --- !u!135 &8819895963742250885
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2137,33 +2138,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.25
   m_Center: {x: -0.08, y: 0, z: 0}
---- !u!54 &1643044813645091884
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7457183780752170155}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &7554870932485397811
 GameObject:
   m_ObjectHideFlags: 0

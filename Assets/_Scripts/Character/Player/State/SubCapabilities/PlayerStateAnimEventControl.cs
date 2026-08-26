@@ -19,14 +19,20 @@ public class PlayerStateAnimEventControl
         _player.StateControl.ComboWindowOpen = false;
         _player.StateControl.ConsumeNormalAttack();
     }
-    /// <summary>动画事件驱动的蓄力结算：按 tier 写倍率到右手武器并扣耐力。tier>=2=满蓄(LongChargeMulti)，否则短蓄(ShortChargeMulti)。不在此切状态——倍率写完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
+    /// <summary>动画事件驱动的蓄力结算：按 tier 从右手武器的 ChargeBuffEffectIds 取对应倍率 effect id 查表得深拷贝实例，挂到攻击者自身 EffectControl。tier>=2 取 [1]（满蓄），否则取 [0]（短蓄）；列表不足则跳过（无倍率）。挂载后由 EventTimer 到点自动 OnRemove 复位倍率。不在此切状态——倍率挂完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
     public void EndHeavyChargeByTier(int tier_)
     {
         if (_player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) is BaseWeapon weapon)
         {
             _player.StatsControl.SpendStamina(_player.StateControl.HeavyAttackStaminaCost);
-            weapon.CurrentMultiplier = tier_ >= 2 ? weapon.WeaponData.LongChargeMulti : weapon.WeaponData.ShortChargeMulti;
-            Debug.Log($"Rapier HeavyAttackMultiplier:{weapon.CurrentMultiplier}");
+            var buffIds = weapon.WeaponData.ChargeBuffEffectIds;
+            int index = tier_ >= 2 ? 1 : 0;
+            if (buffIds != null && index < buffIds.Count)
+            {
+                var effect = Services.Get<EffectService>().GetEffect(buffIds[index]);
+                if (effect != null)
+                    _player.StatsControl.EffectControl.ApplyEffect(effect, _player.StatsControl, _player.StatsControl);
+            }
         }
         _player.StateControl.ConsumeHeavyAttack();
     }

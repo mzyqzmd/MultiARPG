@@ -36,7 +36,7 @@ public class PlayerMovementState : PlayerActionState
         }
         bool combat = _player.StateControl.IsInCombat;
         // 0 耐力时即使按住跑步也降级为走路
-        bool running = _player.InputService.IsRunning && _player.StatsControl.CanExert;
+        bool running = _player.InputService.IsRunning && _player.StatsControl.CurrentStamina > 0;
         if (running)
             _player.StatsControl.DrainStamina(_player.StatsControl.RunStaminaDrain, Time.deltaTime);
         HandleMovement(combat, running);

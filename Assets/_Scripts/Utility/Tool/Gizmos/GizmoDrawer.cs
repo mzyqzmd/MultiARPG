@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Gizmo 编辑器可视化静态工具类。集中封装线框球、视锥扇形、FOV 边界等通用绘制，
@@ -78,4 +77,3 @@ public static class GizmoDrawer
     }
     #endregion
 }
-#endif

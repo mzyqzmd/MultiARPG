@@ -11,6 +11,8 @@ public class BossZombieColliderHit : MonoBehaviour
     [SerializeField] private BossZombie _owner;
     [SerializeField] private Collider _collider;
     [SerializeField] private float _attackInterval = 2f;
+    [Tooltip("攻击效果 id（对应 SO_EffectDatabase 注册 key，如 enemy.boss_zombie.attack）。")]
+    [SerializeField] private string _attackEffectId;
 
     private float _cooldownTimer;
     private bool _hasHitThisSwing;
@@ -37,12 +39,13 @@ public class BossZombieColliderHit : MonoBehaviour
         if (!_owner.IsServer || _cooldownTimer > 0f) return;
         var target = other_.GetComponentInParent<Character>();
         if (target == null || target == _owner) return;
+        //同阵营过滤：Boss 僵尸只攻击玩家，不误伤其他 AI NPC（AINPC 及其子类）。
+        if (target is AINPC) return;
         if (_hasHitThisSwing) return;
         _hasHitThisSwing = true;
         _cooldownTimer = _attackInterval;
         Vector3 contactPoint = other_.ClosestPoint(_collider.transform.position);
-        var damage = new DamageInfo(_owner.BossZombieStatsControl.AttackDamage, 0, 0, 0, 0,
-            contactPoint, _owner.StatsControl, target.StatsControl);
-        NetworkHub.Instance.RequestDamageServerRpc(_owner.NetworkObjectId, target.NetworkObjectId, damage);
+        NetworkHub.Instance.RequestDamageServerRpc(_owner.NetworkObjectId, target.NetworkObjectId,
+            _attackEffectId, 1f, contactPoint, false);
     }
 }

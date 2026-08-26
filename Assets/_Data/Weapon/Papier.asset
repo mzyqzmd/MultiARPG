@@ -30,9 +30,10 @@ MonoBehaviour:
   _unequipTargetSlots:
   - Slot: 2
     IsOccupying: 0
-  _effects:
-  - {fileID: 11400000, guid: 4dbbb785c8d85b74c82205a7d7ba7917, type: 2}
-  _shortChargeMulti: 1.5
-  _longChargeMulti: 3
+  _effectIds:
+  - Papier_AttackDamage
+  _chargeBuffEffectIds:
+  - Papier_ShortCharge
+  - Papier_LongCharge
   _overrideController: {fileID: 22100000, guid: 157b39ffdb53cf542aee9dbc66f05475,
     type: 2}

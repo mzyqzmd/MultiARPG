@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 /// <summary>
-/// 玩家状态机编排：父层(姿态)=Free/Combat，子层(动作)=Movement/Dodge/Jump/Fall。
+/// 玩家状态机编排：父层(姿态)=Free/Combat，子层(动作)=Movement/Dodge/Jump/Fall/Dead/NormalAttack/HeavyAttack/Hit/Stun。
 /// 子层在父层内始终运行；Dodge/Jump 用 High 优先级 AnyTransition 抢断，天然适用于两种姿态。
 /// 本类为 MonoBehaviour 组件（挂 Player.prefab 同对象）：服务类依赖在 Awake 经 Services 容器获取，
 /// Component 类依赖经 Inspector [SerializeField] 注入，PlayerVerticalMotionControl 在 Awake 内部 new。
@@ -24,12 +24,14 @@ public class PlayerStateControl : MonoBehaviour
     public bool NormalAttackRequested => _normalAttackRequested;
     public bool HeavyAttackRequested => _heavyAttackRequested;
     public bool HitRequested => _hitRequested;
+    public bool StunRequested => _stunRequested;
 
     private bool _dodgeRequested;              // 是否请求翻滚
     private bool _jumpRequested;               // 是否请求跳
     private bool _normalAttackRequested;       // 是否请求轻击
     private bool _heavyAttackRequested;        // 是否请求重击
-    private bool _hitRequested;                // 是否请求受击 
+    private bool _hitRequested;                // 是否请求受击
+    private bool _stunRequested;               // 是否请求击晕
     #endregion
 
     #region 玩家状态(_builder获取处实例)
@@ -45,6 +47,7 @@ public class PlayerStateControl : MonoBehaviour
     public PlayerNormalAttackState NormalAttackState => _builder.NormalAttackState;
     public PlayerHeavyAttackState HeavyAttackState => _builder.HeavyAttackState;
     public PlayerHitState HitState => _builder.HitState;
+    public PlayerStunState StunState => _builder.StunState;
     #endregion
 
     #region 是否处在某种状态
@@ -106,6 +109,7 @@ public class PlayerStateControl : MonoBehaviour
             if (!ComboWindowOpen) _normalAttackRequested = false;
             _heavyAttackRequested = false;
             _hitRequested = false;
+            _stunRequested = false;
         }
 
         // 耐力不足以支付闪避则丢弃请求
@@ -178,6 +182,8 @@ public class PlayerStateControl : MonoBehaviour
     public void ConsumeJump() => _jumpRequested = false;
     /// <summary>消费受击请求(进入 Hit 态时调用，避免重复触发)。</summary>
     public void ConsumeHit() => _hitRequested = false;
+    /// <summary>消费击晕请求(进入 Stun 态时调用，避免重复触发)。</summary>
+    public void ConsumeStun() => _stunRequested = false;
     #endregion
 
     #region 动画事件转发
@@ -205,5 +211,9 @@ public class PlayerStateControl : MonoBehaviour
         PendingHitY = localVector2.y;
         _hitRequested = true;
     }
+    #endregion
+    #region 击晕入口
+    /// <summary>击晕入口：置请求标志，由 AnyTransition 抢断切入击晕态（不接触发源，触发方留待战斗阶段接线）。</summary>
+    public void EnterStunState() => _stunRequested = true; 
     #endregion
 }

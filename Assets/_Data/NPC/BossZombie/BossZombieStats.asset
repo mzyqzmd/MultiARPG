@@ -12,7 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e3770fd8a1874479339d002c26888a, type: 3}
   m_Name: BossZombieStats
   m_EditorClassIdentifier: 
-  _normalMoveSpeed: 2
   _rotationSpeed: 500
+  _normalMoveSpeed: 2
   _maxHealth: 250
   _hitDuration: 0.7
+  _physicalArmor: 10
+  _magicalArmor: 5
+  _runSpeed: 5
+  _attackDamage: 20
+  _hitStunThreshold: 4
+  _attackWindup: 0.2
+  _attackWindow: 0.9
+  _attackDuration: 3.5
+  _attack01Range: 2.2
+  _attack02Range: 2.2
+  _attack03Range: 2.2
+  _dashAtkRange: 6
+  _doubleHandRange: 2.5
+  _footLeftRange: 2.5
+  _footRightRange: 2.5
+  _groundRange: 3
+  _shockwaveEffectId: BossZombie_ShockWaveDamage
+  _handShockwaveRadius: 1.5
+  _ringShockwaveMaxRadius: 3
+  _ringShockwaveDuration: 0.6
+  _groundShockwaveRadius: 4
+  _shockwaveLifetime: 1.2

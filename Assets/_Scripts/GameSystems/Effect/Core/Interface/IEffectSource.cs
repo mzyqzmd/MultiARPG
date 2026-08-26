@@ -1,5 +1,7 @@
-/// <summary>效果来源身份标记接口：仅标识「谁发起效果 / 伤害」，不携带任何攻击数值。
-/// 实际伤害数值（五类 attack）由来源方在构造 DamageInfo 时直接填入，不读本接口属性（2026-08-01 决策：攻击属性归武器 Item，角色不持有）。</summary>
+/// <summary>效果来源接口：标识「谁发起效果 / 伤害」。除身份外，持有伤害倍率字段（由 DamageMultiplierEffect 在蓄力时临时写入、到期复位）。
+/// 实际伤害数值（physical/magic 两类）仍由 DamageEffect 承载，倍率经本接口读取，不与武器手乘耦合。</summary>
 public interface IEffectSource
 {
+    /// <summary>当前伤害倍率，默认 1。DamageMultiplierEffect 施加时写入、到期 OnRemove 复位 1。</summary>
+    float DamageMultiplier { get; set; }
 }

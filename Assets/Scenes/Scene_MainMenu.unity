@@ -1140,7 +1140,7 @@ MonoBehaviour:
   _audioDatabase: {fileID: 11400000, guid: acb607a633b1e5948b20ba3dde73046b, type: 2}
   _vfxDatabase: {fileID: 11400000, guid: 849d77899c7719747af96647be3ada1d, type: 2}
   _uiDatabase: {fileID: 11400000, guid: ece97db7906981e45b3be02bb3f05b6a, type: 2}
-  _effectDatabase: {fileID: 11400000, guid: 7a24322d7d35e8543a943594d78202ca, type: 2}
+  _effectDatabase: {fileID: 11400000, guid: 19003dbc89d0e384cac7b5ea35301ee7, type: 2}
   _networkHubPrefab: {fileID: 6942618001672833119, guid: 6dc0a070c7b382940944401b66ba218a,
     type: 3}
 --- !u!114 &504751900

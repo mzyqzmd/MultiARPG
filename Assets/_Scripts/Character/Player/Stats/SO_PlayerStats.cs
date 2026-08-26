@@ -35,6 +35,10 @@ public class SO_PlayerStats : SO_CharacterStats
     [Tooltip("单次重击一次性消耗的耐力值。耐力不足时重击请求被丢弃，无法蓄力。")]
     [SerializeField] private int _heavyAttackStaminaCost = 25;
 
+    [Header("击晕参数")]
+    [Tooltip("击晕时长（秒）。玩家被击晕后停留在击晕态的时长（不可被闪避打断），可被延长/缩短击晕类效果经 EStatType.StunDuration 运行时修正。")]
+    [SerializeField] private float _stunDuration = 1.5f;
+
     [Header("耐力参数")]
     [Tooltip("耐力上限。用于跑步 / 闪避 / 跳跃等消耗性动作的通用资源。")]
     [SerializeField] private int _maxStamina = 100;
@@ -58,6 +62,8 @@ public class SO_PlayerStats : SO_CharacterStats
     public int NormalAttackStaminaCost => _normalAttackStaminaCost;
     public float NormalAttackDuration => _normalAttackDuration;
     public int HeavyAttackStaminaCost => _heavyAttackStaminaCost;
+
+    public float StunDuration => _stunDuration;
 
     public int MaxStamina => _maxStamina;
     public int DodgeStaminaCost => _dodgeStaminaCost;

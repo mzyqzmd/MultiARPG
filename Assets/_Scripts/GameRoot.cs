@@ -25,8 +25,8 @@ public class GameRoot : MonoBehaviour
     private PlayerCameraService _playerCameraService;
     private UIService _uiService;
     private GameSaveService _saveService;
-    private EffectService _effectService;
     private AINpcService _aiNpcService;
+    private EffectService _effectService;
 
     private void Awake()
     {
@@ -43,6 +43,7 @@ public class GameRoot : MonoBehaviour
         var dataWriter = new SaveFileDataWriter();
         RegisterSettingsService(dataWriter);   // 须在 AudioService 之前：其构造即 ApplyVolumes 依赖 SettingsService
         RegisterSaveService(dataWriter);
+        RegisterEffectService();               // 须在所有运行时消费者（Character/Weapon/BaseItem）之前：它们 Awake 取 EffectService
         RegisterUIService();                   // 须在 SceneControlService 之前：场景服务构造注入 UIService 以驱动场景切换黑幕
         RegisterNetworkService();              // 须在 SceneControlService 之前：场景服务构造注入 NetworkService 以收归场景加载
         RegisterAudioService();
@@ -50,14 +51,12 @@ public class GameRoot : MonoBehaviour
         RegisterInputService();
         RegisterSceneControlService();
         RegisterPlayerCameraService();
-        RegisterEffectService();
         RegisterAINpcService();
     }
 
     private void OnDestroy()
     {
         _alive = false;
-        UnregisterEffectService();
         UnregisterPlayerCameraService();
         UnregisterSceneControlService();
         UnregisterInputService();
@@ -65,6 +64,7 @@ public class GameRoot : MonoBehaviour
         UnregisterVFXService();
         UnregisterNetworkService();
         UnregisterUIService();
+        UnregisterEffectService();
         UnregisterSaveService();
         UnregisterSettingsService();
         UnregisterAINpcService();
@@ -101,6 +101,19 @@ public class GameRoot : MonoBehaviour
     private void UnregisterSaveService()
     {
         Services.Unregister<GameSaveService>();
+    }
+    #endregion
+
+    #region 注册/注销效果服务
+    private void RegisterEffectService()
+    {
+        _effectService = new EffectService(_effectDatabase);
+        Services.Register(_effectService);
+    }
+
+    private void UnregisterEffectService()
+    {
+        Services.Unregister<EffectService>();
     }
     #endregion
 
@@ -194,19 +207,6 @@ public class GameRoot : MonoBehaviour
     private void UnregisterPlayerCameraService()
     {
         Services.Unregister<PlayerCameraService>();
-    }
-    #endregion
-
-    #region 注册/注销效果服务
-    private void RegisterEffectService()
-    {
-        _effectService = new EffectService(_effectDatabase);
-        Services.Register(_effectService);
-    }
-
-    private void UnregisterEffectService()
-    {
-        Services.Unregister<EffectService>();
     }
     #endregion
 
