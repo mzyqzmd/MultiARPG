@@ -47,6 +47,8 @@ public class PlayerStatsControl : CharacterStatsControl
     public int NormalAttackStaminaCost => PlayerStats.NormalAttackStaminaCost;
     public float NormalAttackDuration => PlayerStats.NormalAttackDuration;
     public int HeavyAttackStaminaCost => PlayerStats.HeavyAttackStaminaCost;
+    /// <summary>复活倒计时（秒）：刻意不注册为 ModifiableStat，复活时长不应被任何效果修正。</summary>
+    public float RespawnDuration => PlayerStats.RespawnDuration;
     public int RunStaminaDrain => PlayerStats.RunStaminaDrain;
     public float StaminaRegenDelay => PlayerStats.StaminaRegenDelay;
     #endregion

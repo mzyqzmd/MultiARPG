@@ -52,15 +52,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "TestButton",
-                    "type": "Button",
-                    "id": "23d0a32b-88aa-4b7a-8da7-f7e25da2f3cb",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "EquipHotKey1",
                     "type": "Button",
                     "id": "adc63dbe-d2f1-4f9c-8f4e-4775495072a8",
@@ -136,6 +127,15 @@
                     "name": "LockOnTarget",
                     "type": "Button",
                     "id": "92b3f905-8b1b-419a-8dbf-b290781dbeda",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ESC",
+                    "type": "Button",
+                    "id": "e9e7bd1e-24e7-4f15-8ab0-433091e116f1",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -431,17 +431,6 @@
                 },
                 {
                     "name": "",
-                    "id": "36fad941-14a8-4c12-a482-0fcb375e4d01",
-                    "path": "<Keyboard>/h",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "TestButton",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "5ceb39cf-6435-4813-80ce-d0b06d5ab076",
                     "path": "<Keyboard>/1",
                     "interactions": "",
@@ -531,7 +520,7 @@
                 {
                     "name": "",
                     "id": "5362f5cd-2faa-424f-bfc9-a833a2e07e0f",
-                    "path": "<Keyboard>/5",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard",
@@ -635,6 +624,28 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "LockOnTarget",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b71624c8-7d35-49ea-945e-8d49c2822d2e",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "ESC",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "232bbeb0-17af-4ea4-9710-89679905c055",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ESC",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

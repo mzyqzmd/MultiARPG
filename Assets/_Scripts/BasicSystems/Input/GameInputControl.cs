@@ -138,15 +138,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""TestButton"",
-                    ""type"": ""Button"",
-                    ""id"": ""23d0a32b-88aa-4b7a-8da7-f7e25da2f3cb"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""EquipHotKey1"",
                     ""type"": ""Button"",
                     ""id"": ""adc63dbe-d2f1-4f9c-8f4e-4775495072a8"",
@@ -222,6 +213,15 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""name"": ""LockOnTarget"",
                     ""type"": ""Button"",
                     ""id"": ""92b3f905-8b1b-419a-8dbf-b290781dbeda"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ESC"",
+                    ""type"": ""Button"",
+                    ""id"": ""e9e7bd1e-24e7-4f15-8ab0-433091e116f1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -517,17 +517,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""36fad941-14a8-4c12-a482-0fcb375e4d01"",
-                    ""path"": ""<Keyboard>/h"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard"",
-                    ""action"": ""TestButton"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""5ceb39cf-6435-4813-80ce-d0b06d5ab076"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
@@ -617,7 +606,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""5362f5cd-2faa-424f-bfc9-a833a2e07e0f"",
-                    ""path"": ""<Keyboard>/5"",
+                    ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
@@ -723,6 +712,28 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""action"": ""LockOnTarget"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b71624c8-7d35-49ea-945e-8d49c2822d2e"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""ESC"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""232bbeb0-17af-4ea4-9710-89679905c055"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""ESC"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -803,7 +814,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_DodgeTrigger = m_Player.FindAction("DodgeTrigger", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_TestButton = m_Player.FindAction("TestButton", throwIfNotFound: true);
         m_Player_EquipHotKey1 = m_Player.FindAction("EquipHotKey1", throwIfNotFound: true);
         m_Player_EquipHotKey2 = m_Player.FindAction("EquipHotKey2", throwIfNotFound: true);
         m_Player_EquipHotKey3 = m_Player.FindAction("EquipHotKey3", throwIfNotFound: true);
@@ -813,6 +823,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         m_Player_SpecialAttack = m_Player.FindAction("SpecialAttack", throwIfNotFound: true);
         m_Player_AimOrParry = m_Player.FindAction("AimOrParry", throwIfNotFound: true);
         m_Player_LockOnTarget = m_Player.FindAction("LockOnTarget", throwIfNotFound: true);
+        m_Player_ESC = m_Player.FindAction("ESC", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_ClickSelectedButton = m_UI.FindAction("ClickSelectedButton", throwIfNotFound: true);
@@ -902,7 +913,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_DodgeTrigger;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_TestButton;
     private readonly InputAction m_Player_EquipHotKey1;
     private readonly InputAction m_Player_EquipHotKey2;
     private readonly InputAction m_Player_EquipHotKey3;
@@ -912,6 +922,7 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_SpecialAttack;
     private readonly InputAction m_Player_AimOrParry;
     private readonly InputAction m_Player_LockOnTarget;
+    private readonly InputAction m_Player_ESC;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -943,10 +954,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Jump".
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/TestButton".
-        /// </summary>
-        public InputAction @TestButton => m_Wrapper.m_Player_TestButton;
         /// <summary>
         /// Provides access to the underlying input action "Player/EquipHotKey1".
         /// </summary>
@@ -983,6 +990,10 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/LockOnTarget".
         /// </summary>
         public InputAction @LockOnTarget => m_Wrapper.m_Player_LockOnTarget;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ESC".
+        /// </summary>
+        public InputAction @ESC => m_Wrapper.m_Player_ESC;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1024,9 +1035,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @TestButton.started += instance.OnTestButton;
-            @TestButton.performed += instance.OnTestButton;
-            @TestButton.canceled += instance.OnTestButton;
             @EquipHotKey1.started += instance.OnEquipHotKey1;
             @EquipHotKey1.performed += instance.OnEquipHotKey1;
             @EquipHotKey1.canceled += instance.OnEquipHotKey1;
@@ -1054,6 +1062,9 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @LockOnTarget.started += instance.OnLockOnTarget;
             @LockOnTarget.performed += instance.OnLockOnTarget;
             @LockOnTarget.canceled += instance.OnLockOnTarget;
+            @ESC.started += instance.OnESC;
+            @ESC.performed += instance.OnESC;
+            @ESC.canceled += instance.OnESC;
         }
 
         /// <summary>
@@ -1080,9 +1091,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @TestButton.started -= instance.OnTestButton;
-            @TestButton.performed -= instance.OnTestButton;
-            @TestButton.canceled -= instance.OnTestButton;
             @EquipHotKey1.started -= instance.OnEquipHotKey1;
             @EquipHotKey1.performed -= instance.OnEquipHotKey1;
             @EquipHotKey1.canceled -= instance.OnEquipHotKey1;
@@ -1110,6 +1118,9 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
             @LockOnTarget.started -= instance.OnLockOnTarget;
             @LockOnTarget.performed -= instance.OnLockOnTarget;
             @LockOnTarget.canceled -= instance.OnLockOnTarget;
+            @ESC.started -= instance.OnESC;
+            @ESC.performed -= instance.OnESC;
+            @ESC.canceled -= instance.OnESC;
         }
 
         /// <summary>
@@ -1308,13 +1319,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "TestButton" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnTestButton(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "EquipHotKey1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -1377,6 +1381,13 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLockOnTarget(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ESC" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnESC(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

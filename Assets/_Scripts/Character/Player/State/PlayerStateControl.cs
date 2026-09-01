@@ -109,7 +109,9 @@ public class PlayerStateControl : MonoBehaviour
             if (!ComboWindowOpen) _normalAttackRequested = false;
             _heavyAttackRequested = false;
             _hitRequested = false;
-            _stunRequested = false;
+            // 仅当当前态不可被击晕打断（或死亡）时清空击晕请求；处于可击晕打断集合(攻击/跳跃/闪避/重击/坠落/受击)时保留，
+            // 使同帧 Fsm.Update 内 Stun 守卫可抢断这些动作，避免冲击波击晕被 IsBusy 吞掉
+            if (_player.StatsControl.IsDead || !IsStunInterruptible(CurrentActionState)) _stunRequested = false;
         }
 
         // 耐力不足以支付闪避则丢弃请求
@@ -190,14 +192,26 @@ public class PlayerStateControl : MonoBehaviour
     /// <summary>轻击连段窗口开启（动画事件 OnComboWindowOpen 驱动）：置标志，AnyTransition 此刻起允许消费轻击请求连段。</summary>
     public void OpenComboWindow() => _stateAnimEventControl.OpenComboWindow();
     /// <summary>轻击段结束（窗口关闭，动画事件 OnComboWindowClose 驱动）：关标志并清残留请求，避免窗口外误连。</summary>
-    public void CloseComboWindow()=>_stateAnimEventControl.CloseComboWindow();
+    public void CloseComboWindow() => _stateAnimEventControl.CloseComboWindow();
     /// <summary>动画事件驱动的蓄力结算：按 tier 写倍率到右手武器并扣耐力。tier>=2=满蓄(LongChargeMulti)，否则短蓄(ShortChargeMulti)。不在此切状态——倍率写完后由动画机 IsChargingHeavyAttack==false 自动流转释放动画，释放动画末尾 clip 事件再驱动退出。</summary>
     public void EndHeavyChargeByTier(int tier_) => _stateAnimEventControl.EndHeavyChargeByTier(tier_);
     public void ReturnToMovementState() => _stateAnimEventControl.ReturnToMovementState();
     /// <summary>攻击命中窗口开启（动画事件 OnAttackColliderOpen 驱动）：启用右手武器碰撞体，仅窗口期内可命中目标。</summary>
-    public void EnableWeaponCollider()=>_stateAnimEventControl.EnableWeaponCollider();
+    public void EnableWeaponCollider() => _stateAnimEventControl.EnableWeaponCollider();
     /// <summary>攻击命中窗口关闭（动画事件 OnAttackColliderClose 驱动）：禁用右手武器碰撞体，避免非攻击期误伤。</summary>
-    public void DisableWeaponCollider()=>_stateAnimEventControl.DisableWeaponCollider();
+    public void DisableWeaponCollider() => _stateAnimEventControl.DisableWeaponCollider();
+    #endregion
+
+    #region 传送
+    /// <summary>瞬移角色到指定位姿：先禁用 CharacterController 再改 transform（避免启用态直接改 transform 残留碰撞缓存），随后恢复启用并清零垂直速度（避免高处复活后带残余下落速度立刻进 Fall 态）。</summary>
+    public void TeleportTo(Vector3 position_, Quaternion rotation_)
+    {
+        bool wasEnabled = _characterController.enabled;
+        _characterController.enabled = false;
+        transform.SetPositionAndRotation(position_, rotation_);
+        _characterController.enabled = wasEnabled;
+        _verticalMotion.Reset();
+    }
     #endregion
 
     #region 受击入口
@@ -214,6 +228,11 @@ public class PlayerStateControl : MonoBehaviour
     #endregion
     #region 击晕入口
     /// <summary>击晕入口：置请求标志，由 AnyTransition 抢断切入击晕态（不接触发源，触发方留待战斗阶段接线）。</summary>
-    public void EnterStunState() => _stunRequested = true; 
+    public void EnterStunState() => _stunRequested = true;
     #endregion
+
+    /// <summary>判断当前动作态是否可被击晕抢断：攻击/跳跃/闪避/重击/坠落/受击均允许被击晕打断；Movement/Dead 等不可。</summary>
+    public bool IsStunInterruptible(PlayerActionState state_) =>
+        state_ is PlayerNormalAttackState or PlayerHeavyAttackState or PlayerJumpState
+            or PlayerDodgeState or PlayerFallState or PlayerHitState;
 }

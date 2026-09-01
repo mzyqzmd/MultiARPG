@@ -72,9 +72,10 @@ public class PlayerStateMachineBuilder
         ChildFsm.AddAnyTransition(DeadState,
             () => _player.StatsControl.IsDead && (!_stateControl.IsBusy || _stateControl.CurrentActionState == _stateControl.StunState), ETransitionPriority.High);
         // 击晕为 High 优先级任意态抢断；进行中不可再次进入(互斥)；死亡态下禁止触发。
+        // 允许打断可击晕动作集合(攻击/跳跃/闪避/重击/坠落/受击)：IsBusy 时若当前态属于该集合则仍放行，使冲击波击晕能抢断这些动作。
         // 不可被闪避抢断：Dodge 守卫仅对 Hit 态放行，击晕态 IsBusy=true 时 Dodge 不命中，天然满足「击晕期间无法冲刺脱身」。
         ChildFsm.AddAnyTransition(StunState,
-            () => _stateControl.StunRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead, ETransitionPriority.High);
+            () => _stateControl.StunRequested && (!_stateControl.IsBusy || _stateControl.IsStunInterruptible(_stateControl.CurrentActionState)) && !_player.StatsControl.IsDead, ETransitionPriority.High);
         // 受击为 High 优先级任意态抢断；进行中不可再次进入(互斥)；死亡态下禁止触发
         ChildFsm.AddAnyTransition(HitState,
             () => _stateControl.HitRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead, ETransitionPriority.High);
@@ -96,6 +97,8 @@ public class PlayerStateMachineBuilder
         ChildFsm.AddAnyTransition(HeavyAttackState,
             () => _stateControl.HeavyAttackRequested && !_stateControl.IsBusy && !_player.StatsControl.IsDead &&
                    _player.EquipmentControl.GetEquippedItem(EEquipmentSlot.RightHand) != null, ETransitionPriority.High);
+        // 死亡态出站回边：血量回复后（IsDead 转 false）自动退出死亡态回到移动态。按 InsertSorted 排在全部 High 之后，不影响既有优先级判定。
+        ChildFsm.AddTransition(DeadState, MovementState, () => !_player.StatsControl.IsDead, ETransitionPriority.Normal);
         #endregion
     }
     #endregion

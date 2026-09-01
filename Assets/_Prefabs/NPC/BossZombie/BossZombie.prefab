@@ -1128,7 +1128,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1541729684742840139}
+  - component: {fileID: 8638145406235608790}
   - component: {fileID: 7271580836328246432}
+  - component: {fileID: 3097579602400312741}
   m_Layer: 0
   m_Name: LowerLeg_R
   m_TagString: Untagged
@@ -1152,6 +1154,22 @@ Transform:
   - {fileID: 5729679582861592645}
   m_Father: {fileID: 8650945753260631217}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8638145406235608790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4335718699996227725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1e83350c59e7484aa60d5c0b6c4729e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _owner: {fileID: 1113798038212114959}
+  _collider: {fileID: 7271580836328246432}
+  _attackInterval: 2
+  _attackEffectId: BossZombie_P2AttackDamage
 --- !u!136 &7271580836328246432
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1169,12 +1187,39 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.11939223
   m_Height: 0.37219033
   m_Direction: 0
   m_Center: {x: 0.1606263, y: -0.02887391, z: -0.002340279}
+--- !u!54 &3097579602400312741
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4335718699996227725}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &4420214128103767137
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,7 +1229,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7244194775275875619}
+  - component: {fileID: 4483101983255548832}
   - component: {fileID: 1585249462823334984}
+  - component: {fileID: 7117671108664822615}
   m_Layer: 0
   m_Name: LowerLeg_L
   m_TagString: Untagged
@@ -1208,6 +1255,22 @@ Transform:
   - {fileID: 3382445312028674783}
   m_Father: {fileID: 2902724648600639200}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4483101983255548832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4420214128103767137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1e83350c59e7484aa60d5c0b6c4729e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _owner: {fileID: 1113798038212114959}
+  _collider: {fileID: 1585249462823334984}
+  _attackInterval: 2
+  _attackEffectId: BossZombie_P2AttackDamage
 --- !u!136 &1585249462823334984
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1225,12 +1288,39 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.11939223
   m_Height: 0.37219033
   m_Direction: 0
   m_Center: {x: -0.1606263, y: 0.028873907, z: 0.0023402788}
+--- !u!54 &7117671108664822615
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4420214128103767137}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &4448322636875508198
 GameObject:
   m_ObjectHideFlags: 0
@@ -1489,7 +1579,7 @@ SkinnedMeshRenderer:
   m_SortingOrder: 0
   serializedVersion: 2
   m_Quality: 0
-  m_UpdateWhenOffscreen: 0
+  m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
   m_Mesh: {fileID: 4300002, guid: 7933c903cd8e81a4592f32062ab6883f, type: 3}
   m_Bones:
@@ -1559,6 +1649,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4413210478899730432}
+  - component: {fileID: 7040172888350629533}
+  - component: {fileID: 498186005976104720}
+  - component: {fileID: 654252476172383261}
   m_Layer: 0
   m_Name: Hand_L
   m_TagString: Untagged
@@ -1585,6 +1678,70 @@ Transform:
   - {fileID: 833864458733257941}
   m_Father: {fileID: 1080447435498679104}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7040172888350629533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5360045626695564644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1e83350c59e7484aa60d5c0b6c4729e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _owner: {fileID: 1113798038212114959}
+  _collider: {fileID: 498186005976104720}
+  _attackInterval: 2
+  _attackEffectId: BossZombie_P2AttackDamage
+--- !u!135 &498186005976104720
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5360045626695564644}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Radius: 0.2
+  m_Center: {x: -0.08, y: 0, z: -0.08}
+--- !u!54 &654252476172383261
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5360045626695564644}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &5381299442141338969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2393,6 +2550,7 @@ GameObject:
   - component: {fileID: 685053173329252970}
   - component: {fileID: 5388170735191958395}
   - component: {fileID: 7143372963459915216}
+  - component: {fileID: 4831925816889120815}
   m_Layer: 0
   m_Name: BossZombie
   m_TagString: Untagged
@@ -2457,20 +2615,28 @@ MonoBehaviour:
   _presentation: {fileID: 11400000, guid: 2735ed4d5a219ec488c98c39d7c81816, type: 2}
   _navAgent: {fileID: 7143372963459915216}
   _btOwner: {fileID: 2954278918315567551}
-  _activationRadius: 30
+  _activationRadius: 20
   _lookStartPoint: {fileID: 1865136161003689778}
   _frontViewDistance: 15
-  _backViewDistance: 10
+  _backViewDistance: 12
   _viewAngle: 150
   _obstacleMask:
     serializedVersion: 2
     m_Bits: 128
-  _memoryDuration: 5
+  _memoryDuration: 3
   _animControl: {fileID: 8801477015484581247}
   _weaponHit: {fileID: 1294143786734329119}
   _rightHandHit: {fileID: 7120725940269375289}
+  _leftHandHit: {fileID: 7040172888350629533}
+  _footLeftHit: {fileID: 4483101983255548832}
+  _footRightHit: {fileID: 8638145406235608790}
   _BossZombiePresentation: {fileID: 11400000, guid: 2735ed4d5a219ec488c98c39d7c81816,
     type: 2}
+  _shockWavePrefab: {fileID: 1331207901850156051, guid: 29fab34f3d038cf4c8f0575ef4c4fe3b,
+    type: 3}
+  _phase2HealthThreshold: 0.5
+  _transitionDuration: 6.58
+  _fogWall: {fileID: 0}
 --- !u!114 &9054904029305111602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2511,13 +2677,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializedExposedParameters: []
-  _boundGraphSerialization: '{"type":"NodeCanvas.BehaviourTrees.BehaviourTree","nodes":[{"dynamic":true,"_position":{"x":400.0,"y":150.0},"$type":"NodeCanvas.BehaviourTrees.Selector","$id":"0"},{"_position":{"x":-423.6242,"y":284.9035},"$type":"NodeCanvas.BehaviourTrees.Sequencer","$id":"1"},{"_condition":{"conditions":[{"$type":"BossZombieCanSeePlayer"},{"$type":"BossZombieIsPhase"},{"$type":"BossZombieInAttackRange"}],"$type":"NodeCanvas.Framework.ConditionList"},"_position":{"x":-707.2915,"y":403.552},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"2"},{"_action":{"$type":"BossZombieAttack"},"_position":{"x":-282.5653,"y":435.403},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"3"},{"_position":{"x":283.2802,"y":289.9404},"$type":"NodeCanvas.BehaviourTrees.Sequencer","$id":"4"},{"_condition":{"conditions":[{"$type":"BossZombieCanSeePlayer"},{"$type":"BossZombieIsPhase"},{"$type":"BossZombieInOrbitRange"}],"$type":"NodeCanvas.Framework.ConditionList"},"_position":{"x":-122.7002,"y":399.3824},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"5"},{"_action":{"$type":"BossZombieHoldTimer"},"_position":{"x":102.1231,"y":420.924},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"6"},{"_condition":{"$type":"BossZombieInAttackRange"},"_position":{"x":256.4866,"y":432.2394},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"7"},{"_action":{"$type":"BossZombieAttack"},"_position":{"x":524.0322,"y":432.1215},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"8"},{"_action":{"$type":"BossZombieSetIdle"},"_position":{"x":717.4886,"y":351.0823},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"9"}],"connections":[{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"1"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"4"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"9"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"1"},"_targetNode":{"$ref":"2"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"1"},"_targetNode":{"$ref":"3"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"4"},"_targetNode":{"$ref":"5"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"4"},"_targetNode":{"$ref":"6"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"4"},"_targetNode":{"$ref":"7"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"4"},"_targetNode":{"$ref":"8"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"}],"canvasGroups":[],"localBlackboard":{"_variables":{}},"derivedData":{"repeat":true,"$type":"NodeCanvas.BehaviourTrees.BehaviourTree+DerivedSerializationData"}}'
+  _boundGraphSerialization: '{"type":"NodeCanvas.BehaviourTrees.BehaviourTree","nodes":[{"dynamic":true,"_position":{"x":-401.3541,"y":56.22452},"$type":"NodeCanvas.BehaviourTrees.Selector","$id":"0"},{"_position":{"x":-1050.301,"y":276.2938},"$type":"NodeCanvas.BehaviourTrees.Sequencer","$id":"1"},{"_condition":{"conditions":[{"$type":"BossZombieCanSeePlayer"},{"Phase":2,"$type":"BossZombieIsPhase"},{"_action":3,"$type":"BossZombieInAttackRange"}],"$type":"NodeCanvas.Framework.ConditionList"},"_position":{"x":-1229.536,"y":357.6452},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"2"},{"_action":{"_groundChance":0.15,"$type":"BossZombiePhase2Attack"},"_position":{"x":-1004.082,"y":363.9211},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"3"},{"_position":{"x":-741.267,"y":282.6875},"$type":"NodeCanvas.BehaviourTrees.Sequencer","$id":"4"},{"_condition":{"conditions":[{"$type":"BossZombieCanSeePlayer"},{"Phase":2,"$type":"BossZombieIsPhase"}],"$type":"NodeCanvas.Framework.ConditionList"},"_position":{"x":-865.0897,"y":368.3015},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"5"},{"_action":{"_orbitRangeMultiplier":1.0,"rangeAction":3,"$type":"BossZombieMove"},"_position":{"x":-672.671,"y":375.643},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"6"},{"_position":{"x":-392.7209,"y":283.8379},"$type":"NodeCanvas.BehaviourTrees.Sequencer","$id":"7"},{"_condition":{"conditions":[{"$type":"BossZombieCanSeePlayer"},{"$type":"BossZombieIsPhase"},{"$type":"BossZombieInAttackRange"}],"$type":"NodeCanvas.Framework.ConditionList"},"_position":{"x":-537.8563,"y":376.9112},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"8"},{"_action":{"$type":"BossZombieAttack"},"_position":{"x":-324.1248,"y":381.0558},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"9"},{"_position":{"x":69.08849,"y":294.2029},"$type":"NodeCanvas.BehaviourTrees.Sequencer","$id":"10"},{"_condition":{"conditions":[{"$type":"BossZombieCanSeePlayer"},{"$type":"BossZombieIsPhase"},{"$type":"BossZombieInOrbitRange"}],"$type":"NodeCanvas.Framework.ConditionList"},"_position":{"x":-206.8849,"y":388.7261},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"11"},{"_action":{"$type":"BossZombieHoldTimer"},"_position":{"x":-2.308568,"y":396.4145},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"12"},{"_condition":{"$type":"BossZombieInAttackRange"},"_position":{"x":135.0049,"y":396.008},"$type":"NodeCanvas.BehaviourTrees.ConditionNode","$id":"13"},{"_action":{"$type":"BossZombieAttack"},"_position":{"x":341.8095,"y":399.0869},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"14"},{"_action":{"$type":"BossZombieSetIdle"},"_position":{"x":486.2468,"y":319.1134},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"15"}],"connections":[{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"1"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"4"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"7"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"10"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"0"},"_targetNode":{"$ref":"15"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"1"},"_targetNode":{"$ref":"2"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"1"},"_targetNode":{"$ref":"3"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"4"},"_targetNode":{"$ref":"5"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"4"},"_targetNode":{"$ref":"6"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"7"},"_targetNode":{"$ref":"8"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"7"},"_targetNode":{"$ref":"9"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"10"},"_targetNode":{"$ref":"11"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"10"},"_targetNode":{"$ref":"12"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"10"},"_targetNode":{"$ref":"13"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"10"},"_targetNode":{"$ref":"14"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"}],"canvasGroups":[],"localBlackboard":{"_variables":{}},"derivedData":{"repeat":true,"$type":"NodeCanvas.BehaviourTrees.BehaviourTree+DerivedSerializationData"}}'
   _boundGraphObjectReferences: []
   _boundGraphSource:
     _version: 3.33
     _category: 
     _comments: 
-    _translation: {x: 564, y: -32}
+    _translation: {x: 904, y: -14}
     _zoomFactor: 0.7507292
   _firstActivation: 0
   _enableAction: 0
@@ -2631,6 +2797,29 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!136 &4831925816889120815
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7819784542959690887}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.05
+  m_Height: 0.05
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &8049674342222607163
 GameObject:
   m_ObjectHideFlags: 0
@@ -2718,7 +2907,7 @@ Transform:
   m_GameObject: {fileID: 8779912097288324039}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 1.479, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

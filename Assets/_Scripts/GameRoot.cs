@@ -1,5 +1,6 @@
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 组合根：全场唯一的引导 MonoBehaviour，在 Awake 中创建并登记各 C# 服务，
@@ -19,6 +20,7 @@ public class GameRoot : MonoBehaviour
     private SettingsSaveService _settingsService;
     private AudioService _audioService;
     private VFXService _vfxService;
+    private DamageTextService _damageTextService;
     private InputService _inputService;
     private SceneControlService _sceneControlService;
     private NetworkService _networkService;
@@ -48,6 +50,7 @@ public class GameRoot : MonoBehaviour
         RegisterNetworkService();              // 须在 SceneControlService 之前：场景服务构造注入 NetworkService 以收归场景加载
         RegisterAudioService();
         RegisterVFXService();
+        RegisterDamageTextService(); // 须在 UIService 与 EffectService 之后：构造注入两者（取飘字预制体 + 预结算伤害数值）
         RegisterInputService();
         RegisterSceneControlService();
         RegisterPlayerCameraService();
@@ -62,6 +65,7 @@ public class GameRoot : MonoBehaviour
         UnregisterInputService();
         UnregisterAudioService();
         UnregisterVFXService();
+        UnregisterDamageTextService();
         UnregisterNetworkService();
         UnregisterUIService();
         UnregisterEffectService();
@@ -168,18 +172,46 @@ public class GameRoot : MonoBehaviour
     }
     #endregion
 
+    #region 注册/注销伤害飘字服务
+    private void RegisterDamageTextService()
+    {
+        _damageTextService = new DamageTextService(_uiService, _effectService, transform);
+        Services.Register(_damageTextService);
+    }
+
+    private void UnregisterDamageTextService()
+    {
+        Services.Unregister<DamageTextService>();
+    }
+    #endregion
+
     #region 注册/注销输入服务
     private void RegisterInputService()
     {
         _inputService = new InputService();
         _inputService.EnableUIMode();
+        _inputService.OnESCTriggered += HandleESCTriggered;
         Services.Register(_inputService);
     }
 
     private void UnregisterInputService()
     {
+        _inputService.OnESCTriggered -= HandleESCTriggered;
         _inputService?.Dispose();
         Services.Unregister<InputService>();
+    }
+
+    // ESC / 手柄 Start 触发：面板已开则关闭并恢复输入，否则仅在世界场景中打开
+    private void HandleESCTriggered()
+    {
+        if (_uiService.IsEscPanelOpen)
+        {
+            _uiService.CloseEscPanel();
+            _inputService.EnablePlayerMode();
+            return;
+        }
+        if (SceneManager.GetActiveScene().name == SceneControlService.SceneWorld)
+            _uiService.OpenEscPanel();
     }
     #endregion
 

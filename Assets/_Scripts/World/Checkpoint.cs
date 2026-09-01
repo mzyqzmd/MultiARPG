@@ -21,6 +21,8 @@ public class Checkpoint : MonoBehaviour
         if (isLocal)
         {
             player.RequestSave();
+            // 登记自身为玩家复活点（优先复活到存档点物体位置，而非存档瞬间玩家坐标）
+            player.SaveControl.SetRespawnPoint(transform);
             _uiService.SpawnUiView<UI_PopText>("PopText", EUILayerCanvas.Overlay)
                 .Initialize("已保存存档点", Color.white);
         }

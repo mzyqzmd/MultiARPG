@@ -20,6 +20,11 @@ public class PlayerStunState : PlayerActionState
         _player.StateControl.RequestLockBreak();
         _player.StateControl.IsBusy = true;
         _player.StateControl.ConsumeStun();
+        // 消费残留动作请求：避免进入击晕态后被 Dodge/Jump/NormalAttack/HeavyAttack 守卫抢回（击晕期间不可被这些动作脱身）
+        _player.StateControl.ConsumeDodge();
+        _player.StateControl.ConsumeJump();
+        _player.StateControl.ConsumeNormalAttack();
+        _player.StateControl.ConsumeHeavyAttack();
         // 击晕时长由配置（SO_CharacterStats.StunDuration）驱动，可被延长/缩短击晕类效果经 EStatType.StunDuration 修正
         _stateDuration = _player.StatsControl.StunDuration;
         _player.Anim.SetBool("StunState", true);

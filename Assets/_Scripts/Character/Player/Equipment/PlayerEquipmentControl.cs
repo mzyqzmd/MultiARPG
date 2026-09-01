@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 /// <summary>装备控制（MonoBehaviour，挂 Player.prefab）：本地挂载权威，管理五个挂载点，统一占用表 _slotTaken 记录槽位是否被占。
@@ -10,6 +11,7 @@ public class PlayerEquipmentControl : MonoBehaviour
 {
     [Header("玩家引用")]
     [SerializeField] private Player _player;
+    [SerializeField] private BaseWeapon _defaultWeapon;
     [Header("装备挂载点")]
     [SerializeField] private Transform _leftHand;
     [SerializeField] private Transform _rightHand;
@@ -44,6 +46,10 @@ public class PlayerEquipmentControl : MonoBehaviour
             _slotTaken[slot] = false;
         _overrideController = new AnimatorOverrideController(_player.Anim.runtimeAnimatorController);
         _player.Anim.runtimeAnimatorController = _overrideController;
+    }
+    private void Start()
+    {
+        Equip(_defaultWeapon);
     }
 
     #region 输入事件绑定（由 Player.OnNetworkSpawn/OnNetworkDespawn 在 IsOwner 可靠后转发调用）

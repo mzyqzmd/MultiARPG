@@ -21,6 +21,10 @@ MonoBehaviour:
     - {fileID: -4664897816591084523, guid: 957cbe956c77baf4ba0ed99277199d33, type: 3}
     - {fileID: 5793223338747977742, guid: 47bb51e3e854b2348b17a594e02f3f7b, type: 3}
     - {fileID: 2347836589557698758, guid: ea9cb94dca66ca84da1bc3de52d0b24d, type: 3}
+    - {fileID: 8760296331926383845, guid: 0a1a4e8f83f795b449747a8820d53bdd, type: 3}
+    - {fileID: 7957729957447618351, guid: 2b3bedf9ad6adb746aad7817bf776286, type: 3}
+    - {fileID: 6888196430646255251, guid: 2539cfcfcedcfb142bfd1a310ddc0d99, type: 3}
+    - {fileID: 1831970606879897498, guid: eb26305d327c52d4881d684c800222a8, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -39,7 +43,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 5
+      Data: 9
     - Name: 
       Entry: 7
       Data: 
@@ -97,6 +101,54 @@ MonoBehaviour:
     - Name: $v
       Entry: 10
       Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: BossZombieInfoPanel
+    - Name: $v
+      Entry: 10
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: OperationTipPanel
+    - Name: $v
+      Entry: 10
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: EscPanel
+    - Name: $v
+      Entry: 10
+      Data: 7
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: DamageText
+    - Name: $v
+      Entry: 10
+      Data: 8
     - Name: 
       Entry: 8
       Data: 

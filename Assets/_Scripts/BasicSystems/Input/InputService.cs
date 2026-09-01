@@ -16,8 +16,6 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     public event Action OnDodgeTriggered;
     /// <summary>跳跃触发事件（performed 时触发一次）。</summary>
     public event Action OnJumpTriggered;
-    /// <summary>测试按钮点击事件（performed 时触发一次）。</summary>
-    public event Action OnTestButtonClicked;//NOTE:测试用的到时候删掉
     /// <summary>热键栏触发：参数为对应装备槽位（1=LeftHand / 2=LeftHip / 3=Back / 4=RightHip / 5=RightHand）。</summary>
     public event Action<EEquipmentSlot> OnHotbarTriggered;
     /// <summary>轻击触发事件（performed 时触发一次）。</summary>
@@ -30,6 +28,8 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     public event Action OnAimOrParryTriggered;
     /// <summary>锁定目标触发事件（performed 时触发一次）。</summary>
     public event Action OnLockOnTargetTriggered;
+    /// <summary>ESC / 手柄 Start 键触发事件（performed 时触发一次），用于弹出/关闭 ESC 暂停面板。</summary>
+    public event Action OnESCTriggered;
     /// <summary>活跃设备切换事件（键盘 ↔ 手柄）。</summary>
     public event Action<EActiveDevice> OnActiveDeviceChanged;
 
@@ -73,6 +73,12 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
         _control.UI.Enable();
     }
     public void DisableAllMode() => _control.Disable();
+    // 暂停玩法输入但保留 ESC 动作（面板打开期间仍可按 ESC 关闭）
+    public void DisableGameplayKeepEsc()
+    {
+        _control.Disable();
+        _control.Player.ESC.Enable();
+    }
     #endregion
 
     // 根据触发来源设备更新活跃设备，切换时广播 OnActiveDeviceChanged
@@ -159,11 +165,6 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     }
     #endregion
 
-    public void OnTestButton(InputAction.CallbackContext context)
-    {
-        if (context.performed) OnTestButtonClicked?.Invoke();
-    }
-
     public void OnNormalAttack(InputAction.CallbackContext context)
     {
         UpdateActiveDevice(context);
@@ -186,5 +187,11 @@ public class InputService : IService, GameInputControl.IUIActions, GameInputCont
     {
         UpdateActiveDevice(context);
         if (context.performed) OnLockOnTargetTriggered?.Invoke();
+    }
+
+    public void OnESC(InputAction.CallbackContext context)
+    {
+        UpdateActiveDevice(context);
+        if (context.performed) OnESCTriggered?.Invoke();
     }
 }

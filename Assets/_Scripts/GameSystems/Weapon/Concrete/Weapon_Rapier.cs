@@ -12,12 +12,14 @@ public class Weapon_Rapier : BaseWeapon
 
     private VFXService _vfxService;
     private AudioService _audioService;
+    private DamageTextService _damageTextService;
     private float _damageableInterval;
 
     private void Awake()
     {
         _vfxService = Services.Get<VFXService>();
         _audioService = Services.Get<AudioService>();
+        _damageTextService = Services.Get<DamageTextService>();
     }
 
     private void Update() =>
@@ -58,6 +60,9 @@ public class Weapon_Rapier : BaseWeapon
             Debug.LogWarning("[Weapon_Rapier] 武器 _effectIds 未配置，扣血链路中止。请在 SO_Weapon 资产填入 effect id。");
             return;
         }
+        //经通用中转站 NetworkHub 发 Host 之前，先在本机弹出伤害数字（与 VFX / 音效同帧，零往返延迟）：
+        //数值走 DamageEffect.Compute 同一口径，保证飘字数字与目标端实际扣血一致。
+        _damageTextService.SpawnByEffect(effectId, multiplier, contactPoint);
         NetworkHub.Instance.RequestDamageServerRpc(Owner.OwnerClientId, targetCharacter.NetworkObjectId, effectId, multiplier, contactPoint, false);
     }
 }

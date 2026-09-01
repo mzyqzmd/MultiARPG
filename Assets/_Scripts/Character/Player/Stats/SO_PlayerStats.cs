@@ -39,6 +39,10 @@ public class SO_PlayerStats : SO_CharacterStats
     [Tooltip("击晕时长（秒）。玩家被击晕后停留在击晕态的时长（不可被闪避打断），可被延长/缩短击晕类效果经 EStatType.StunDuration 运行时修正。")]
     [SerializeField] private float _stunDuration = 1.5f;
 
+    [Header("复活参数")]
+    [Tooltip("复活倒计时（秒）。玩家死亡后停留在死亡态的时长，到点自动满血复活到最近触碰过的存档点。")]
+    [SerializeField] private float _respawnDuration = 3f;
+
     [Header("耐力参数")]
     [Tooltip("耐力上限。用于跑步 / 闪避 / 跳跃等消耗性动作的通用资源。")]
     [SerializeField] private int _maxStamina = 100;
@@ -64,6 +68,8 @@ public class SO_PlayerStats : SO_CharacterStats
     public int HeavyAttackStaminaCost => _heavyAttackStaminaCost;
 
     public float StunDuration => _stunDuration;
+    /// <summary>复活倒计时（秒）：不被任何效果修正，保持配置原值透传。</summary>
+    public float RespawnDuration => _respawnDuration;
 
     public int MaxStamina => _maxStamina;
     public int DodgeStaminaCost => _dodgeStaminaCost;

@@ -11,10 +11,13 @@ using UnityEngine;
 [Name("Boss：接近玩家")]
 public class BossZombieMove : ActionTask<BossZombie>
 {
-    /// <summary>环绕距离系数：维持 attackRange 的此倍数作为停留中心距离。</summary>
+    /// <summary>环绕距离系数：维持 attackRange 的此倍数作为停留中心距离。P2 直冲配 1（否则 6~12m 区间会原地停步）。</summary>
     public float _orbitRangeMultiplier = 2f;
+    /// <summary>攻击距离基准动作：P1 配 Attack01（短 3m），P2 配 DashAtk（长 6m）。</summary>
+    [Tooltip("攻击距离基准动作：P1 用 Attack01，P2 用 DashAtk。")]
+    public EBossZombieAttackAction rangeAction = EBossZombieAttackAction.Attack01;
 
-    protected override void OnExecute() => agent.NavAgent.updateRotation = false;
+    protected override void OnExecute() => agent.NavAgent.updateRotation = true;
 
     protected override void OnUpdate()
     {
@@ -26,8 +29,8 @@ public class BossZombieMove : ActionTask<BossZombie>
             return;
         }
 
-        FaceTarget();
-        float attackRange = agent.BossZombieStatsControl.GetAttackRange(EBossZombieAttackAction.Attack01);
+        if (agent.Phase != EBossZombiePhase.Phase2) FaceTarget();
+        float attackRange = agent.BossZombieStatsControl.GetAttackRange(rangeAction);
         float orbitRange = attackRange * _orbitRangeMultiplier;
         float dist = Vector3.Distance(agent.transform.position, agent.TargetPlayer.position);
 

@@ -1675,7 +1675,7 @@ GameObject:
   - component: {fileID: 6302240863034523449}
   - component: {fileID: 503398360127940229}
   - component: {fileID: 6058693046429894389}
-  - component: {fileID: 4091281663795453123}
+  - component: {fileID: 6013376601572516766}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -1740,7 +1740,8 @@ MonoBehaviour:
   _presentation: {fileID: 11400000, guid: bd02cf4f1d7e64344a31b5df68ee8792, type: 2}
   _navAgent: {fileID: 503398360127940229}
   _btOwner: {fileID: 1824140246035827087}
-  _activationRadius: 50
+  _activationRadius: 40
+  _skinnedMesh: {fileID: 3594823780711230000}
   _lookStartPoint: {fileID: 6471150532567525933}
   _frontViewDistance: 15
   _backViewDistance: 10
@@ -1942,7 +1943,7 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!54 &4091281663795453123
+--- !u!54 &6013376601572516766
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

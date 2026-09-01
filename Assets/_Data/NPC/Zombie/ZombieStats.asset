@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d2f604dbb9662249ae9475b88e066db, type: 3}
   m_Name: ZombieStats
   m_EditorClassIdentifier: 
-  _normalMoveSpeed: 1.5
   _rotationSpeed: 700
-  _maxHealth: 30
+  _normalMoveSpeed: 1.5
+  _maxHealth: 200
   _hitDuration: 0.9
+  _physicalArmor: 0
+  _magicalArmor: 0
   _runSpeed: 4
   _attackDamage: 3
   _attackRange: 1.2

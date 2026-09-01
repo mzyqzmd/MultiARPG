@@ -50,16 +50,9 @@ public class SceneControlService : IService
     public void ReturnToMainMenu()
     {
         EventBus<ReturningToMainMenuEvent>.InvokeEvent(new ReturningToMainMenuEvent());
-        if (_networkService.IsHost)
-        {
-            _transitioning = true;
-            _uiService.FadeToBlack(() => _networkService.LoadScene(SceneMainMenu));
-        }
-        else
-        {
-            _transitioning = true;
-            _uiService.FadeToBlack(() => _networkService.DisconnectAndReturnToMainMenu());
-        }
+        // Host/Client 统一走断开式返回：Shutdown 销毁 Player 网络对象，重进世界为干净连接（与 Client 行为一致）。
+        _transitioning = true;
+        _uiService.FadeToBlack(() => _networkService.DisconnectAndReturnToMainMenu());
     }
 
     #endregion

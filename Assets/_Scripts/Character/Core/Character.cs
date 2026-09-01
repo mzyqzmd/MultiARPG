@@ -24,7 +24,7 @@ public abstract class Character : NetworkBehaviour, ILockableTarget
     public Animator Anim => _anim;
     // ILockableTarget
     /// <summary>是否可被锁定：死亡（本地血量归零）时自动不可锁定，复活后自动恢复。</summary>
-    public virtual bool CanBeLocked => _statsControl == null || !_statsControl.IsDead;
+    public virtual bool CanBeLocked => !_statsControl.IsDead;
     public Transform LockCenter => _lockCenter;
     public CharacterStatsControl StatsControl => _statsControl;
     /// <summary>角色表现配置：受击/待机等表现使用的 VFX 与音频 key，由子类 prefab 挂对应 SO_*Presentation 资产。</summary>

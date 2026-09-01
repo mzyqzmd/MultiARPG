@@ -168,4 +168,26 @@ public class Player : Character
     /// <summary>击晕入口：转发给状态控制，进入击晕态。</summary>
     public void OnStunReceived() => _stateControl.EnterStunState();
     #endregion
+
+    #region 复活
+    /// <summary>复活编排（仅 owner 调用，由死亡态倒计时到点触发）：满血 → 传送到复活点 → 破锁 → 耐力回满 → 相机瞬时跟随。
+    /// 血量先行回复使 IsDead 转 false，同帧状态机经 Dead→Movement 回边自动退出死亡态并恢复输入。</summary>
+    public void Respawn()
+    {
+        Vector3 oldPosition = transform.position;
+        StatsControl.ApplyDefaultHealth();
+        _stateControl.TeleportTo(_saveControl.RespawnPosition, _saveControl.RespawnRotation);
+        _lockOnTarget.ForceUnlock();
+        StatsControl.ResetStamina();
+        WarpCamera(oldPosition);
+    }
+
+    /// <summary>瞬移后通知 Cinemachine 目标被瞬移，使 FreeLook 相机立即跳到新位置（不出现阻尼飞行）。</summary>
+    private void WarpCamera(Vector3 oldPosition_)
+    {
+        if (_freeLookCamera == null || _freeLookCamera.Follow == null) return;
+        Vector3 delta = transform.position - oldPosition_;
+        _freeLookCamera.OnTargetObjectWarped(_freeLookCamera.Follow, delta);
+    }
+    #endregion
 }

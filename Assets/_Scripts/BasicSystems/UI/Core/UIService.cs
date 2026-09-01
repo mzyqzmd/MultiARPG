@@ -15,6 +15,7 @@ public class UIService : IService
     private readonly Dictionary<EUILayerCanvas, Transform> _layers = new(); // 分层
 
     private readonly UI_FadeScreen _fadeScreen; // 常驻全屏遮罩（非分层，独立 Canvas sortingOrder 100）
+    private UI_EscPanel _escPanel; // ESC 暂停面板缓存引用（防重复打开）
 
     public Player LocalPlayer { get; private set; }
 
@@ -62,6 +63,28 @@ public class UIService : IService
     #region 按 key 取面板预制体（供需自行指定父物体者，如列表子项）
     public UI_BaseView GetUiPrefab(string key_) => _database.GetUIPrefab(key_);
     #endregion
+
+    #region ESC 暂停面板管理（世界场景内由 GameRoot 订阅输入事件调用）
+    /// <summary>弹出 ESC 暂停面板并暂停玩法输入（面板自身在 Initialize 内处理输入暂停）。防重复打开。</summary>
+    public void OpenEscPanel()
+    {
+        if (_escPanel != null) return;
+        _escPanel = SpawnUiView<UI_EscPanel>("EscPanel", EUILayerCanvas.Overlay);
+        _escPanel.Initialize(this);
+    }
+
+    /// <summary>关闭 ESC 暂停面板并销毁（输入恢复由面板按钮显式处理）。</summary>
+    public void CloseEscPanel()
+    {
+        if (_escPanel == null) return;
+        UnityEngine.Object.Destroy(_escPanel.gameObject);
+        _escPanel = null;
+    }
+
+    /// <summary>ESC 面板当前是否处于打开状态。</summary>
+    public bool IsEscPanelOpen => _escPanel != null;
+    #endregion
+
 
     #region 创建Canvas / 清空Canvas下的面板
     /// <summary>创建指定层。</summary>

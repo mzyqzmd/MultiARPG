@@ -23,7 +23,7 @@ public class BossZombieHoldTimer : ActionTask<BossZombie>
     protected override void OnExecute()
     {
         _timer = 0f;
-        agent.NavAgent.updateRotation = false;
+        agent.NavAgent.updateRotation = agent.Phase != EBossZombiePhase.Phase2;
     }
 
     protected override void OnUpdate()
@@ -36,7 +36,7 @@ public class BossZombieHoldTimer : ActionTask<BossZombie>
             return;
         }
 
-        FaceTarget();
+        if (agent.Phase != EBossZombiePhase.Phase2) FaceTarget();
         float attackRange = agent.BossZombieStatsControl.GetAttackRange(EBossZombieAttackAction.Attack01);
         float orbitRange = attackRange * _orbitRangeMultiplier;
         float dist = Vector3.Distance(agent.transform.position, agent.TargetPlayer.position);

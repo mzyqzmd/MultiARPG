@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4247472776382902011}
   - component: {fileID: 3521613468194725613}
   - component: {fileID: 556956143971139442}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FogWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4906,7 +4906,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9041693409761994804}
   - component: {fileID: 7828204024065065541}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BolckCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

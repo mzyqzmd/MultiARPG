@@ -15,11 +15,19 @@ public class FogWall : MonoBehaviour
 
     private Player _cachedPlayer;
     private float _cachedRadius;
+    private bool _deactivated;   // Boss 死亡后永久放行，Update 自动判定让位
 
     private void Start() => SetBlock(false);
+
+    /// <summary>强制永久放行（Boss 死亡调用）：此后不再受 Update 单向判定影响，双向自由通过。</summary>
+    public void Deactivate()
+    {
+        _deactivated = true;
+        SetBlock(false);
+    }
     #region 被动受控接口（外部 Boss 房间控制器在 boss 死亡时调 Deactivate 全量放行）
     /// <summary>放行：boss 死亡统一出口。阻挡体变 trigger，双向自由通过。</summary>
-    public void SetBlock(bool block_)
+    private void SetBlock(bool block_)
     {
         _blockCollider.isTrigger = !block_;   // 放行→变 trigger 穿过；挡→变实体挡住。尺寸/登记始终不变，避免首次卡顿
         if (_particleSystem.isPlaying == block_) return;
@@ -40,6 +48,7 @@ public class FogWall : MonoBehaviour
 
     private void Update()
     {
+        if (_deactivated) return;
         if (_cachedPlayer == null) return;
         var dotPos = Vector3.Dot(_cachedPlayer.transform.position - transform.position, transform.forward);
         // 中心在房外侧即放行（提前关墙避免擦碰），完全跨入房内才挡，过渡带保持上态防抖

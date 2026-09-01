@@ -13,23 +13,24 @@ MonoBehaviour:
   m_Name: PlayerStats
   m_EditorClassIdentifier: 
   _rotationSpeed: 600
-  _normalMoveSpeed: 2
+  _normalMoveSpeed: 3
   _maxHealth: 100
   _hitDuration: 0.8
   _physicalArmor: 1
   _magicalArmor: 1
-  _runSpeed: 5
-  _dodgeSpeed: 12
-  _dodgeDuration: 0.6
-  _jumpHeight: 1.5
+  _runSpeed: 6
+  _dodgeSpeed: 14
+  _dodgeDuration: 0.5
+  _jumpHeight: 1.8
   _gravity: -20
-  _jumpStaminaCost: 20
-  _normalAttackStaminaCost: 12
+  _jumpStaminaCost: 12
+  _normalAttackStaminaCost: 10
   _normalAttackDuration: 1
-  _heavyAttackStaminaCost: 18
+  _heavyAttackStaminaCost: 15
   _stunDuration: 1.5
+  _respawnDuration: 2
   _maxStamina: 100
-  _dodgeStaminaCost: 20
-  _staminaRegenRate: 20
-  _staminaRegenDelay: 1
-  _runStaminaDrain: 10
+  _dodgeStaminaCost: 12
+  _staminaRegenRate: 25
+  _staminaRegenDelay: 0.8
+  _runStaminaDrain: 4

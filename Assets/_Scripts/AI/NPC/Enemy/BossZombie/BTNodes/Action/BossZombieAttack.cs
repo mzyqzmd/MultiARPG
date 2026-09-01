@@ -21,6 +21,7 @@ public class BossZombieAttack : ActionTask<BossZombie>
         _timer = 0f;
         agent.NavAgent.updateRotation = false;
         agent.NavAgent.ResetPath();
+        agent.FaceTarget();
         _selected = SelectActionByRelativePosition();
         agent.AnimationControl.RequestAction(_selected);
     }
