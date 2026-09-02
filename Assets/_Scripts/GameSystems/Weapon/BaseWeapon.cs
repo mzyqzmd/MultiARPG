@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>场景中的武器实例：承载运行时状态（持有者、装备态），持有 SO_Weapon 数据引用。
-/// 与消耗品（BaseItem）互不继承，各自实现 IEquippable 接入装备系统。</summary>
+/// 与消耗品（BaseItem）互不继承，各自实现 IEquippable 接入装备系统。
+/// 攻击命中碰撞体默认禁用，由动画事件经 Enable/DisableAttackCollider 在攻击窗口期启停（非攻击期不结算）。</summary>
 public abstract class BaseWeapon : MonoBehaviour, IEquippable
 {
     [SerializeField] protected SO_Weapon _weaponData;
@@ -30,17 +30,4 @@ public abstract class BaseWeapon : MonoBehaviour, IEquippable
     /// <summary>禁用武器碰撞体（非攻击期关闭，避免走路蹭到目标误伤）。</summary>
     public void DisableAttackCollider() => _attackCollider.enabled = false;
     #endregion
-
-    /// <summary>场景武器拾取（纯本地，各端各自捡各自副本，不抢武器）：未装备状态下碰到本地玩家（IsOwner）时
-    /// 按 EquipTargetSlots/UnequipTargetSlots 空闲情况即时装备或收起挂背，两者均无空间则不拾取；
-    /// 成功后关闭攻击碰撞体（非攻击期防误伤，攻击窗口由动画事件重新启用）。
-    /// 已装备时跳过拾取，交由子类伤害结算（互斥）。</summary>
-    protected virtual void OnTriggerEnter(Collider other)
-    {
-        if (IsEquipped) return;
-        var player = other.GetComponentInParent<Player>();
-        if (player == null || !player.IsOwner) return;
-        if (!player.EquipmentControl.TryPickup(this)) return;
-        DisableAttackCollider();
-    }
 }

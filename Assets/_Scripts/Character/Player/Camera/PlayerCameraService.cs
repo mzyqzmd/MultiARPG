@@ -13,7 +13,7 @@ public class PlayerCameraService : IService
     {
         get
         {
-            if (_cachedCamera == null)
+            if (_cachedCamera == null || !_cachedCamera.isActiveAndEnabled)
                 _cachedCamera = Camera.main;
             return _cachedCamera;
         }

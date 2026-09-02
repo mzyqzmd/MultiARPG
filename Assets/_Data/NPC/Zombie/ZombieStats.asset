@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rotationSpeed: 700
   _normalMoveSpeed: 1.5
-  _maxHealth: 200
+  _maxHealth: 70
   _hitDuration: 0.9
   _physicalArmor: 0
   _magicalArmor: 0

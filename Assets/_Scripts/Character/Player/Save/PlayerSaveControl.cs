@@ -17,7 +17,9 @@ public class PlayerSaveControl : MonoBehaviour
     private void Update()
     {
         // 非世界场景直接跳过：既不累计时长，也不记录出生点（玩家在 MainMenu 就已 spawn，坐标无效）
-        if (_player.SceneControlService.CurrentActiveScene.name != SceneControlService.SceneWorld)
+        if (_player.SceneControlService == null
+            || _player.SceneControlService.CurrentActiveScene == null
+            || _player.SceneControlService.CurrentActiveScene.name != SceneControlService.SceneWorld)
             return;
         _secondsPlayed += Time.deltaTime;
         // 首次进入世界场景记录出生点（默认复活点，之后被存档点覆盖）
@@ -31,14 +33,18 @@ public class PlayerSaveControl : MonoBehaviour
 
     #region 组装存档数据
     /// <summary>组装本机玩家存档：绑定传入 playerId + 当前坐标/朝向 + 当前生命值。</summary>
-    public PlayerSaveData BuildPlayerSaveData(string playerId_) => new()
+    public PlayerSaveData BuildPlayerSaveData(string playerId_)
     {
-        playerId = playerId_,
-        characterName = $"Player:{playerId_}",
-        currentHealth = _player.StatsControl.CurrentHealth,
-        position = transform.position,
-        rotation = transform.rotation,
-    };
+        int health = _player.StatsControl.CurrentHealth;
+        return new()
+        {
+            playerId = playerId_,
+            characterName = $"PlayerCurrentHealth:{health}",
+            currentHealth = health,
+            position = transform.position,
+            rotation = transform.rotation,
+        };
+    }
 
     /// <summary>组装世界状态（仅 Host 调用）：当前激活场景名 + 世界累计时长。</summary>
     public WorldSaveData BuildWorldSaveData() =>

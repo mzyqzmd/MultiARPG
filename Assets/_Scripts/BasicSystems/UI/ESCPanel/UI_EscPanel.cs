@@ -70,7 +70,7 @@ public class UI_EscPanel : UI_BaseView
         panel.Initialize();
     }
 
-    // 保存并退出：Host 经 ReturnToMainMenu 同步切回主菜单（客户端跟随）、Client 断开返回；随后关闭面板
+    // 保存并退出：本机经 ReturnToMainMenu 断开返回主菜单；对端 Client 由 NetworkService 被动断线检测自动返回并弹断线提示
     private void SaveAndQuit()
     {
         _uiService.CloseEscPanel();

@@ -159,34 +159,6 @@ public class PlayerEquipmentControl : MonoBehaviour
     }
     #endregion
 
-    #region 拾取（纯本地）
-    /// <summary>场景物品拾取（即时挂载，不走拔刀动画）：EquipTargetSlots 占用槽全空闲则直接装备；
-    /// 被占则挂到 UnequipTargetSlots（收起态，不登记占用、不改 IsEquipped、不应用动画覆盖，避免顶掉手持武器映射）；
-    /// 两者均无空间返回 false（不拾取，留待背包系统）。收起态仍触发 OnEquipped 供 UI 显示。</summary>
-    public bool TryPickup(IEquippable item_)
-    {
-        if (item_ == null) return false;
-        if (HasFreeSpace(item_.EquipTargetSlots)) { Equip(item_); return true; }
-        if (HasFreeSpace(item_.UnequipTargetSlots))
-        {
-            MountInternal(item_, item_.UnequipTargetSlots, false);
-            item_.RegisterOwner(_player);
-            var mainSlot = item_.UnequipTargetSlots.Length > 0 ? item_.UnequipTargetSlots[0].Slot : EEquipmentSlot.Back;
-            OnEquipped?.Invoke(mainSlot, item_);
-            return true;
-        }
-        return false;
-    }
-
-    /// <summary>给定槽位集合是否可整体挂载：任一 IsOccupying==true 的槽已被占即视为无空间（表现挂不占槽、不阻断）。</summary>
-    private bool HasFreeSpace(EquipSlot[] slots_)
-    {
-        foreach (var e in slots_)
-            if (e.IsOccupying && IsSlotTaken(e.Slot)) return false;
-        return true;
-    }
-    #endregion
-
     #region 查询
     /// <summary>指定槽位当前是否被占用。</summary>
     public bool IsSlotTaken(EEquipmentSlot slot_) =>

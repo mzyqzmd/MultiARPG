@@ -142,7 +142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PopText
+  m_text: Host Disconnect
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ea6547640d46f1e43a99e7b8379147e4, type: 2}
   m_sharedMaterial: {fileID: 6314125127788608930, guid: ea6547640d46f1e43a99e7b8379147e4,

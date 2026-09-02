@@ -627,7 +627,7 @@ MonoBehaviour:
   XYAxis: {fileID: -5459398111035850907, guid: 1ad7cd6be07dd2644beba8b2c012efba, type: 3}
   ZAxis: {fileID: 0}
   _mouseGain: {x: 1, y: 1}
-  _gamepadGain: {x: 2.5, y: 8}
+  _gamepadGain: {x: 4.5, y: 8}
 --- !u!1 &1381660558715320024
 GameObject:
   m_ObjectHideFlags: 0
@@ -2088,7 +2088,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _player: {fileID: 584404837969333627}
-  _defaultWeapon: {fileID: 0}
+  _defaultWeapon: {fileID: 8153371317004542815}
   _leftHand: {fileID: 8580341165961062880}
   _rightHand: {fileID: 664214206033113219}
   _leftHip: {fileID: 1682214006340859936}
@@ -2904,7 +2904,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7425007597203722037}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.13009937, y: 0.27566788, z: -0.037685864, w: 0.95166236}
   m_LocalPosition: {x: -0.000031352043, y: 0, z: 0.000015497208}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3578,3 +3578,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7362707732906852453}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8153371317004542815 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1660438135450198842, guid: cfb918ea2c500804bad4ffafb8e8fbcc,
+    type: 3}
+  m_PrefabInstance: {fileID: 7362707732906852453}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f4116492c3de84d829ba2df52b2927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

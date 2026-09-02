@@ -58,6 +58,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e95a60150e2186842bb9b593c3f55625, type: 3}
     - {fileID: 24300002, guid: 2560deb79e12310428b7376f23454b55, type: 2}
     - {fileID: 8300000, guid: 82f3051f81a8a7e4ab9e48bcbd5ee9e9, type: 3}
+    - {fileID: 8300000, guid: 5ea243f1057fb9344a28225948afa2b7, type: 3}
     - {fileID: 8300000, guid: 1c5c1cacc4d54be478c36ad6b6f80b95, type: 3}
     - {fileID: 8300000, guid: 400a9257f458c744d933543a12d63827, type: 3}
     SerializedBytesString: 
@@ -850,7 +851,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 7
       Data: 
@@ -974,6 +975,67 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MainMenuBGM
+    - Name: $v
+      Entry: 7
+      Data: 32|AudioClipData, Assembly-CSharp
+    - Name: _clips
+      Entry: 7
+      Data: 33|System.Collections.Generic.List`1[[UnityEngine.AudioClip, UnityEngine.AudioModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 10
+      Data: 42
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _priority
+      Entry: 3
+      Data: 128
+    - Name: _isRandomVolume
+      Entry: 5
+      Data: false
+    - Name: _volume
+      Entry: 4
+      Data: 0.6
+    - Name: _volumeRandomMin
+      Entry: 4
+      Data: 0.1
+    - Name: _isRandomPitch
+      Entry: 5
+      Data: false
+    - Name: _pitch
+      Entry: 4
+      Data: 1
+    - Name: _pitchRandomMin
+      Entry: 4
+      Data: 0.1
+    - Name: _spatialBlend
+      Entry: 4
+      Data: 0
+    - Name: _mixerGroup
+      Entry: 10
+      Data: 40
+    - Name: _loop
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -990,11 +1052,11 @@ MonoBehaviour:
       Data: General
     - Name: $v
       Entry: 7
-      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[AudioClipData,
+      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[AudioClipData,
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 33|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 35|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1010,20 +1072,20 @@ MonoBehaviour:
       Data: BloodSplatter
     - Name: $v
       Entry: 7
-      Data: 34|AudioClipData, Assembly-CSharp
+      Data: 36|AudioClipData, Assembly-CSharp
     - Name: _clips
       Entry: 7
-      Data: 35|System.Collections.Generic.List`1[[UnityEngine.AudioClip, UnityEngine.AudioModule]],
+      Data: 37|System.Collections.Generic.List`1[[UnityEngine.AudioClip, UnityEngine.AudioModule]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 10
-      Data: 42
+      Data: 43
     - Name: 
       Entry: 10
-      Data: 43
+      Data: 44
     - Name: 
       Entry: 13
       Data: 

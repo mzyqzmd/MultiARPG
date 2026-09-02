@@ -25,9 +25,8 @@ public class Weapon_Rapier : BaseWeapon
     private void Update() =>
         _damageableInterval = Mathf.Max(0f, _damageableInterval - Time.deltaTime);
 
-    protected override void OnTriggerEnter(Collider other_)
+    protected void OnTriggerEnter(Collider other_)
     {
-        base.OnTriggerEnter(other_);
         if (!IsEquipped) return;
         //攻击命中窗口外（碰撞体未启用）触碰直接跳过结算，避免走路蹭到目标误伤。
         if (!_attackCollider.enabled) return;
@@ -39,11 +38,8 @@ public class Weapon_Rapier : BaseWeapon
         var source = Owner.StatsControl;
         if (ReferenceEquals(target, source)) return;
 
-        if (IsEquipped)
-        {
-            if (_damageableInterval > 0f) return;
-            _damageableInterval = _meleeCooldown;
-        }
+        if (_damageableInterval > 0f) return;
+        _damageableInterval = _meleeCooldown;
 
         //攻击者本机命中瞬间立即本地播受击表现（按目标角色表现配置取 key，飙血 VFX + 受伤音效，零网络延迟）。
         var contactPoint = other_.ClosestPoint(transform.position);

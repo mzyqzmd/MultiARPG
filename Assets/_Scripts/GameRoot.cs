@@ -17,6 +17,9 @@ public class GameRoot : MonoBehaviour
     [SerializeField] private NetworkHub _networkHubPrefab;
 
     private static bool _alive;
+    // Awake 被 _alive 守卫早退的重复实例不置该标志，使其 OnDestroy 跳过整套注销链，
+    // 避免把持久实例登记进 Services 的服务引用清空（Scene_MainMenu 内嵌了第二颗 GameRoot）
+    private bool _initialized;
     private SettingsSaveService _settingsService;
     private AudioService _audioService;
     private VFXService _vfxService;
@@ -55,10 +58,12 @@ public class GameRoot : MonoBehaviour
         RegisterSceneControlService();
         RegisterPlayerCameraService();
         RegisterAINpcService();
+        _initialized = true;
     }
 
     private void OnDestroy()
     {
+        if (!_initialized) return;
         _alive = false;
         UnregisterPlayerCameraService();
         UnregisterSceneControlService();
@@ -196,8 +201,11 @@ public class GameRoot : MonoBehaviour
 
     private void UnregisterInputService()
     {
-        _inputService.OnESCTriggered -= HandleESCTriggered;
-        _inputService?.Dispose();
+        if (_inputService != null)
+        {
+            _inputService.OnESCTriggered -= HandleESCTriggered;
+            _inputService.Dispose();
+        }
         Services.Unregister<InputService>();
     }
 
@@ -218,8 +226,8 @@ public class GameRoot : MonoBehaviour
     #region 注册/注销场景控制服务
     public void RegisterSceneControlService()
     {
-        // InputService / UIService / NetworkService 已在本方法之前注册，可安全注入
-        _sceneControlService = new SceneControlService(_inputService, _uiService, _networkService);
+        // InputService / UIService / NetworkService / AudioService 已在本方法之前注册，可安全注入
+        _sceneControlService = new SceneControlService(_inputService, _uiService, _networkService, _audioService);
         Services.Register(_sceneControlService);
     }
 

@@ -19,8 +19,9 @@ public abstract class PlayerActionState : PlayerBaseState<PlayerActionState>
     #region 由相机朝向与输入向量算出水平移动方向（过渡期用缓存锁定朝向，否则实时）
     protected Vector3 GetMoveDirection(Vector2 input_)
     {
-        Vector3 moveDir = _player.PlayerCameraService.MoveForward * input_.y +
-            _player.PlayerCameraService.MoveRight * input_.x;
+        var cam = _player.PlayerCameraService;
+        if (cam == null) return Vector3.zero;
+        Vector3 moveDir = cam.MoveForward * input_.y + cam.MoveRight * input_.x;
         moveDir.y = 0;
         return moveDir.normalized;
     }

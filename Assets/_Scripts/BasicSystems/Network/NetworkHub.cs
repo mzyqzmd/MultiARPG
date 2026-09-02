@@ -48,6 +48,8 @@ public class NetworkHub : NetworkBehaviour
     {
         if (Instance == this)
             Instance = null;
+        _clientSaves.Clear();
+        _saveTimers.Clear();
         if (IsServer)
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
     }

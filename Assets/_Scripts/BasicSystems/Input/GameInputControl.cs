@@ -762,17 +762,6 @@ public partial class @GameInputControl: IInputActionCollection2, IDisposable
                     ""action"": ""ClickSelectedButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6cee931d-e1fa-4c1b-9fa8-8730d7b75e83"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""ClickSelectedButton"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         }
