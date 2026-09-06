@@ -1,6 +1,6 @@
 # MultiARPG
 
-> 🏁 **项目状态：已定版（Final）**。这是一个**用于技术展示的架构实践项目**——数据驱动配置、分层状态机、服务容器组合根、领域逻辑与网络层的解耦实践。**当前版本为最终版本，不再继续开发**；架构质量以根目录 [`架构分析报告.md`](架构分析报告.md)（v24 终版快照，2026-09-02）的全量逐文件审阅为准，遗留问题已全量登记、随终版归档。
+> 🏁 **项目状态：已定版（Final）**。这是一个**用于技术展示的架构实践项目**——数据驱动配置、分层状态机、服务容器组合根、领域逻辑与网络层的解耦实践。**当前版本为最终版本，不再继续开发**。代码最新提交 `0b41c77d`（「完善所有游戏流程」，工作树干净）；架构质量以根目录 [`架构分析报告.md`](架构分析报告.md)（v24 终版快照 2026-09-02，v25 现状复核 2026-09-04 确认结论不变）的全量逐文件审阅为准，遗留问题已全量登记、随终版归档。
 
 > A Unity multiplayer ARPG sandbox exploring data-driven, decoupled architecture — hierarchical FSM, ScriptableObject-driven configuration, and a single centralized network surface.
 
@@ -226,7 +226,7 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | GameRoot.cs（根目录组合根） | 1 | 271 |
 | **合计** | **163** | **10266** |
 
-> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 8870 行，零编辑器工具文件、零 >300 行手写文件（最大 `BossZombie` 279 行 / `NetworkHub` 269 行）。AI 模块（42 文件）为 NodeCanvas 行为树驱动子系统。完整逐文件审阅见 [`架构分析报告.md`](架构分析报告.md)（v24 终版，2026-09-02）。
+> 其中 `GameInputControl.cs`（1396 行）为 Input System 自动生成代码，手写代码约 8870 行，零编辑器工具文件、零 >300 行手写文件（最大 `BossZombie` 279 行 / `NetworkHub` 269 行）。AI 模块（42 文件）为 NodeCanvas 行为树驱动子系统。完整逐文件审阅见 [`架构分析报告.md`](架构分析报告.md)（v24 终版，2026-09-02；v25 复核 2026-09-04 确认不变）。
 
 ## 终版状态
 
@@ -235,6 +235,20 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 | ✅ 已具备 | SO 数据驱动体系（含表现层 `SO_*Presentation`）；组合根与服务容器（12 个服务 + 防双实例）；分层状态机（含击晕链路）；零 GC 事件总线；集中式网络 Hub（Boss 有 1 处 ClientRpc 破例）；客户端权威变换/动画同步；**被动断线检测闭环**；Host 单一数据源存档；MVP 事件驱动 UI；锁定目标系统；效果与属性修饰器；VFX / 音频服务；对象池与计时器；AI 子系统（NodeCanvas 行为树驱动）；BossZombie 僵尸 Boss 两阶段（Host 权威 AI，血量经 `_syncedHealth` NV 跨端同步）；`_MultiARPG.Utility` 程序集隔离；World FogWall 单向门 |
 | ⚠️ 已知问题（随终版归档，不再修复） | 详见 [`架构分析报告.md`](架构分析报告.md) §9 遗留债务清单。要点：Boss 转阶段演出窗口内打穿血量会导致 Boss 无法死亡且雾墙不开（P1，触发条件为 6.5s 窗口内打出过量伤害）；存档槽名显示调试口径文本（P2）；耐力上限变更 UI 错值（P2）；若干热路径调试 Log / 死代码 / 冗余 using（P3） |
 | 🏁 定版 | **当前版本为最终版本，不再继续开发**。架构评分 **82 / 100（B 档）**，纯设计分 75.5/94（≈80%），九维度：分层 12.5 / 边界 12.0 / SRP 9.5 / 数据 12.0 / 解耦 11.0 / 网络 9.0 / 可测 4.0 / 卫生 5.5 / 构建 6.0。版本演进：v15 AI 子系统 → v16/v17 AI 内聚重构 → v18 物品/武器接口化 → v19 表现层 Presentation 化 + 装备拾取 → v20 BossZombie 框架 + Utility asmdef + FogWall → v22 伤害链路数据驱动化 → v23 BossZombie 两阶段 + 击晕链路 + Boss 血条 → **v24 终版（Item 模块删除 / 被动断线闭环 / 组合根防双实例 / 全量 163 文件逐行复审定档）** |
+
+## 后续计划
+
+项目已定版（Final），**当前不再安排新功能开发**。以下为若未来重启开发时的**优先级 backlog**（均来自 [`架构分析报告.md`](架构分析报告.md) §9 遗留债务清单，当前全部登记为已知问题、未执行）：
+
+| 优先级 | 事项 | 位置 | 成本 |
+|--------|------|------|------|
+| 🔴 P1 | **Boss 转阶段死亡缺口**：演出窗口（6.5s）内打穿血量 → Boss 永久不死 + 雾墙永不开（困房） | `BossZombie.cs:142 / 163` | 一行（`TransitionToPhase2` 末尾补 `if (_statsControl.IsDead) Die()`） |
+| 🟡 P2 | 存档槽名显示调试文本（`characterName` 写为 `"PlayerCurrentHealth:{health}"`） | `PlayerSaveControl.cs:42` | 一行（恢复 `"Player:{playerId_}"` 语义） |
+| 🟡 P2 | `PlayerStatsControl` 复制粘贴 bug（耐力上限变更时 UI 错值） | `PlayerStatsControl.cs:159-160` | 一行（`CurrentHealth` → `CurrentStamina`） |
+| 🟢 P3 | 霸体死字段（零调用者）/ 死代码 ×2 / 冗余 `using` ×4 / 过期注释 ×3 / 热路径调试 Log | 多处（详见 §7/§9） | 删 ~40 行 |
+| — | 若重启，可评估的设计级扩展（非缺陷）：掉落 / 任务系统接入、第二种 Boss、技能连招系统复活、补 `Zombie`/`Player` 血量跨端 NV、自动化测试程序集 | — | — |
+
+> 架构骨架（组合根 / 服务容器 / 数据驱动 / Hub 收口 / 分层 FSM）完整可复用，重启开发可直接在此基础上迭代，无需重构地基。
 
 ## 已知限制
 
@@ -249,7 +263,7 @@ git clone https://github.com/mzyqzmd/MultiARPG.git
 
 ## 架构文档
 
-仓库根目录的 [`架构分析报告.md`](架构分析报告.md) 是一份**全量逐文件架构审阅报告**（v24 终版：对 `Assets/_Scripts` 全部 163 个文件的逐一源码审阅），包含九维度评分（分层 / 边界 / SRP / 数据驱动 / 解耦 / 网络 / 可测试性 / 代码卫生 / 构建）、依赖关系分析、P0–P3 分级问题清单与终版遗留债务登记。
+仓库根目录的 [`架构分析报告.md`](架构分析报告.md) 是一份**全量逐文件架构审阅报告**（v24 终版：对 `Assets/_Scripts` 全部 163 个文件的逐一源码审阅；v25 现状复核 2026-09-04 确认结论不变），包含九维度评分（分层 / 边界 / SRP / 数据驱动 / 解耦 / 网络 / 可测试性 / 代码卫生 / 构建）、依赖关系分析、P0–P3 分级问题清单与终版遗留债务登记。
 
 ## 许可与第三方资产
 
